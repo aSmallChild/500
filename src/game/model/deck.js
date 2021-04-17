@@ -1,0 +1,121 @@
+import Card from './card.js';
+import Suit from './suit.js';
+
+export default class Deck {
+    constructor(cards = Deck.buildStandardDeck(), config = null) {
+        this.cards = cards;
+        this.config = config;
+    }
+
+    [Symbol.iterator]() { return this.cards.values(); }
+
+    get size() {
+        return this.cards.length;
+    }
+
+    draw() {
+        return this.cards.shift();
+    }
+
+    push(card) {
+        this.cards.push(card);
+    }
+
+    shuffle() {
+        for (let i = this.size - 1; i > 0; i--) {
+            const newIndex = Math.floor(Math.random() * (i + 1));
+            const oldValue = this.cards[newIndex];
+            this.cards[newIndex] = this.cards[i];
+            this.cards[i] = oldValue;
+        }
+    }
+
+    static sort(cards) {
+        cards.sort((a, b) => {
+            if (a.value === Card.JOKER) return b.value !== Card.JOKER ? 1 : 0; // all jokers are equal
+            if (b.value === Card.JOKER) return -1;
+
+            const aSuitIndex = Suit.ALL.indexOf(a.suit);
+            const bSuitIndex = Suit.ALL.indexOf(b.suit);
+            if (aSuitIndex < bSuitIndex) return 1;
+            if (aSuitIndex > bSuitIndex) return -1;
+
+            if (a.value === b.value) return 0; // the cards are unequal in any further case
+
+            // picture cards
+            const aPictureIndex = Card.SUIT_PICTURE_CARDS.indexOf(a.value);
+            const bPictureIndex = Card.SUIT_PICTURE_CARDS.indexOf(b.value);
+            if (aPictureIndex >= 0 && bPictureIndex < 0) return 1;
+            if (bPictureIndex >= 0 && aPictureIndex < 0) return -1;
+            if (aPictureIndex >= 0 && bPictureIndex >= 0) return aPictureIndex < bPictureIndex ? 1 : -1;
+
+            // number cards
+            return a.value > b.value ? 1 : -1;
+        });
+    }
+
+    static buildDeck(config) {
+        const totalHands = config.totalHands ?? 4;
+        const totalJokers = 1;
+        const kittySize = 3;
+        if ((kittySize - totalJokers) % 2) throw new Error('Unsupported kitty/joker configuration (wont correctly set lowest/highest number cards)');
+        const cardsPerPlayer = 10;
+        const pictureCardsPerSuit = Card.SUIT_PICTURE_CARDS.length;
+        const totalSuits = Suit.ALL.length;
+        const totalCards = (totalHands < 3 ? 4 : totalHands) * cardsPerPlayer + kittySize;
+        const totalNumberCards = totalCards - (pictureCardsPerSuit * totalSuits + totalJokers);
+        const cardsPerBlackSuit = Math.floor(totalNumberCards / totalSuits);
+        const cardsPerRedSuit = cardsPerBlackSuit + (totalNumberCards % totalSuits ? 1 : 0);
+
+        const [lowestRedCard, highestRedCard] = Deck.getStartEndNumberCards(cardsPerRedSuit);
+        const [lowestBlackCard, highestBlackCard] = Deck.getStartEndNumberCards(cardsPerBlackSuit);
+
+        return new Deck([
+            new Card(null, Card.JOKER),
+            ...Deck.buildSuitPictureCards(Suit.HEART), ...Deck.buildSuitNumberCards(Suit.HEART, lowestRedCard, highestRedCard),
+            ...Deck.buildSuitPictureCards(Suit.DIAMOND), ...Deck.buildSuitNumberCards(Suit.DIAMOND, lowestRedCard, highestRedCard),
+            ...Deck.buildSuitPictureCards(Suit.CLUB), ...Deck.buildSuitNumberCards(Suit.CLUB, lowestBlackCard, highestBlackCard),
+            ...Deck.buildSuitPictureCards(Suit.SPADE), ...Deck.buildSuitNumberCards(Suit.SPADE, lowestBlackCard, highestBlackCard),
+        ], config);
+    }
+
+    static getStartEndNumberCards(numberOfNumberCards) {
+        let lowest = 2;
+        let highest = 10;
+        const target = highest - lowest + 1;
+        if (numberOfNumberCards < target) {
+            lowest += target - numberOfNumberCards;
+        }
+
+        if (numberOfNumberCards > target) {
+            highest += numberOfNumberCards - target;
+        }
+
+        return [lowest, highest];
+    }
+
+    static buildStandardDeck() {
+        let cards = [];
+        for (const suit of Suit.ALL) cards = [...cards, ...Deck.buildSuitPictureCards(suit), ...Deck.buildSuitNumberCards(suit)];
+        cards.push(new Card(null, Card.JOKER));
+        return cards;
+    }
+
+    static buildSuitPictureCards(suit) {
+        const cards = [];
+        for (const value of Card.SUIT_PICTURE_CARDS) {
+            cards.push(new Card(suit, value));
+        }
+        return cards;
+    }
+
+    static buildSuitNumberCards(suit, lowest = 2, highest = 10) {
+        const cards = [];
+        for (let i = highest; i >= lowest; i--) {
+            cards.push(new Card(suit, i));
+        }
+        return cards;
+    }
+}
+
+export class Hand extends Deck {}

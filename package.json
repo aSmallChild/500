@@ -1,0 +1,16 @@
+{
+  "type": "module",
+  "name": "500",
+  "version": "1.0.0",
+  "main": "src/500.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "should": "^13.2.3",
+    "mocha": "^8.2.1"
+  }
+}
