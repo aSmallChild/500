@@ -43,7 +43,15 @@ export default class Card {
     }
 
     toString() {
-        return this.value + (this.suit || '');
+        return (this.suit || '') + this.value;
+    }
+
+    static fromString(str) {
+        if (str === Card.JOKER) return new Card(null, Card.JOKER);
+        let [suit, ...value] = str;
+        value = value.join('');
+        if (!isNaN(parseInt(value))) value = parseInt(value);
+        return new Card(suit, value);
     }
 
     valueOf() {
