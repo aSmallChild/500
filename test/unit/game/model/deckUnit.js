@@ -1,4 +1,6 @@
 import Deck from '../../../../src/game/model/deck.js';
+import Card from '../../../../src/game/model/card.js';
+import Suit from '../../../../src/game/model/suit.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
@@ -106,6 +108,30 @@ describe('Deck Unit', function() {
             }
             const averageUnmovedPortion = unmovedPortion / iterations;
             (averageUnmovedPortion).should.be.lessThan(1 - minimumMovedPortion, `in ${iterations} shuffles ${Math.round(averageUnmovedPortion * 1e4) / 1e2}% of cards did not move more than ${positionsToMove} positions`);
+        });
+    });
+
+    describe('toString()', function() {
+        it(`should produce a full deck by default`, function() {
+            const deck = new Deck();
+            (deck + '').should.equal('?♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
+        });
+        it(`should produce correct ranges`, function() {
+            const deck = new Deck([
+                new Card(Suit.HEART, Card.ACE),
+                new Card(Suit.HEART, Card.JACK),
+                new Card(Suit.HEART, 20),
+                new Card(Suit.HEART, 19),
+                new Card(Suit.HEART, 18),
+                new Card(Suit.HEART, 16),
+                new Card(Suit.CLUB, 3),
+                new Card(Suit.SPADE, 5),
+                new Card(Suit.SPADE, 4),
+                new Card(Suit.SPADE, 3),
+                new Card(Suit.SPADE, 2),
+            ]);
+            deck.shuffle();
+            (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
         });
     });
 });
