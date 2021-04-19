@@ -114,7 +114,7 @@ describe('Deck Unit', function() {
     describe('toString()', function() {
         it(`should produce a full deck by default`, function() {
             const deck = new Deck();
-            (deck + '').should.equal('?♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
+            (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
         });
         it(`should produce correct ranges`, function() {
             const deck = new Deck([
@@ -131,6 +131,17 @@ describe('Deck Unit', function() {
                 new Card(Suit.SPADE, 2),
             ]);
             deck.shuffle();
+            (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
+        });
+    });
+
+    describe('fromString()', function() {
+        it(`should produce a full deck by default`, function() {
+            const deck = Deck.fromString('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
+            (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
+        });
+        it(`should produce correct ranges`, function() {
+            const deck = Deck.fromString('♥AJ20-18,16♣3♠5-2');
             (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
         });
     });

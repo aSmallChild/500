@@ -1,7 +1,7 @@
 import Suit from './suit.js';
 
 export default class Card {
-    static JOKER = '?';
+    static JOKER = '$';
     static ACE = 'A';
     static KING = 'K';
     static QUEEN = 'Q';

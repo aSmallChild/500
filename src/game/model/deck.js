@@ -37,8 +37,9 @@ export default class Deck {
         let str = cards[0].value === Card.JOKER ? Card.JOKER : '';
         let i = str.length;
         let previousValue;
-        let range = [], applyRange = () => {
-            const r = range.splice(0, range.length)
+        const range = [];
+        const applyRange = () => {
+            const r = range.splice(0, range.length);
             if (!r.length) return '';
             let str = typeof previousValue === 'number' ? ',' : '';
             if (r.length < 3) return str + r.join(',');
@@ -49,16 +50,13 @@ export default class Deck {
         for (const suit of Suit.ALL) {
             let suitStr = '';
             previousValue = null;
-            // ranges are in descending order
             while (i < cards.length && cards[i].suit === suit) {
                 const card = cards[i++];
                 if (typeof card.value === 'number') {
-                    if (!range.length || range[range.length - 1] - 1 === card.value) {
-                        range.push(card.value);
-                    } else {
+                    if (range.length && range[range.length - 1] - 1 !== card.value && range[range.length - 1] + 1 !== card.value) {
                         suitStr += applyRange();
-                        range.push(card.value);
                     }
+                    range.push(card.value);
                 } else {
                     suitStr += card.value;
                     previousValue = card.value;
@@ -70,7 +68,27 @@ export default class Deck {
     }
 
     static fromString(str) {
-        // todo
+        const cards = [];
+        let suit = null, previousValue = null;
+        for (let x of str.match(/(\d+|.)/g)) {
+            if (x === Card.JOKER) cards.push(new Card(null, x));
+            else if (Suit.ALL.indexOf(x) >= 0) suit = x;
+            else if (x === '-' || x === ',') previousValue = x;
+            else if (previousValue === '-') {
+                let value = parseInt(cards[cards.length - 1].value);
+                const increment = x > value ? 1 : -1;
+                for (value += increment; increment > 0 ? x >= value : x <= value; value += increment) {
+                    cards.push(new Card(suit, value));
+                }
+                previousValue = value;
+            } else {
+                const number = parseInt(x);
+                if (!isNaN) x = number;
+                cards.push(new Card(suit, x));
+                previousValue = x;
+            }
+        }
+        return new Deck(cards);
     }
 
     sort(compare) {
