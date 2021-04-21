@@ -120,61 +120,53 @@ export default class Deck {
 
     static buildDeck(config) {
         const totalHands = config.totalHands ?? 4;
-        const totalJokers = 1;
-        const kittySize = 3;
-        if ((kittySize - totalJokers) % 2) throw new Error('Unsupported kitty/joker configuration (wont correctly set lowest/highest number cards)');
-        const cardsPerPlayer = 10;
-        const pictureCardsPerSuit = Card.SUIT_PICTURE_CARDS.length;
-        const totalSuits = Suit.ALL.length;
+        const totalJokers = config.totalJokers ?? 1;
+        const kittySize = config.kittySize ?? 3;
+        const cardsPerPlayer = config.cardsPerPlayer ?? 10;
+        const pictureCards = config.pictureCards ?? Card.SUIT_PICTURE_CARDS;
+        const suits = config.suits ?? Suit.ALL;
         const totalCards = (totalHands < 3 ? 4 : totalHands) * cardsPerPlayer + kittySize;
-        const totalNumberCards = totalCards - (pictureCardsPerSuit * totalSuits + totalJokers);
-        const cardsPerBlackSuit = Math.floor(totalNumberCards / totalSuits);
-        const cardsPerRedSuit = cardsPerBlackSuit + (totalNumberCards % totalSuits ? 1 : 0);
+        const totalNumberCards = totalCards - (pictureCards.length * suits.length + totalJokers);
+        const cardsPerSuit = Math.floor(totalNumberCards / suits.length);
+        let unallocatedCards = totalNumberCards % suits.length;
 
-        const [lowestRedCard, highestRedCard] = Deck.getStartEndNumberCards(cardsPerRedSuit);
-        const [lowestBlackCard, highestBlackCard] = Deck.getStartEndNumberCards(cardsPerBlackSuit);
-
-        return new Deck([
-            new Card(null, Card.JOKER),
-            ...Deck.buildSuitPictureCards(Suit.HEART), ...Deck.buildSuitNumberCards(Suit.HEART, lowestRedCard, highestRedCard),
-            ...Deck.buildSuitPictureCards(Suit.DIAMOND), ...Deck.buildSuitNumberCards(Suit.DIAMOND, lowestRedCard, highestRedCard),
-            ...Deck.buildSuitPictureCards(Suit.CLUB), ...Deck.buildSuitNumberCards(Suit.CLUB, lowestBlackCard, highestBlackCard),
-            ...Deck.buildSuitPictureCards(Suit.SPADE), ...Deck.buildSuitNumberCards(Suit.SPADE, lowestBlackCard, highestBlackCard),
-        ], config);
+        const cards = [new Card(null, Card.JOKER)];
+        for (const suit of Suit.ALL) {
+            const [lowest, highest] = Deck.getStartEndNumberCards(cardsPerSuit + (unallocatedCards-- > 0));
+            Deck.buildSuitPictureCards(suit, pictureCards, cards);
+            Deck.buildSuitNumberCards(suit, lowest, highest, cards);
+        }
+        return new Deck(cards, config);
     }
 
-    static getStartEndNumberCards(numberOfNumberCards) {
+    static getStartEndNumberCards(numberOfNumberCards = 9) {
         let lowest = 2;
         let highest = 10;
         const target = highest - lowest + 1;
-        if (numberOfNumberCards < target) {
-            lowest += target - numberOfNumberCards;
-        }
-
-        if (numberOfNumberCards > target) {
-            highest += numberOfNumberCards - target;
-        }
-
+        if (numberOfNumberCards < target) lowest += target - numberOfNumberCards;
+        if (numberOfNumberCards > target) highest += numberOfNumberCards - target;
         return [lowest, highest];
     }
 
     static buildStandardDeck() {
         let cards = [];
-        for (const suit of Suit.ALL) cards = [...cards, ...Deck.buildSuitPictureCards(suit), ...Deck.buildSuitNumberCards(suit)];
+        const [lowest, highest] = Deck.getStartEndNumberCards();
+        for (const suit of Suit.ALL) {
+            Deck.buildSuitPictureCards(suit, Card.SUIT_PICTURE_CARDS, cards);
+            Deck.buildSuitNumberCards(suit, lowest, highest, cards);
+        }
         cards.push(new Card(null, Card.JOKER));
         return cards;
     }
 
-    static buildSuitPictureCards(suit) {
-        const cards = [];
-        for (const value of Card.SUIT_PICTURE_CARDS) {
+    static buildSuitPictureCards(suit, pictureCards, cards = []) {
+        for (const value of pictureCards) {
             cards.push(new Card(suit, value));
         }
         return cards;
     }
 
-    static buildSuitNumberCards(suit, lowest = 2, highest = 10) {
-        const cards = [];
+    static buildSuitNumberCards(suit, lowest, highest, cards = []) {
         for (let i = highest; i >= lowest; i--) {
             cards.push(new Card(suit, i));
         }
