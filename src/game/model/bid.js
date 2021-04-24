@@ -36,6 +36,11 @@ export default class Bid {
             (this.antiTrumps ? '!' + this.antiTrumps : '');
     }
 
+    static compareBids(a, b) {
+        if (a.points === b.points) return 0;
+        return a.points > b.points ? 1 : -1;
+    }
+
     static fromString(str) {
         let [points, call] = str.split(':');
         points = parseInt(points);
@@ -44,6 +49,30 @@ export default class Bid {
         let {tricks, trumps, antiTrumps} = regex.exec(call).groups;
         tricks = parseInt(tricks);
         return new Bid(tricks, trumps || null, antiTrumps || null, null, points);
+    }
+
+    static getSpecialBids(specialBids = Bid.SPECIAL_BIDS) {
+        const bids = [];
+        for (const x in specialBids) {
+            bids.push(new Bid(null, null, null, x, specialBids[x].points));
+        }
+        return bids;
+    }
+
+    static getAvondaleBids(cardsPerPlayer = 10, suitsHighToLow = Suit.ALL, specialBids = Bid.SPECIAL_BIDS) {
+        const minTricks = parseInt(10 / 2) + 1;
+        const suits = suitsHighToLow.slice().reverse();
+        const bids = Bid.getSpecialBids(specialBids);
+        let points = 40;
+        for (let tricks = minTricks; tricks <= cardsPerPlayer; tricks++) {
+            for (const suit of suits) {
+                bids.push(new Bid(tricks, suit, null, null, points));
+                points += 20;
+            }
+            bids.push(new Bid(tricks, null, null, null, points));
+            points += 20;
+        }
+        return bids.sort(Bid.compareBids);
     }
 }
 

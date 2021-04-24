@@ -26,6 +26,15 @@ describe('Card Unit', function() {
             });
         }
     });
+    describe('avondaleBids()', function() {
+        const bids = Bid.getAvondaleBids();
+        for (const bid of bids) {
+            console.log('' + bid);
+        }
+        it(`should have 28 bids'`, function() {
+            bids.length.should.equal(28);
+        });
+    });
 });
 
 function bidsDeepEqual(actual, expected) {
