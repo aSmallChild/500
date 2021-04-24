@@ -17,14 +17,6 @@ export default class Card {
         return this.value === Card.JOKER || Card.SUIT_PICTURE_CARDS.indexOf(this.value) >= 0;
     }
 
-    static getSuitName(suit) {
-        if (suit === Suit.SPADE) return 'Spade';
-        else if (suit === Suit.CLUB) return 'Club';
-        else if (suit === Suit.DIAMOND) return 'Diamond';
-        else if (suit === Suit.HEART) return 'Heart';
-        else return '';
-    }
-
     static getValueName(value) {
         if (value === Card.ACE) return 'Ace';
         else if (value === Card.KING) return 'King';
@@ -36,7 +28,7 @@ export default class Card {
 
     getName() {
         if (this.suit) {
-            return `${Card.getValueName(this.value)} of ${Card.getSuitName(this.suit)}s`;
+            return `${Card.getValueName(this.value)} of ${Suit.getName(this.suit)}s`;
         }
 
         return Card.getValueName(this.value);
