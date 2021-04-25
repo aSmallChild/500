@@ -1,9 +1,14 @@
 import Deck from '../../../../src/game/model/Deck.js';
 import Card from '../../../../src/game/model/Card.js';
-import Suit from '../../../../src/game/model/Suit.js';
+import SuitCollection from '../../../../src/game/model/SuitCollection.js';
+import OrdinaryNormalDeck from '../../../../src/game/constants/OrdinaryNormalDeck.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
+const suits = new SuitCollection(OrdinaryNormalDeck.SUITS_HIGH_TO_LOW);
+const heart = suits.getSuit('♥');
+const club = suits.getSuit('♣');
+const spade = suits.getSuit('♠');
 describe('Deck Unit', function() {
     describe('buildDeck()', function() {
         for (const config of [
@@ -59,7 +64,7 @@ describe('Deck Unit', function() {
             },
         ]) {
             describe(`${config.totalHands} handed`, function() {
-                const deck = Deck.buildDeck(config);
+                const deck = Deck.buildDeck(config, suits);
                 it(`should have ${config._totalCards} cards`, function() {
                     deck.size.should.equal(config._totalCards);
                 });
@@ -75,7 +80,7 @@ describe('Deck Unit', function() {
     });
 
     function testShuffle(positionsToMove) {
-        const deck = Deck.buildDeck({totalHands: 5});
+        const deck = Deck.buildDeck({totalHands: 5}, suits);
         const originalOrder = [];
         for (const card of deck) {
             originalOrder.push(card.toString());
@@ -113,23 +118,23 @@ describe('Deck Unit', function() {
 
     describe('toString()', function() {
         it(`should produce a full deck by default`, function() {
-            const deck = new Deck();
+            const deck = new Deck(Deck.buildStandardDeck(suits), suits);
             (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
         });
         it(`should produce correct ranges`, function() {
             const deck = new Deck([
-                new Card(Suit.HEART, Card.ACE),
-                new Card(Suit.HEART, Card.JACK),
-                new Card(Suit.HEART, 20),
-                new Card(Suit.HEART, 19),
-                new Card(Suit.HEART, 18),
-                new Card(Suit.HEART, 16),
-                new Card(Suit.CLUB, 3),
-                new Card(Suit.SPADE, 5),
-                new Card(Suit.SPADE, 4),
-                new Card(Suit.SPADE, 3),
-                new Card(Suit.SPADE, 2),
-            ]);
+                new Card(heart, Card.ACE),
+                new Card(heart, Card.JACK),
+                new Card(heart, 20),
+                new Card(heart, 19),
+                new Card(heart, 18),
+                new Card(heart, 16),
+                new Card(club, 3),
+                new Card(spade, 5),
+                new Card(spade, 4),
+                new Card(spade, 3),
+                new Card(spade, 2),
+            ], suits);
             deck.shuffle();
             (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
         });
@@ -137,11 +142,11 @@ describe('Deck Unit', function() {
 
     describe('fromString()', function() {
         it(`should produce a full deck by default`, function() {
-            const deck = Deck.fromString('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
+            const deck = Deck.fromString('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2', suits);
             (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
         });
         it(`should produce correct ranges`, function() {
-            const deck = Deck.fromString('♥AJ20-18,16♣3♠5-2');
+            const deck = Deck.fromString('♥AJ20-18,16♣3♠5-2', suits);
             (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
         });
     });

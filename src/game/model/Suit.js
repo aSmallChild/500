@@ -1,15 +1,19 @@
 export default class Suit {
-    static HEART = '♥';
-    static DIAMOND = '♦';
-    static CLUB = '♣';
-    static SPADE = '♠';
-    static ALL = [Suit.HEART, Suit.DIAMOND, Suit.CLUB, Suit.SPADE];
+    constructor(symbol, name) {
+        this.symbol = symbol;
+        this.name = name;
+    }
 
-    static getName(suit) {
-        if (suit === Suit.HEART) return 'Heart';
-        if (suit === Suit.DIAMOND) return 'Diamond';
-        if (suit === Suit.CLUB) return 'Club';
-        if (suit === Suit.SPADE) return 'Spade';
-        return null;
+    valueOf() {
+        return this.toString();
+    }
+
+    toString() {
+        return this.symbol + ':' + this.name;
+    }
+
+    static fromString(str) {
+        const [symbol, name] = str.split(':');
+        return new Suit(symbol, name);
     }
 }

@@ -1,5 +1,3 @@
-import Suit from './Suit.js';
-
 export default class Card {
     static JOKER = '$';
     static ACE = 'A';
@@ -28,22 +26,22 @@ export default class Card {
 
     getName() {
         if (this.suit) {
-            return `${Card.getValueName(this.value)} of ${Suit.getName(this.suit)}s`;
+            return `${Card.getValueName(this.value)} of ${this.suit.name}s`;
         }
 
         return Card.getValueName(this.value);
     }
 
     toString() {
-        return (this.suit || '') + this.value;
+        return (this.suit?.symbol || '') + this.value;
     }
 
-    static fromString(str) {
+    static fromString(str, suits) {
         if (str === Card.JOKER) return new Card(null, Card.JOKER);
         let [suit, ...value] = str;
         value = value.join('');
         if (!isNaN(parseInt(value))) value = parseInt(value);
-        return new Card(suit, value);
+        return new Card(suits.getSuit(suit), value);
     }
 
     valueOf() {

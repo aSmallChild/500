@@ -1,16 +1,18 @@
-import Suit from '../../../../src/game/model/Suit.js';
 import Bid from '../../../../src/game/model/Bid.js';
+import SuitCollection from '../../../../src/game/model/SuitCollection.js';
+import OrdinaryNormalDeck from '../../../../src/game/constants/OrdinaryNormalDeck.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
+const suits = new SuitCollection(OrdinaryNormalDeck.SUITS_HIGH_TO_LOW);
 const testBids = [
-    ['250:M', new Bid(null, null, null, 'M', 250)],
-    ['40:6♠', new Bid(6, Suit.SPADE, null, null, 40)],
-    ['140:7♠!♣', new Bid(7, Suit.SPADE, Suit.CLUB, null, 140)],
-    ['100:6', new Bid(6, null, null, null, 100)],
-    ['40:6!♠', new Bid(6, null, Suit.SPADE, null, 40)],
+    ['250:M', new Bid(null, null, null, 'M', 250, suits)],
+    ['40:6♠', new Bid(6, '♠', null, null, 40, suits)],
+    ['140:7♠!♣', new Bid(7, '♠', '♣', null, 140, suits)],
+    ['100:6', new Bid(6, null, null, null, 100, suits)],
+    ['40:6!♠', new Bid(6, null, '♠', null, 40, suits)],
 ];
-describe('Card Unit', function() {
+describe('Bid Unit', function() {
     describe('toString()', function() {
         for (const [str, bid] of testBids) {
             it(`serialize '${bid.getName()}' to ${str}`, function() {
@@ -21,13 +23,13 @@ describe('Card Unit', function() {
     describe('fromString()', function() {
         for (const [str, bid] of testBids) {
             it(`deserialize ${str} to '${bid.getName()}'`, function() {
-                const newBid = Bid.fromString(str);
+                const newBid = Bid.fromString(str, suits);
                 bidsDeepEqual(bid, newBid);
             });
         }
     });
     describe('avondaleBids()', function() {
-        const bids = Bid.getAvondaleBids();
+        const bids = Bid.getAvondaleBids(suits);
         for (const bid of bids) {
             console.log('' + bid);
         }
