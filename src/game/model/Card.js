@@ -1,47 +1,28 @@
 export default class Card {
     static JOKER = '$';
-    static ACE = 'A';
-    static KING = 'K';
-    static QUEEN = 'Q';
-    static JACK = 'J';
-    static SUIT_PICTURE_CARDS = [Card.ACE, Card.KING, Card.QUEEN, Card.JACK];
 
-    constructor(suit, value) {
+    constructor(suit, value, config) {
         this.suit = suit;
+        if (!value) throw new Error('value missing while creating card');
         this.value = value;
-    }
-
-    isPictureCard() {
-        return this.value === Card.JOKER || Card.SUIT_PICTURE_CARDS.indexOf(this.value) >= 0;
-    }
-
-    static getValueName(value) {
-        if (value === Card.ACE) return 'Ace';
-        else if (value === Card.KING) return 'King';
-        else if (value === Card.QUEEN) return 'Queen';
-        else if (value === Card.JACK) return 'Jack';
-        else if (value === Card.JOKER) return 'Joker';
-        else return value;
+        if (!config) throw new Error('DeckConfig missing while creating card');
+        this.config = config;
     }
 
     getName() {
-        if (this.suit) {
-            return `${Card.getValueName(this.value)} of ${this.suit.name}s`;
-        }
-
-        return Card.getValueName(this.value);
+        return this.config.getCardName(this.value) + (this.suit ? ` of ${this.suit.name}` : '')
     }
 
     toString() {
         return (this.suit?.symbol || '') + this.value;
     }
 
-    static fromString(str, suits) {
-        if (str === Card.JOKER) return new Card(null, Card.JOKER);
+    static fromString(str, config) {
+        if (config.getSymbolIndex(config.specialCards, str) >= 0) return new Card(null, str, config);
         let [suit, ...value] = str;
         value = value.join('');
         if (!isNaN(parseInt(value))) value = parseInt(value);
-        return new Card(suits.getSuit(suit), value);
+        return new Card(config.suits.getSuit(suit), value, config);
     }
 
     valueOf() {

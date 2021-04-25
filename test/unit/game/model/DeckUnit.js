@@ -1,17 +1,19 @@
 import Deck from '../../../../src/game/model/Deck.js';
 import Card from '../../../../src/game/model/Card.js';
-import SuitCollection from '../../../../src/game/model/SuitCollection.js';
 import OrdinaryNormalDeck from '../../../../src/game/constants/OrdinaryNormalDeck.js';
+import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
-const suits = new SuitCollection(OrdinaryNormalDeck.SUITS_HIGH_TO_LOW);
+const config = new DeckConfig(OrdinaryNormalDeck);
+const suits = config.suits;
 const heart = suits.getSuit('♥');
 const club = suits.getSuit('♣');
 const spade = suits.getSuit('♠');
+
 describe('Deck Unit', function() {
     describe('buildDeck()', function() {
-        for (const config of [
+        for (const c of [
             {
                 totalHands: 2,
                 _totalCards: 43,
@@ -63,8 +65,12 @@ describe('Deck Unit', function() {
                 _highestBlackCard: 5,
             },
         ]) {
+            const config = new DeckConfig(OrdinaryNormalDeck);
+            for (const x in c) {
+                if (c.hasOwnProperty(x)) config[x] = c[x];
+            }
             describe(`${config.totalHands} handed`, function() {
-                const deck = Deck.buildDeck(config, suits);
+                const deck = Deck.buildDeck(config);
                 it(`should have ${config._totalCards} cards`, function() {
                     deck.size.should.equal(config._totalCards);
                 });
@@ -80,7 +86,9 @@ describe('Deck Unit', function() {
     });
 
     function testShuffle(positionsToMove) {
-        const deck = Deck.buildDeck({totalHands: 5}, suits);
+        const config = new DeckConfig(OrdinaryNormalDeck);
+        config.totalHands = 5;
+        const deck = Deck.buildDeck(config);
         const originalOrder = [];
         for (const card of deck) {
             originalOrder.push(card.toString());
@@ -117,24 +125,26 @@ describe('Deck Unit', function() {
     });
 
     describe('toString()', function() {
-        it(`should produce a full deck by default`, function() {
-            const deck = new Deck(Deck.buildStandardDeck(suits), suits);
+        it(`should produce a full deck`, function() {
+            const config = new DeckConfig(OrdinaryNormalDeck);
+            config.totalHands = 5;
+            const deck = Deck.buildDeck(config);
             (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
         });
         it(`should produce correct ranges`, function() {
             const deck = new Deck([
-                new Card(heart, Card.ACE),
-                new Card(heart, Card.JACK),
-                new Card(heart, 20),
-                new Card(heart, 19),
-                new Card(heart, 18),
-                new Card(heart, 16),
-                new Card(club, 3),
-                new Card(spade, 5),
-                new Card(spade, 4),
-                new Card(spade, 3),
-                new Card(spade, 2),
-            ], suits);
+                new Card(heart, 'A', config),
+                new Card(heart, 'J', config),
+                new Card(heart, 20, config),
+                new Card(heart, 19, config),
+                new Card(heart, 18, config),
+                new Card(heart, 16, config),
+                new Card(club, 3, config),
+                new Card(spade, 5, config),
+                new Card(spade, 4, config),
+                new Card(spade, 3, config),
+                new Card(spade, 2, config),
+            ], config);
             deck.shuffle();
             (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
         });
@@ -142,11 +152,11 @@ describe('Deck Unit', function() {
 
     describe('fromString()', function() {
         it(`should produce a full deck by default`, function() {
-            const deck = Deck.fromString('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2', suits);
+            const deck = Deck.fromString('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2', config);
             (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
         });
         it(`should produce correct ranges`, function() {
-            const deck = Deck.fromString('♥AJ20-18,16♣3♠5-2', suits);
+            const deck = Deck.fromString('♥AJ20-18,16♣3♠5-2', config);
             (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
         });
     });

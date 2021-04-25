@@ -1,10 +1,9 @@
 import Card from './Card.js';
 
 export default class Deck {
-    constructor(cards, suits, config = null) {
+    constructor(cards, config) {
         this.cards = cards;
         this.config = config;
-        this.suits = suits;
     }
 
     [Symbol.iterator]() { return this.cards.values(); }
@@ -24,9 +23,9 @@ export default class Deck {
     shuffle() {
         for (let i = this.size - 1; i > 0; i--) {
             const newIndex = Math.floor(Math.random() * (i + 1));
-            const oldValue = this.cards[newIndex];
+            const cardToSwap = this.cards[newIndex];
             this.cards[newIndex] = this.cards[i];
-            this.cards[i] = oldValue;
+            this.cards[i] = cardToSwap;
         }
     }
 
@@ -34,8 +33,12 @@ export default class Deck {
         if (!this.size) return '';
         const cards = this.cards.slice();
         cards.sort((a, b) => this.compareCards(b, a));
-        let str = cards[0].value === Card.JOKER ? Card.JOKER : '';
-        let i = str.length;
+        let str = '';
+        let i = 0;
+        while (!cards[i].suit) {
+            str += cards[i].value;
+            i++;
+        }
         let previousValue;
         const consecutiveNumbers = [];
         const applyRange = () => {
@@ -47,7 +50,7 @@ export default class Deck {
             str += r[0] + '-' + previousValue;
             return str;
         };
-        for (const suit of this.suits) {
+        for (const suit of this.config.suits) {
             let suitStr = '';
             previousValue = null;
             while (i < cards.length && cards[i].suit.symbol === suit.symbol) {
@@ -68,44 +71,49 @@ export default class Deck {
         return str;
     }
 
-    static fromString(str, suits) {
+    static fromString(str, config) {
         const cards = [];
         let suit = null, previousValue = null;
         for (let x of str.match(/(\d+|.)/g)) {
-            if (x === Card.JOKER) cards.push(new Card(null, x));
-            else if (suits.symbols.indexOf(x) >= 0) suit = suits.getSuit(x);
+            if (config.getSymbolIndex(config.specialCards, x) >= 0) cards.push(new Card(null, x, config));
+            else if (config.suits.symbols.indexOf(x) >= 0) suit = config.suits.getSuit(x);
             else if (x === '-' || x === ',') previousValue = x;
             else if (previousValue === '-') {
                 let value = cards[cards.length - 1].value;
                 const increment = x > value ? 1 : -1;
                 for (value += increment; increment > 0 ? x >= value : x <= value; value += increment) {
-                    cards.push(new Card(suit, value));
+                    cards.push(new Card(suit, value, config));
                 }
                 previousValue = value;
             } else {
                 const number = parseInt(x);
                 if (!isNaN(number)) x = number;
-                cards.push(new Card(suit, x));
+                cards.push(new Card(suit, x, config));
                 previousValue = x;
             }
         }
-        return new Deck(cards, suits);
+        return new Deck(cards, config);
     }
 
     compareCards(a, b) {
-        if (a.value === Card.JOKER) return b.value !== Card.JOKER ? 1 : 0; // all jokers are equal
-        if (b.value === Card.JOKER) return -1;
+        const specials = this.config.specialCards;
+        const aSpecialIndex = this.config.getSymbolIndex(specials, a.value);
+        const bSpecialIndex = this.config.getSymbolIndex(specials, b.value);
+        if (aSpecialIndex >= 0 && bSpecialIndex >= 0) return bSpecialIndex - aSpecialIndex;
+        if (aSpecialIndex >= 0) return 1;
+        if (bSpecialIndex >= 0) return -1;
 
-        const aSuitIndex = this.suits.symbols.indexOf(a.suit.symbol);
-        const bSuitIndex = this.suits.symbols.indexOf(b.suit.symbol);
+        const suits = this.config.suits;
+        const aSuitIndex = suits.symbols.indexOf(a.suit.symbol);
+        const bSuitIndex = suits.symbols.indexOf(b.suit.symbol);
         if (aSuitIndex < bSuitIndex) return 1;
         if (aSuitIndex > bSuitIndex) return -1;
 
         if (a.value === b.value) return 0; // the cards are unequal in any further case
 
-        // picture cards
-        const aPictureIndex = Card.SUIT_PICTURE_CARDS.indexOf(a.value);
-        const bPictureIndex = Card.SUIT_PICTURE_CARDS.indexOf(b.value);
+        const pictures = this.config.suitPictureCards;
+        const aPictureIndex = this.config.getSymbolIndex(pictures, a.value);
+        const bPictureIndex = this.config.getSymbolIndex(pictures, b.value);
         if (aPictureIndex >= 0 && bPictureIndex < 0) return 1;
         if (bPictureIndex >= 0 && aPictureIndex < 0) return -1;
         if (aPictureIndex >= 0 && bPictureIndex >= 0) return aPictureIndex < bPictureIndex ? 1 : -1;
@@ -114,24 +122,27 @@ export default class Deck {
         return a.value > b.value ? 1 : -1;
     }
 
-    static buildDeck(config, suits) {
+    static buildDeck(config) {
+        const suits = config.suits;
         const totalHands = config.totalHands ?? 4;
-        const totalJokers = config.totalJokers ?? 1;
         const kittySize = config.kittySize ?? 3;
         const cardsPerPlayer = config.cardsPerPlayer ?? 10;
-        const pictureCards = config.pictureCards ?? Card.SUIT_PICTURE_CARDS;
+        const pictureCards = config.suitPictureCards;
         const totalCards = (totalHands < 3 ? 4 : totalHands) * cardsPerPlayer + kittySize;
-        const totalNumberCards = totalCards - (pictureCards.length * suits.length + totalJokers);
+        const totalNumberCards = totalCards - (pictureCards.length * suits.length + config.specialCards.length);
         const cardsPerSuit = Math.floor(totalNumberCards / suits.length);
         let unallocatedCards = totalNumberCards % suits.length;
 
-        const cards = [new Card(null, Card.JOKER)];
+        const cards = [];
+        for (const specialCard of config.specialCards) {
+            cards.push(new Card(null, specialCard.symbol, config));
+        }
         for (const suit of suits) {
             const [lowest, highest] = Deck.getStartEndNumberCards(cardsPerSuit + (unallocatedCards-- > 0));
-            Deck.buildSuitPictureCards(suit, pictureCards, cards);
-            Deck.buildSuitNumberCards(suit, lowest, highest, cards);
+            Deck.buildSuitPictureCards(suit, pictureCards, cards, config);
+            Deck.buildSuitNumberCards(suit, lowest, highest, cards, config);
         }
-        return new Deck(cards, suits, config);
+        return new Deck(cards, config);
     }
 
     static getStartEndNumberCards(numberOfNumberCards = 9) {
@@ -143,27 +154,16 @@ export default class Deck {
         return [lowest, highest];
     }
 
-    static buildStandardDeck(suits) {
-        const cards = [];
-        const [lowest, highest] = Deck.getStartEndNumberCards();
-        for (const suit of suits) {
-            Deck.buildSuitPictureCards(suit, Card.SUIT_PICTURE_CARDS, cards);
-            Deck.buildSuitNumberCards(suit, lowest, highest, cards);
-        }
-        cards.push(new Card(null, Card.JOKER));
-        return cards;
-    }
-
-    static buildSuitPictureCards(suit, pictureCards, cards = []) {
-        for (const value of pictureCards) {
-            cards.push(new Card(suit, value));
+    static buildSuitPictureCards(suit, pictureCards, cards = [], config) {
+        for (const card of pictureCards) {
+            cards.push(new Card(suit, card.symbol, config));
         }
         return cards;
     }
 
-    static buildSuitNumberCards(suit, lowest, highest, cards = []) {
+    static buildSuitNumberCards(suit, lowest, highest, cards = [], config) {
         for (let i = highest; i >= lowest; i--) {
-            cards.push(new Card(suit, i));
+            cards.push(new Card(suit, i, config));
         }
         return cards;
     }
