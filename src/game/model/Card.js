@@ -1,4 +1,4 @@
-import Suit from './suit.js';
+import Suit from './Suit.js';
 
 export default class Card {
     static JOKER = '$';

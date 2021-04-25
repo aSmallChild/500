@@ -1,5 +1,5 @@
-import Card from './card.js';
-import Suit from './suit.js';
+import Card from './Card.js';
+import Suit from './Suit.js';
 
 export default class Deck {
     constructor(cards = Deck.buildStandardDeck(), config = null) {
@@ -149,7 +149,7 @@ export default class Deck {
     }
 
     static buildStandardDeck() {
-        let cards = [];
+        const cards = [];
         const [lowest, highest] = Deck.getStartEndNumberCards();
         for (const suit of Suit.ALL) {
             Deck.buildSuitPictureCards(suit, Card.SUIT_PICTURE_CARDS, cards);

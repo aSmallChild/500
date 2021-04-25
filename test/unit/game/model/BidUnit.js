@@ -1,5 +1,5 @@
-import Suit from '../../../../src/game/model/suit.js';
-import Bid from '../../../../src/game/model/bid.js';
+import Suit from '../../../../src/game/model/Suit.js';
+import Bid from '../../../../src/game/model/Bid.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 

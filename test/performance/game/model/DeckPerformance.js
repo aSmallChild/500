@@ -1,5 +1,5 @@
-import Deck from '../../../../src/game/model/deck.js';
-import Timer from '../../../../src/util/timer.js';
+import Deck from '../../../../src/game/model/Deck.js';
+import Timer from '../../../../src/util/Timer.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 

@@ -1,6 +1,6 @@
-import Deck from '../../../../src/game/model/deck.js';
-import Card from '../../../../src/game/model/card.js';
-import Suit from '../../../../src/game/model/suit.js';
+import Deck from '../../../../src/game/model/Deck.js';
+import Card from '../../../../src/game/model/Card.js';
+import Suit from '../../../../src/game/model/Suit.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 

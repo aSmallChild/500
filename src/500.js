@@ -1,4 +1,4 @@
-import Deck from './game/model/deck';
+import Deck from './game/model/Deck.js';
 
 export class FiveHundred {
     constructor(numberOfPlayers) {
