@@ -55,6 +55,13 @@ export default class DeckConfig {
         }
     }
 
+    getSpecialBid(symbol) {
+        for (const bid of this.specialBids) {
+            if (bid.symbol === symbol) return bid;
+        }
+        return null;
+    }
+
     get specialBids() {
         return this._specialBids;
     }

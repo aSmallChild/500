@@ -20,15 +20,15 @@ export default class SuitCollection {
         return this.suits.length;
     }
 
+    get lowToHigh() {
+        return this.suits.slice().reverse();
+    }
+
     getSuit(symbol) {
         for (const suit of this.suits) {
             if (suit.symbol === symbol) return suit;
         }
         return null;
-    }
-
-    getName(symbol) {
-        return this.getSuit(symbol)?.name;
     }
 
     get symbols() {

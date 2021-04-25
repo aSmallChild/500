@@ -1,16 +1,16 @@
 import Bid from '../../../../src/game/model/Bid.js';
-import SuitCollection from '../../../../src/game/model/SuitCollection.js';
 import OrdinaryNormalDeck from '../../../../src/game/constants/OrdinaryNormalDeck.js';
 // noinspection ES6UnusedImports
 import should from 'should';
+import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 
-const suits = new SuitCollection(OrdinaryNormalDeck.SUITS_HIGH_TO_LOW);
+const config = new DeckConfig(OrdinaryNormalDeck)
 const testBids = [
-    ['250:M', new Bid(null, null, null, 'M', 250, suits)],
-    ['40:6♠', new Bid(6, '♠', null, null, 40, suits)],
-    ['140:7♠!♣', new Bid(7, '♠', '♣', null, 140, suits)],
-    ['100:6', new Bid(6, null, null, null, 100, suits)],
-    ['40:6!♠', new Bid(6, null, '♠', null, 40, suits)],
+    ['250:M', new Bid(null, null, null, 'M', 250, config)],
+    ['40:6♠', new Bid(6, config.suits.getSuit('♠'), null, null, 40, config)],
+    ['140:7♠!♣', new Bid(7, config.suits.getSuit('♠'), config.suits.getSuit('♣'), null, 140, config)],
+    ['100:6', new Bid(6, null, null, null, 100, config)],
+    ['40:6!♠', new Bid(6, null, config.suits.getSuit('♠'), null, 40, config)],
 ];
 describe('Bid Unit', function() {
     describe('toString()', function() {
@@ -23,16 +23,22 @@ describe('Bid Unit', function() {
     describe('fromString()', function() {
         for (const [str, bid] of testBids) {
             it(`deserialize ${str} to '${bid.getName()}'`, function() {
-                const newBid = Bid.fromString(str, suits);
+                const newBid = Bid.fromString(str, config);
                 bidsDeepEqual(bid, newBid);
             });
         }
     });
     describe('avondaleBids()', function() {
-        const bids = Bid.getAvondaleBids(suits);
-        for (const bid of bids) {
-            console.log('' + bid);
-        }
+        const bids = Bid.getAvondaleBids(config);
+        it(`should have unique bids`, function() {
+            const uniqueBids = new Set();
+            for (const bid of bids) {
+                const str = bid + '';
+                should.exist(bid, 'bid is missing');
+                uniqueBids.has(str).should.be.false(`bid set contained a duplicate ${str}`);
+                uniqueBids.add(str);
+            }
+        });
         it(`should have 28 bids`, function() {
             bids.length.should.equal(28);
         });
