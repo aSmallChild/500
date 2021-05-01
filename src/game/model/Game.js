@@ -5,7 +5,7 @@ export default class Game {
         this.currentStageIndex = -1;
         this.players = [];
         this.spectators = [];
-        this.dataStore = [];
+        this.dataStore = {};
     }
 
     notifyClients(actionName, actionData) {}
@@ -25,22 +25,20 @@ export default class Game {
         this.currentStage.onSpectatorConnect(spectator);
     }
 
-    nextStage(initialStageData) {
-        if (++this.currentStageIndex === this.stages.length) {
+    nextStage(dataFromPreviousStage) {
+        if (++this.currentStageIndex >= this.stages.length) {
             this.currentStageIndex = 0;
         }
-        const stageDataStore = this.dataStore[this.currentStageIndex] || {};
-        this.currentStage = new this.stages[this.currentStageIndex](
-            (dataForNextStage, dataToStore) => {
-                this.dataStore[currentStageIndex] = dataToStore;
-                this.nextStage(dataForNextStage);
-            },
-            this.notifyClients,
-            this.players,
-            initialStageData,
-            stageDataStore,
-        );
-        this.currentStage.start();
+        this.currentStage = new this.stages[this.currentStageIndex]();
+        this.currentStage.onStageComplete((dataForNextStage, dataToStore) => {
+            this.dataStore[this.currentStage.constructor.name] = JSON.parse(JSON.stringify(dataToStore));
+            this.currentStage = null;
+            setTimeout(() => this.nextStage(JSON.parse(JSON.stringify(dataForNextStage))), 1);
+        });
+        this.currentStage.setDataStore(this.dataStore[this.currentStage.constructor.name] || {});
+        this.currentStage.setNotifyClientCallback(this.notifyClients);
+        this.currentStage.setPlayers(this.players);
+        this.currentStage.start(dataFromPreviousStage);
     }
 }
 
