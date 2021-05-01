@@ -4,12 +4,11 @@ export default class GameStage {
     }
 
     complete(dataForNextStage) {
-        this._onStageComplete(dataForNextStage, this.dataStore);
-        this._onStageComplete = null;
         this.setNotifyClientCallback(null);
-        this.players = null;
-        this.initialStageData = null;
-        this.dataStore = null;
+        this._onStageComplete(dataForNextStage, this.dataStore);
+        for (const key of Object.keys(this)) {
+            delete this[key];
+        }
     }
 
     setDataStore(dataStore) {
@@ -18,6 +17,13 @@ export default class GameStage {
 
     setPlayers(players) {
         this.players = players;
+    }
+
+    getPlayerByName(name) {
+        for (const player of this.players) {
+            if (player.name.toLowerCase() === name.toLowerCase()) return player;
+        }
+        return null;
     }
 
     setNotifyClientCallback(notifyClients) {

@@ -8,7 +8,11 @@ export default class Game {
         this.dataStore = {};
     }
 
-    notifyClients(actionName, actionData) {}
+    notifyClients(actionName, actionData) {
+        for (const client of [...this.players, ...this.spectators]) {
+            client.emit(actionName, actionData);
+        }
+    }
 
     onPlayerAction(player, actionName, actionData) {
         if (!this.currentStage) return;

@@ -75,7 +75,13 @@ describe('Game Unit', function() {
                     dataFromPreviousStage.should.equal('game_over');
                     done();
                 };
+                const stage = game.currentStage;
                 game.currentStage.complete('game_over');
+                should(game.currentStage).be.null();
+                should(stage.dataStore).be.undefined();
+                should(stage._onStageComplete).be.undefined();
+                should(stage.players).be.undefined();
+                Object.keys(stage).should.have.length(0);
             });
         });
     });

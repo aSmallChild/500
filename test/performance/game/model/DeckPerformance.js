@@ -12,11 +12,11 @@ describe('Deck Performance', function() {
             {
                 totalHands: 5,
                 _buildCount: 100000,
-                _maxDurationMs: 75,
+                _maxDurationMs: 100,
             }, {
                 totalHands: 100,
                 _buildCount: 5000,
-                _maxDurationMs: 75,
+                _maxDurationMs: 100,
 
             }]) {
             const config = new DeckConfig(OrdinaryNormalDeck);
