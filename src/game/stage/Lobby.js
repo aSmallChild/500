@@ -1,6 +1,8 @@
+import GameStage from '../model/GameStage.js';
+
 export default class Lobby extends GameStage {
     start(dataFromPreviousStage) {
-        this.isNewGame = !!dataFromPreviousStage;
+        this.isNewGame = !dataFromPreviousStage;
         if (!this.isNewGame) return this.complete();
 
         if (!this.dataStore.preferredPartners) {
@@ -26,7 +28,12 @@ export default class Lobby extends GameStage {
     onSpectatorConnect(spectator) {}
 
     requestPartner(player, partnerName) {
-        this.dataStore.preferredPartners[player.name] = partnerName;
+        const store = this.dataStore.preferredPartners;
+        if (store[player.name] && store[player.name] !== partnerName) {
+            delete store[player.name]; // keep requests in order
+        }
+        if (!this.getPlayerByName(partnerName)) return;
+        store[player.name] = partnerName;
     }
 
     playerReady(player, isReady) {
@@ -41,40 +48,82 @@ export default class Lobby extends GameStage {
         if (player) player.isAdmin = true;
     }
 
-    startGame() {
-        if (!this.isNewGame) return;
+    resetPlayerPositionsAndPartners() {
+        for (const player of this.players) {
+            player.position = null;
+            player.clearPartner();
+        }
+    }
 
-        if (this.players.length === 4 || this.players.length === 6) {
+    setPlayerPositions() {
+        let position = 0;
+        for (const player of this.players) {
+            if (player.position !== null) continue;
+            player.position = position;
+            if (player.partner) player.partner.position = position + this.players.length / 2;
+            position++;
+        }
+    }
+
+    startGame() {
+        if (!this.isNewGame) return this.complete();
+
+        this.resetPlayerPositionsAndPartners();
+        if (!(this.players.length % 2) && 4 <= this.players.length && this.players.length <= 10) {
             this.matchPartners(this.dataStore.preferredPartners);
         }
-        else {
-            for (let i = 0; i < players.length; i++) {
-                player.partner = null;
-                player.position = i;
-            }
-        }
+        this.setPlayerPositions();
 
         this.complete();
     }
 
-    matchPartners(eachPlayersRequest) {
-        const willingPartnersFor = {};
-        for (const playerName of Object.keys(eachPlayersRequest)) {
-            const partnerName = eachPlayersRequest[playerName];
-            if (!willingPartnersFor[partnerName]) willingPartnersFor[partnerName] = [];
-            willingPartnersFor[partnerName].push(playerName);
+    matchPartners(outgoingRequests) {
+        if (this.players.length % 2) {
+            throw new Error(`Attempted to pair up an odd number of players.`);
+        }
+        const incomingRequestsPerPlayer = {};
+        for (const playerName of Object.keys(outgoingRequests)) {
+            const partnerName = outgoingRequests[playerName];
+            if (!incomingRequestsPerPlayer[partnerName]) incomingRequestsPerPlayer[partnerName] = new Set();
+            incomingRequestsPerPlayer[partnerName].add(playerName);
         }
 
-        for (const playerName of Object.keys(willingPartnersFor)) {
-            const incomingRequests = willingPartnersFor[playerName];
-            if (incomingRequests.length === 1) {
-                if (!willingPartnersFor[playerName] || incomingRequests[0] === partnerRequests[playerName]) {
-                    const a = this.getPlayerByName(playerName);
-                    const b = this.getPlayerByName(incomingRequests[0]);
-                    a.partner = b;
-                    b.partner = a;
+        for (const player of this.players) {
+            if (player.partner) continue;
+
+            const incomingRequests = incomingRequestsPerPlayer[player.name] || new Set();
+            let partner = this.getPlayerByName(outgoingRequests[player.name]);
+
+            // can't be your own partner
+            if (partner === player) partner = null;
+
+            // they want each other
+            if (partner && incomingRequests.has(partner.name)) {
+                player.setPartner(partner);
+                continue;
+            }
+
+            // nobody else wanted this player as their partner
+            if (partner && !partner.partner && !incomingRequestsPerPlayer[partner.name]) {
+                player.setPartner(partner);
+                continue;
+            }
+
+            for (const otherPlayer of this.players) {
+                if (otherPlayer.partner || otherPlayer === player) continue;
+
+                if (!partner || partner.partner) {
+                    partner = otherPlayer;
+                    continue;
+                }
+
+                // current matched player did not want to be our partner, but this other play does
+                if (!incomingRequests.has(partner.name) && incomingRequests.has(otherPlayer.name)) {
+                    partner = otherPlayer;
                 }
             }
+
+            player.setPartner(partner);
         }
     }
 }
