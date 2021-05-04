@@ -5,7 +5,7 @@ import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
-const config = new DeckConfig(OrdinaryNormalDeck);
+const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
 const suits = config.suits;
 const heart = suits.getSuit('♥');
 const club = suits.getSuit('♣');
@@ -65,7 +65,7 @@ describe('Deck Unit', function() {
                 _highestBlackCard: 5,
             },
         ]) {
-            const config = new DeckConfig(OrdinaryNormalDeck);
+            const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
             for (const x in c) {
                 if (c.hasOwnProperty(x)) config[x] = c[x];
             }
@@ -86,7 +86,7 @@ describe('Deck Unit', function() {
     });
 
     function testShuffle(positionsToMove) {
-        const config = new DeckConfig(OrdinaryNormalDeck);
+        const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
         config.totalHands = 5;
         const deck = Deck.buildDeck(config);
         const originalOrder = [];
@@ -126,7 +126,7 @@ describe('Deck Unit', function() {
 
     describe('toString()', function() {
         it(`should produce a full deck`, function() {
-            const config = new DeckConfig(OrdinaryNormalDeck);
+            const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
             config.totalHands = 5;
             const deck = Deck.buildDeck(config);
             (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
@@ -158,6 +158,10 @@ describe('Deck Unit', function() {
         it(`should produce correct ranges`, function() {
             const deck = Deck.fromString('♥AJ20-18,16♣3♠5-2', config);
             (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
+        });
+        it(`should not fail on that weird edge case where it didn't add all the commas`, function() {
+            const deck = Deck.fromString('♥Q♦K10,6,5♣10,8,7♠10,7', config);
+            (deck + '').should.equal('♥Q♦K10,6,5♣10,8,7♠10,7');
         });
     });
 });

@@ -4,7 +4,7 @@ import OrdinaryNormalDeck from '../../../../src/game/constants/OrdinaryNormalDec
 import should from 'should';
 import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 
-const config = new DeckConfig(OrdinaryNormalDeck)
+const config = new DeckConfig(OrdinaryNormalDeck.getConfig())
 const testBids = [
     ['250:M', new Bid(null, null, null, 'M', 250, config)],
     ['40:6♠', new Bid(6, config.suits.getSuit('♠'), null, null, 40, config)],

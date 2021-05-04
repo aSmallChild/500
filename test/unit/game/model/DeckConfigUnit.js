@@ -5,7 +5,7 @@ import should from 'should';
 
 describe('DeckConfig Unit', function() {
     describe('ordinary normal deck', function() {
-        const config = new DeckConfig(OrdinaryNormalDeck);
+        const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
         it(`should have unique card symbols`, function() {
             const symbols = new Set();
             for (const card of [...config.suits, ...config.suitPictureCards, ...config.specialCards]) {

@@ -20,6 +20,7 @@ export default class GameStage {
     }
 
     getPlayerByName(name) {
+        if (!name) return null;
         for (const player of this.players) {
             if (player.name.toLowerCase() === name.toLowerCase()) return player;
         }

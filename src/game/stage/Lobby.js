@@ -39,7 +39,7 @@ export default class Lobby extends GameStage {
     playerReady(player, isReady) {
         if (isReady) this.readyPlayers.add(player.name);
         else this.readyPlayers.delete(player.name);
-
+        if (this.players.length < 2) return;
         if (this.readyPlayers.size === this.players.length) this.startGame();
     }
 

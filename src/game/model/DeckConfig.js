@@ -7,6 +7,33 @@ export default class DeckConfig {
         this.suitPictureCards = config.SUIT_PICTURE_CARDS_HIGH_TO_LOW;
         this.specialCards = config.SPECIAL_CARDS_HIGH_TO_LOW;
         this.specialBids = config.SPECIAL_BIDS_HIGH_TO_LOW;
+        config.totalHands = config.totalHands ?? 4;
+        config.kittySize = config.kittySize ?? 3;
+        config.cardsPerPlayer = config.cardsPerPlayer ?? 10;
+    }
+
+    set totalHands(value) {
+        this.config.totalHands = value;
+    }
+
+    get totalHands() {
+        return this.config.totalHands;
+    }
+
+    get kittySize() {
+        return this.config.kittySize;
+    }
+
+    set kittySize(value) {
+        this.config.kittySize = value;
+    }
+
+    get cardsPerPlayer() {
+        return this.config.cardsPerPlayer;
+    }
+
+    set cardsPerPlayer(value) {
+        this.config.cardsPerPlayer = value;
     }
 
     getCardName(value) {
@@ -72,5 +99,9 @@ export default class DeckConfig {
             const [symbol, points, name] = str.split(':');
             this._specialBids.push({symbol, points, name});
         }
+    }
+
+    toJSON() {
+        return this.config;
     }
 }

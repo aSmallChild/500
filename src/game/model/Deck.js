@@ -12,8 +12,14 @@ export default class Deck {
         return this.cards.length;
     }
 
+    deal(numberOfCards) {
+        numberOfCards = Math.min(this.cards.length, Math.abs(numberOfCards));
+        return new Deck(this.cards.splice(this.cards.length - numberOfCards), this.config);
+
+    }
+
     draw() {
-        return this.cards.shift();
+        return this.cards.pop();
     }
 
     push(card) {
@@ -27,6 +33,13 @@ export default class Deck {
             this.cards[newIndex] = this.cards[i];
             this.cards[i] = cardToSwap;
         }
+    }
+
+    toJSON(key) {
+        if (key) {
+            return this.toString();
+        }
+        return {cards: this.toString(), config: this.config};
     }
 
     toString() {
@@ -45,8 +58,8 @@ export default class Deck {
             const r = consecutiveNumbers.splice(0, consecutiveNumbers.length);
             if (!r.length) return '';
             let str = typeof previousValue === 'number' ? ',' : '';
-            if (r.length < 3) return str + r.join(',');
             previousValue = r[r.length - 1];
+            if (r.length < 3) return str + r.join(',');
             str += r[0] + '-' + previousValue;
             return str;
         };
@@ -124,9 +137,9 @@ export default class Deck {
 
     static buildDeck(config) {
         const suits = config.suits;
-        const totalHands = config.totalHands ?? 4;
-        const kittySize = config.kittySize ?? 3;
-        const cardsPerPlayer = config.cardsPerPlayer ?? 10;
+        const totalHands = config.totalHands;
+        const kittySize = config.kittySize;
+        const cardsPerPlayer = config.cardsPerPlayer;
         const pictureCards = config.suitPictureCards;
         const totalCards = (totalHands < 3 ? 4 : totalHands) * cardsPerPlayer + kittySize;
         const totalNumberCards = totalCards - (pictureCards.length * suits.length + config.specialCards.length);
@@ -168,5 +181,3 @@ export default class Deck {
         return cards;
     }
 }
-
-export class Hand extends Deck {}

@@ -1,34 +1,39 @@
 // noinspection ES6UnusedImports
 import should from 'should';
 import Lobby from '../../../../src/game/stage/Lobby.js';
-import Player from '../../../../src/game/model/Player.js';
+import {getPlayers, getStage} from '../../util/stage.js';
 
-function getPlayers(count) {
-    const players = [];
-    for (let i = 0; i < count; i++) {
-        players.push(new Player((i + 10).toString(36), null));
-    }
-    return players;
-}
-
-function getLobby(players) {
-    const lobby = new Lobby();
-    lobby.setDataStore({});
-    lobby.setNotifyClientCallback(() => {});
-    lobby.setPlayers(players);
-    return lobby;
-}
-
-describe('Lobby Unit', function() {
+describe('Lobby Stage Unit', function() {
     describe('Cycle through the game', function() {
-
         describe(`start()`, function() {
-            const lobby = getLobby(getPlayers(6));
+            const lobby = getStage(getPlayers(6), Lobby);
             it(`should not end prematurely`, function() {
                 lobby.onStageComplete(() => {
                     should(true).be.false('Lobby stage ended prematurely');
                 });
                 lobby.start();
+            });
+        });
+        describe(`startGame()`, function() {
+            it(`should complete stage when all players are ready`, function(done) {
+                const lobby = getStage(getPlayers(6), Lobby);
+                lobby.onStageComplete(() => {
+                    done();
+                });
+                lobby.start();
+                for (const player of lobby.players) {
+                    lobby.onPlayerAction(player, 'ready');
+                }
+            });
+            it(`should complete stage when all players are ready`, function() {
+                const lobby = getStage(getPlayers(1), Lobby);
+                lobby.onStageComplete(() => {
+                    should(true).be.false('Lobby stage ended without enough players');
+                });
+                lobby.start();
+                for (const player of lobby.players) {
+                    lobby.onPlayerAction(player, 'ready');
+                }
             });
         });
         describe(`matchPartners()`, function() {
@@ -42,10 +47,10 @@ describe('Lobby Unit', function() {
                 },
                 {
                     name: 'no players request a partner',
-                    playerCount: 6,
-                    partnerRequests: {a: '', b: '', c: '', d: '', e: '', f: ''},
-                    expectedPositions: ['a', 'c', 'e', 'b', 'd', 'f'],
-                    expectedMatches: ['ab', 'cd', 'ef'],
+                    playerCount: 8,
+                    partnerRequests: {a: '', b: '', c: '', d: '', e: '', f: '', g: '', h: ''},
+                    expectedPositions: ['a', 'c', 'e', 'g', 'b', 'd', 'f', 'h'],
+                    expectedMatches: ['ab', 'cd', 'ef', 'gh'],
                 },
                 {
                     name: 'nobody can agree on anything',
@@ -64,7 +69,7 @@ describe('Lobby Unit', function() {
             ];
             for (const testCase of matchPartnerTests) {
                 it(testCase.name, function() {
-                    const lobby = getLobby(getPlayers(testCase.playerCount));
+                    const lobby = getStage(getPlayers(testCase.playerCount), Lobby);
                     lobby.matchPartners(testCase.partnerRequests);
                     for (let [a, b] of testCase.expectedMatches) {
                         a = lobby.getPlayerByName(a);
@@ -75,6 +80,8 @@ describe('Lobby Unit', function() {
                         b.partner.should.equal(a);
                     }
                     lobby.setPlayerPositions();
+                    testCase.playerCount.should.equal(testCase.expectedPositions.length);
+                    testCase.playerCount.should.equal(lobby.players.length);
                     for (let i = 0; i < testCase.expectedPositions.length; i++) {
                         const player = lobby.getPlayerByName(testCase.expectedPositions[i]);
                         should(player.position).not.be.null();

@@ -4,7 +4,7 @@ import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
-const config = new DeckConfig(OrdinaryNormalDeck);
+const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
 const testCards = [
     [new Card(null, '$', config), '$'],
     [new Card(config.suits.getSuit('♣'), 'Q', config), `♣Q`],
