@@ -84,8 +84,10 @@ describe('Lobby Stage Unit', function() {
                     testCase.playerCount.should.equal(lobby.players.length);
                     for (let i = 0; i < testCase.expectedPositions.length; i++) {
                         const player = lobby.getPlayerByName(testCase.expectedPositions[i]);
+                        const playerAtPosition = lobby.players[i];
                         should(player.position).not.be.null();
                         player.position.should.equal(i, `Player is not in correct position, expected player ${player.name} to have position ${i} instead of ${player.position}`);
+                        playerAtPosition.position.should.equal(i, `stage.players is not sorted correctly player at position ${i} had their position set to ${playerAtPosition.position}`);
                     }
                 });
             }

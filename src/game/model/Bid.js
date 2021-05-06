@@ -21,6 +21,10 @@ export default class Bid {
         return this.toString();
     }
 
+    toJSON() {
+        return this.toString();
+    }
+
     toString() {
         const str = this.points + ':';
         if (this.special) return str + this.special;
@@ -54,11 +58,11 @@ export default class Bid {
         return bids;
     }
 
-    static getAvondaleBids(config, cardsPerPlayer = 10) {
-        const minTricks = parseInt(cardsPerPlayer / 2) + 1;
+    static getAvondaleBids(config) {
+        const minTricks = parseInt(config.cardsPerPlayer / 2) + 1;
         const bids = Bid.buildSpecialBids(config.specialBids);
         let points = 40;
-        for (let tricks = minTricks; tricks <= cardsPerPlayer; tricks++) {
+        for (let tricks = minTricks; tricks <= config.cardsPerPlayer; tricks++) {
             for (const suit of config.suits.lowToHigh) {
                 bids.push(new Bid(tricks, suit, null, null, points, config));
                 points += 20;

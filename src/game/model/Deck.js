@@ -35,11 +35,8 @@ export default class Deck {
         }
     }
 
-    toJSON(key) {
-        if (key) {
-            return this.toString();
-        }
-        return {cards: this.toString(), config: this.config};
+    toJSON() {
+        return this.toString();
     }
 
     toString() {

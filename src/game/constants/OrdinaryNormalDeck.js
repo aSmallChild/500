@@ -2,10 +2,10 @@ export default class OrdinaryNormalDeck {
     static getConfig() {
         return {
             SUITS_HIGH_TO_LOW: [
-                '♥:Heart',
-                '♦:Diamond',
-                '♣:Club',
-                '♠:Spade',
+                '♥:red:Heart',
+                '♦:red:Diamond',
+                '♣:black:Club',
+                '♠:black:Spade',
             ],
             SPECIAL_CARDS_HIGH_TO_LOW: [
                 '$:Joker',
@@ -20,6 +20,7 @@ export default class OrdinaryNormalDeck {
                 'B:1000:Blind Misere',
                 'O:500:Open Misere',
                 'M:250:Closed Misere',
+                'P:0:Pass',
             ],
         };
     }

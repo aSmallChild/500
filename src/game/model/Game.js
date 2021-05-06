@@ -21,11 +21,13 @@ export default class Game {
 
     onPlayerConnect(player) {
         if (!this.currentStage) return;
+        player.emit('stage', this.currentStage.name.toLowerCase());
         this.currentStage.onPlayerConnect(player);
     }
 
     onSpectatorConnect(spectator) {
         if (!this.currentStage) return;
+        spectator.emit('stage', this.currentStage.name.toLowerCase());
         this.currentStage.onSpectatorConnect(spectator);
     }
 

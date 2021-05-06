@@ -10,6 +10,7 @@ describe('Deal Stage Unit', function() {
             stage.onStageComplete((data) => {
                 data.kitty.size.should.equal(3);
                 data.hands.should.length(23);
+                stage.players.should.length(23);
                 for (const hand of data.hands) {
                     hand.size.should.equal(10);
                 }

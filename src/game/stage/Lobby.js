@@ -63,6 +63,7 @@ export default class Lobby extends GameStage {
             if (player.partner) player.partner.position = position + this.players.length / 2;
             position++;
         }
+        this.players.sort((a, b) => a.position > b.position ? 1 : -1);
     }
 
     startGame() {

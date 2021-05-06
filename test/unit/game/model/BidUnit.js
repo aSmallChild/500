@@ -39,8 +39,8 @@ describe('Bid Unit', function() {
                 uniqueBids.add(str);
             }
         });
-        it(`should have 28 bids`, function() {
-            bids.length.should.equal(28);
+        it(`should have 29 bids`, function() {
+            bids.length.should.equal(29);
         });
     });
 });

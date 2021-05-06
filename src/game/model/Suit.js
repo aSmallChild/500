@@ -1,6 +1,7 @@
 export default class Suit {
-    constructor(symbol, name) {
+    constructor(symbol, color, name) {
         this.symbol = symbol;
+        this.color = color;
         this.name = name;
     }
 
@@ -9,11 +10,11 @@ export default class Suit {
     }
 
     toString() {
-        return this.symbol + ':' + this.name;
+        return [this.symbol, this.color, this.name].join(':');
     }
 
     static fromString(str) {
-        const [symbol, name] = str.split(':');
-        return new Suit(symbol, name);
+        const [symbol, color, name] = str.split(':');
+        return new Suit(symbol, color, name);
     }
 }
