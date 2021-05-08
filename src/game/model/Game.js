@@ -1,17 +1,18 @@
 export default class Game {
     constructor(stages) {
         this.stages = stages;
+        this.dataStore = {};
         this.currentStage = null;
         this.currentStageIndex = -1;
         this.players = [];
         this.spectators = [];
-        this.dataStore = {};
-    }
-
-    notifyClients(actionName, actionData) {
-        for (const client of [...this.players, ...this.spectators]) {
-            client.emit(actionName, actionData);
-        }
+        this.clients = {
+            emit: (actionName, actionData) => {
+                for (const client of [...this.players, ...this.spectators]) {
+                    client.emit(actionName, actionData);
+                }
+            },
+        };
     }
 
     onPlayerAction(player, actionName, actionData) {
@@ -20,12 +21,14 @@ export default class Game {
     }
 
     onPlayerConnect(player) {
+        player.emit('players', this.players);
         if (!this.currentStage) return;
         player.emit('stage', this.currentStage.name.toLowerCase());
         this.currentStage.onPlayerConnect(player);
     }
 
     onSpectatorConnect(spectator) {
+        player.emit('players', this.players);
         if (!this.currentStage) return;
         spectator.emit('stage', this.currentStage.name.toLowerCase());
         this.currentStage.onSpectatorConnect(spectator);
@@ -42,9 +45,9 @@ export default class Game {
             setTimeout(() => this.nextStage(JSON.parse(JSON.stringify(dataForNextStage))), 1);
         });
         this.currentStage.setDataStore(this.dataStore[this.currentStage.constructor.name] || {});
-        this.currentStage.setNotifyClientCallback(this.notifyClients);
         this.currentStage.setPlayers(this.players);
+        this.currentStage.setSpectators(this.spectators);
+        this.currentStage.setClients(this.clients);
         this.currentStage.start(dataFromPreviousStage);
     }
 }
-

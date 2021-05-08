@@ -11,7 +11,14 @@ export function getPlayers(count) {
 export function getStage(players, constructor) {
     const stage = new constructor();
     stage.setDataStore({});
-    stage.setNotifyClientCallback(() => {});
     stage.setPlayers(players);
+    stage.setSpectators([]);
+    stage.setClients({
+        emit: (actionName, actionData) => {
+            for (const client of [...stage.players, ...stage.spectators]) {
+                client.emit(actionName, actionData);
+            }
+        },
+    });
     return stage;
 }

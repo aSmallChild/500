@@ -24,5 +24,19 @@ describe('DeckConfig Unit', function() {
                 symbols.add(symbol);
             }
         });
+        it(`should have unique suit symbols`, function() {
+            const symbols = new Set();
+            for (const suit of config.suits) {
+                const symbol = suit.symbol;
+                should.exist(symbol, 'symbol is missing');
+                symbols.has(symbol).should.be.false(`symbol set contained a duplicate ${symbol}`);
+                symbols.add(symbol);
+            }
+        });
+        it(`should have colours for all the suits`, function() {
+            for (const suit of config.suits) {
+                suit.color.should.not.be.empty();
+            }
+        });
     });
 });

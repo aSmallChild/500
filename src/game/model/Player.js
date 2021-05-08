@@ -35,4 +35,13 @@ export default class Player {
         }
         this.partner = null;
     }
+
+    toJSON() {
+        return {
+            name: this.name,
+            position: this.position,
+            partner: this.partner.position,
+            connected: !!this.client
+        };
+    }
 }
