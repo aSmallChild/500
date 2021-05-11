@@ -25,12 +25,12 @@ export default class Bid {
         return this.toString();
     }
 
+    get call() {
+        return this.special ? this.special : this.tricks + (this.trumps?.symbol ?? '') + (this.antiTrumps ? '!' + this.antiTrumps.symbol : '');
+    }
+
     toString() {
-        const str = this.points + ':';
-        if (this.special) return str + this.special;
-        return str + this.tricks +
-            (this.trumps?.symbol ?? '') +
-            (this.antiTrumps ? '!' + this.antiTrumps.symbol : '');
+        return this.call + ':' + this.points;
     }
 
     static compareBids(a, b) {
@@ -39,7 +39,8 @@ export default class Bid {
     }
 
     static fromString(str, config) {
-        let [points, call] = str.split(':');
+        if (str.indexOf(':') < 0) str += ':0';
+        let [call, points] = str.split(':');
         points = parseInt(points);
         if (config.getSpecialBid(call)) return new Bid(null, null, null, call, points, config);
         const regex = /^(?<tricks>\d+)(?<trumps>[^!])?!?(?<antiTrumps>[^!])?$/g;
@@ -53,7 +54,7 @@ export default class Bid {
     static buildSpecialBids(specialBids, config) {
         const bids = [];
         for (const specialBid of specialBids) {
-            bids.push(new Bid(null, null, null, specialBid.symbol, specialBid.points, config));
+            bids.push(new Bid(null, null, null, specialBid.symbol, parseInt(specialBid.points), config));
         }
         return bids;
     }

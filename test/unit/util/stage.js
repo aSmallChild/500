@@ -1,9 +1,11 @@
 import Player from '../../../src/game/model/Player.js';
 
-export function getPlayers(count) {
+export function getPlayers(count, positions = false) {
     const players = [];
     for (let i = 0; i < count; i++) {
-        players.push(new Player((i + 10).toString(36), null));
+        const player = new Player((i + 10).toString(36), null);
+        if (positions) player.position = i;
+        players.push(player);
     }
     return players;
 }

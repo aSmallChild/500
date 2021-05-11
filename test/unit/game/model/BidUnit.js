@@ -6,11 +6,11 @@ import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 
 const config = new DeckConfig(OrdinaryNormalDeck.getConfig())
 const testBids = [
-    ['250:M', new Bid(null, null, null, 'M', 250, config)],
-    ['40:6♠', new Bid(6, config.suits.getSuit('♠'), null, null, 40, config)],
-    ['140:7♠!♣', new Bid(7, config.suits.getSuit('♠'), config.suits.getSuit('♣'), null, 140, config)],
-    ['100:6', new Bid(6, null, null, null, 100, config)],
-    ['40:6!♠', new Bid(6, null, config.suits.getSuit('♠'), null, 40, config)],
+    ['M:250', new Bid(null, null, null, 'M', 250, config)],
+    ['6♠:40', new Bid(6, config.suits.getSuit('♠'), null, null, 40, config)],
+    ['7♠!♣:140', new Bid(7, config.suits.getSuit('♠'), config.suits.getSuit('♣'), null, 140, config)],
+    ['6:100', new Bid(6, null, null, null, 100, config)],
+    ['6!♠:40', new Bid(6, null, config.suits.getSuit('♠'), null, 40, config)],
 ];
 describe('Bid Unit', function() {
     describe('toString()', function() {
@@ -30,9 +30,13 @@ describe('Bid Unit', function() {
     });
     describe('avondaleBids()', function() {
         const bids = Bid.getAvondaleBids(config);
+        let points = 0;
         it(`should have unique bids`, function() {
             const uniqueBids = new Set();
             for (const bid of bids) {
+                bid.points.should.be.type('number');
+                bid.points.should.be.aboveOrEqual(points);
+                points = bid.points;
                 const str = bid + '';
                 should.exist(bid, 'bid is missing');
                 uniqueBids.has(str).should.be.false(`bid set contained a duplicate ${str}`);

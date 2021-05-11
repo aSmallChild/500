@@ -9,7 +9,8 @@ export default class Bidding extends GameStage {
         // this.config = new DeckConfig(dataFromPreviousStage.config);
         // this.hands = dataFromPreviousStage.hands.map(hand => Deck.fromString(hand, this.config));
         // this.kitty = Deck.fromString(dataFromPreviousStage.kitty, this.config);
-        this.dataStore.firstBidder = typeof this.dataStore.firstBidder === 'undefined' ? 0 : (this.dataStore.firstBidder + 1) % this.players.length;
+        this.firstBidder = typeof this.dataStore.firstBidder === 'undefined' ? 0 : this.dataStore.firstBidder;
+        this.dataStore.firstBidder = (this.firstBidder + 1) % this.players.length;
         const config = OrdinaryNormalDeck.getConfig();
         config.kittySize = 3;
         config.cardsPerPlayer = 10;
@@ -54,15 +55,27 @@ export default class Bidding extends GameStage {
         this.playerBids = this.players.map(() => []);
         this.highestBid = null;
         this.highestBidder = null;
-        this.currentBidder = this.dataStore.firstBidder;
-        this.playerRaisedOwnBid = null;
+        this.currentBidder = this.firstBidder;
+        this.highestBidderRaisedOwnBid = null;
         this.handsDealt = this.deal(this.config);
         this.onSpectatorConnect(this.clients);
     }
 
-    onBid(player, bid) {
-        bid = Bid.fromString(bid, this.config);
+    getBid(call) {
+        for (const possibleBid of this.possibleBids) {
+            if (possibleBid.call === call) {
+                return possibleBid;
+            }
+        }
+        return null;
+    }
+
+    onBid(player, call) {
         if (this.currentBidder !== player.position) return player.emit('bid_error', 'It is not your turn to bid.');
+
+        const bid = this.getBid(call);
+        if (!bid) return player.emit('bid_error', 'Invalid bid.');
+
         if (bid.special === 'P') {
             if (player === this.highestBidder) return player.emit('bid_error', 'Cannot pass when you are the highest bidder.');
             return this.recordBid(player, bid);
@@ -74,9 +87,7 @@ export default class Bidding extends GameStage {
     }
 
     setHighestBid(player, bid) {
-        if (this.highestBidder === player) {
-            this.highestBidderRaisedOwnBid = true;
-        }
+        this.highestBidderRaisedOwnBid = this.highestBidder === player;
         this.highestBid = bid;
         this.highestBidder = player;
         this.recordBid(player, bid);
@@ -89,13 +100,14 @@ export default class Bidding extends GameStage {
     }
 
     nextBidder() {
-        const pass = this.config.getSpecialBid('P');
+        const pass = this.getBid('P');
         for (const _ of this.players) {
             this.currentBidder = (this.currentBidder + 1) % this.players.length;
             const bids = this.playerBids[this.currentBidder];
             if (bids.length && bids[bids.length - 1].special === 'P' && !this.highestBidderRaisedOwnBid) {
+                const player = this.players[this.currentBidder];
                 bids.push(pass);
-                this.clients.emit('bid', {player, bid: pass})
+                this.clients.emit('bid', {player, bid: pass});
                 continue;
             }
             return this.clients.emit('current_bidder', this.currentBidder);
@@ -117,7 +129,7 @@ export default class Bidding extends GameStage {
             kitty: this.kitty,
             hands: this.hands,
             winningBid: this.highestBid,
-            winningBidder: this.highestBidder.position
+            winningBidder: this.highestBidder.position,
         });
     }
 }
