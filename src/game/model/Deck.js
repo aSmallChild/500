@@ -149,8 +149,8 @@ export default class Deck {
         }
         for (const suit of suits) {
             const [lowest, highest] = Deck.getStartEndNumberCards(cardsPerSuit + (unallocatedCards-- > 0));
-            Deck.buildSuitPictureCards(suit, pictureCards, cards, config);
-            Deck.buildSuitNumberCards(suit, lowest, highest, cards, config);
+            Deck.buildSuitPictureCards(suit, config, pictureCards, cards);
+            Deck.buildSuitNumberCards(suit, config, lowest, highest, cards);
         }
         return new Deck(cards, config);
     }
@@ -164,14 +164,14 @@ export default class Deck {
         return [lowest, highest];
     }
 
-    static buildSuitPictureCards(suit, pictureCards, cards = [], config) {
+    static buildSuitPictureCards(suit, config, pictureCards, cards = []) {
         for (const card of pictureCards) {
             cards.push(new Card(suit, card.symbol, config));
         }
         return cards;
     }
 
-    static buildSuitNumberCards(suit, lowest, highest, cards = [], config) {
+    static buildSuitNumberCards(suit, config, lowest, highest, cards = []) {
         for (let i = highest; i >= lowest; i--) {
             cards.push(new Card(suit, i, config));
         }

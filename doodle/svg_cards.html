@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html lang="">
 <head>
-
-
     <style>
         :root {
             --suit-red: #c00;
@@ -14,7 +12,7 @@
         }
 
         html {
-            background: #222;
+            background: #151;
         }
 
         .card {
@@ -35,6 +33,7 @@
             stroke: var(--suit-red);
         }
     </style>
+    <title></title>
 </head>
 <body>
 <h1>SVG Test</h1>
@@ -107,16 +106,158 @@
     </svg>
 
     <svg viewBox="-120 -168 240 336" class="card heart">
-        <use xlink:href="#c" height="70" width="70" x="-90" y="-150"/>
-        <use xlink:href="#s" height="70" width="70" x="-25" y="-150"/>
-        <use xlink:href="#j" height="70" width="70" x="35" y="-150"/>
-        <use xlink:href="#10" height="70" width="70" x="-90" y="-30"/>
-        <use xlink:href="#2" height="70" width="70" x="-25" y="-30"/>
-        <use xlink:href="#3" height="70" width="70" x="35" y="-30"/>
-        <use xlink:href="#h" height="70" width="70" x="-90" y="90"/>
-        <use xlink:href="#d" height="70" width="70" x="-25" y="90"/>
-        <use xlink:href="#a" height="70" width="70" x="35" y="90"/>
+        <use href="#c" height="70" width="70" x="-90" y="-150"/>
+        <use href="#s" height="70" width="70" x="-25" y="-150"/>
+        <use href="#j" height="70" width="70" x="35" y="-150"/>
+        <use href="#10" height="70" width="70" x="-90" y="-30"/>
+        <use href="#2" height="70" width="70" x="-25" y="-30"/>
+        <use href="#3" height="70" width="70" x="35" y="-30"/>
+        <use href="#h" height="70" width="70" x="-90" y="90"/>
+        <use href="#d" height="70" width="70" x="-25" y="90"/>
+        <use href="#a" height="70" width="70" x="35" y="90"/>
+    </svg>
+    <svg viewBox="0 0 250 350" class="card heart">
+        <path d="M 123 0 h4v3500h-4 z"></path>
+        <use href="#c" height="60" width="60" x="27.5" y="30"/>
+        <use href="#s" height="60" width="60" x="90" y="30"/>
+        <use href="#j" height="60" width="60" x="160" y="30"/>
+        <use href="#10" height="60" width="60" x="27.5" y="140"/>
+        <use href="#2" height="60" width="60" x="90" y="140"/>
+        <use href="#3" height="60" width="60" x="160" y="140"/>
+        <use href="#h" height="60" width="60" x="27.5" y="250"/>
+        <use href="#d" height="60" width="60" x="90" y="250"/>
+        <use href="#a" height="60" width="60" x="160" y="250"/>
+    </svg>
+    <svg viewBox="0 0 250 350" class="card spade black">
+        <use href="#s" height="70" width="70" x="100" y="100"></use>
     </svg>
 </div>
+<div id="asd"></div>
+<script type="module">
+    import OrdinaryNormalDeck from '../src/game/constants/OrdinaryNormalDeck.js';
+    import DeckConfig from '../src/game/model/DeckConfig.js';
+    import Deck from '../src/game/model/Deck.js';
+    const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
+    const cardLayout = {
+        width: 250,
+        height: 350,
+        margin: 4,
+        pipSymbolSize: 30,
+        symbolRowsMax: 4,
+        symbolsColumnsMax: 3,
+        symbolLayouts: [
+            [[50, 50]],
+            [[50, 0], [50, 100]],
+            [[50, 0], [50, 50], [50, 100]],
+            [[0, 0], [0, 100], [100, 0], [100, 100]],
+            [[0, 0], [0, 100], [100, 0], [100, 100], [50, 50]],
+            [[0, 0], [0, 50], [0, 100], [100, 0], [100, 50], [100, 100]],
+            [[0, 0], [0, 50], [0, 100], [100, 0], [100, 50], [100, 100], [50, 25]],
+            [[0, 0], [0, 50], [0, 100], [100, 0], [100, 50], [100, 100], [50, 25], [50, 75]],
+            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, 50], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
+            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, 100/6], [50, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
+            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, 100/6], [50, 50], [50, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
+            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, 0], [50, 100/3], [50, 200/3], [50, 100], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
+        ],
+        getSymbolArea: function() {
+            const horizontalMargin = this.margin * 2 + this.pipSymbolSize;
+            const verticalMargin = this.margin + this.pipSymbolSize;
+            return {
+                horizontalMargin,
+                verticalMargin,
+                width: this.width - horizontalMargin * 2,
+                height: this.width - verticalMargin * 2,
+            };
+        },
+        getSymbolSize: function() {
+            const area = this.getSymbolArea();
+            const availableHeight = area.height - (this.symbolRowsMax - 1) * this.margin;
+            const symbolHeight = availableHeight / this.symbolRowsMax;
+            const availableWidth = area.width - (this.symbolsColumnsMax - 1) * this.margin;
+            const symbolWidth = availableWidth / this.symbolsColumnsMax;
+            return Math.max(symbolWidth, symbolHeight); // should be min but the symbols come out too small
+        },
+        getSymbolMap: function(numberOfSymbols) {
+            if (numberOfSymbols > this.symbolRowsMax * this.symbolsColumnsMax) {
+                return null;
+            }
+            return this.symbolLayouts[numberOfSymbols - 1];
+        }
+    };
+
+    class CardBuilderThing {
+        static namespace = 'http://www.w3.org/2000/svg';
+        static getSVG(card, layout) {
+            const svg = document.createElementNS(this.namespace, 'svg');
+            svg.setAttributeNS(null, 'viewBox', `0 0 ${layout.width} ${layout.height}`);
+            this.addClass(svg, card);
+            this.addPips(svg, card, layout);
+            this.addSymbols(svg, card, layout);
+            return svg;
+        }
+
+        static addClass(svg, card) {
+            svg.classList.add('card');
+            svg.classList.add(card.suit.name.toLowerCase());
+            svg.classList.add(card.suit.color.toLowerCase());
+        }
+
+        static addPips(svg, card, layout) {
+            if (card.suit) {
+                const [char, ] = card.suit.name.toLowerCase();
+                const suit = this.getElement('use');
+                suit.setAttribute('href', `#${char}`);
+                suit.setAttribute('height', layout.pipSymbolSize);
+                suit.setAttribute('width', layout.pipSymbolSize);
+                suit.setAttribute('x', layout.margin);
+                suit.setAttribute('y', layout.margin);
+                svg.appendChild(suit);
+                const suit2 = suit.cloneNode();
+                suit2.setAttribute('x', layout.width - layout.margin);
+                suit2.setAttribute('y', layout.height - layout.margin);
+                suit2.setAttribute('transform', `rotate(180, ${suit2.getAttribute('x')}, ${suit2.getAttribute('y')})`)
+                svg.appendChild(suit2);
+            }
+        }
+
+        static addSymbols(svg, card, layout) {
+            const symbolMap = layout.getSymbolMap(card.value);
+            if (!symbolMap) {
+                return;
+            }
+            const symbolSize = layout.getSymbolSize();
+            const symbolArea = layout.getSymbolArea();
+            const [char, ] = card.suit.name.toLowerCase();
+            for (const [x, y] of symbolMap) {
+                const symbol = this.getElement('use');
+                symbol.setAttribute('href', `#${char}`);
+                symbol.setAttribute('height', symbolSize);
+                symbol.setAttribute('width', symbolSize);
+                const offsetX = symbolArea.horizontalMargin + (symbolArea.width - symbolSize) * x/100;
+                const offsetY = symbolArea.verticalMargin + (symbolArea.height + symbolSize) * y/100;
+                symbol.setAttribute('x', offsetX);
+                symbol.setAttribute('y', offsetY);
+                if (y > 50) {
+                    symbol.setAttribute('transform', `rotate(180, ${symbolSize/2 + offsetX}, ${symbolSize/2 + offsetY})`)
+                }
+                svg.appendChild(symbol);
+            }
+        }
+
+        static getElement(type) {
+            return document.createElementNS(this.namespace, type);
+        }
+    }
+
+    const div = document.getElementById('asd');
+
+    for (const suit of config.suits) {
+        const cards = Deck.buildSuitNumberCards(suit, config, 2, 12);
+        for (const card of cards) {
+            const svg = CardBuilderThing.getSVG(card, cardLayout);
+            div.appendChild(svg);
+        }
+    }
+</script>
 </body>
 </html>
