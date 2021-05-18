@@ -10,7 +10,7 @@ export default class Card {
     }
 
     getName() {
-        return this.config.getCardName(this.value) + (this.suit ? ` of ${this.suit.name}` : '')
+        return this.config.getCardName(this.value) + (this.suit ? ` of ${this.suit.name}s` : '')
     }
 
     toString() {
