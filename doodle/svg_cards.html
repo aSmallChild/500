@@ -21,6 +21,8 @@
             background: #111;
             width: 2.5in;
             height: 3.5in;
+            fill: var(--suit-black);
+            stroke: var(--suit-black);
         }
 
         .spade, .club {
@@ -36,52 +38,47 @@
     <title></title>
 </head>
 <body>
-<h1>SVG Test</h1>
-<a href="https://commons.wikimedia.org/wiki/Category:SVG_playing_cards">SVG CARDS ON WIKIMEDIA</a>
 <div>
     <svg width="0" height="0">
         <defs>
             <symbol id="s" viewBox="-600 -600 1200 1200">
-                <path d="M0 -500C100 -250 355 -100 355 185A150 150 0 0 1 55 185A10 10 0 0 0 35 185C35 385 85 400 130 500L-130 500C-85 400 -35 385 -35 185A10 10 0 0 0 -55 185A150 150 0 0 1 -355 185C-355 -100 -100 -250 0 -500Z"/>
+                <path d="M0 -500C100 -250 355 -100 355 185A150 150 0 0 1 55 185A10 10 0 0 0 35 185C35 385 85 400 130 500L-130 500C-85 400 -35 385 -35 185A10 10 0 0 0 -55 185A150 150 0 0 1 -355 185C-355 -100 -100 -250 0 -500Z"></path>
             </symbol>
             <symbol id="c" viewBox="-600 -600 1200 1200">
-                <path d="M30 150C35 385 85 400 130 500L-130 500C-85 400 -35 385 -30 150A10 10 0 0 0 -50 150A210 210 0 1 1 -124 -51A10 10 0 0 0 -110 -65A230 230 0 1 1 110 -65A10 10 0 0 0 124 -51A210 210 0 1 1 50 150A10 10 0 0 0 30 150Z"/>
+                <path d="M30 150C35 385 85 400 130 500L-130 500C-85 400 -35 385 -30 150A10 10 0 0 0 -50 150A210 210 0 1 1 -124 -51A10 10 0 0 0 -110 -65A230 230 0 1 1 110 -65A10 10 0 0 0 124 -51A210 210 0 1 1 50 150A10 10 0 0 0 30 150Z"></path>
             </symbol>
             <symbol id="h" viewBox="-600 -600 1200 1200">
-                <path d="M0 -300C0 -400 100 -500 200 -500C300 -500 400 -400 400 -250C400 0 0 400 0 500C0 400 -400 0 -400 -250C-400 -400 -300 -500 -200 -500C-100 -500 0 -400 -0 -300Z"/>
+                <path d="M0 -300C0 -400 100 -500 200 -500C300 -500 400 -400 400 -250C400 0 0 400 0 500C0 400 -400 0 -400 -250C-400 -400 -300 -500 -200 -500C-100 -500 0 -400 -0 -300Z"></path>
             </symbol>
             <symbol id="d" viewBox="-600 -600 1200 1200">
-                <path d="M-400 0C-350 0 0 -450 0 -500C0 -450 350 0 400 0C350 0 0 450 0 500C0 450 -350 0 -400 0Z"/>
+                <path d="M-400 0C-350 0 0 -450 0 -500C0 -450 350 0 400 0C350 0 0 450 0 500C0 450 -350 0 -400 0Z"></path>
             </symbol>
-            <symbol id="a" viewBox="-500 -500 1000 1000">
-                <path d="M-270 460L-110 460M-200 450L0 -460L200 450M110 460L270 460M-120 130L120 130" stroke-width="80" stroke-linecap="square" stroke-miterlimit="1.5" fill="none"/>
-            </symbol>
-            <symbol id="k" viewBox="-500 -500 1000 1000">
-                <path d="M-285 -460L-85 -460M-185 -460L-185 460M-285 460L-85 460M85 -460L285 -460M185 -440L-170 155M85 460L285 460M185 440L-10 -70" stroke-width="80" stroke-linecap="square" stroke-miterlimit="1.5" fill="none"/>
-            </symbol>
-            <symbol id="q" viewBox="-500 -500 1000 1000">
-                <path d="M-260 100C40 100 -40 460 260 460M-175 0L-175 -285A175 175 0 0 1 175 -285L175 285A175 175 0 0 1 -175 285Z" stroke-width="80" stroke-linecap="square" stroke-miterlimit="1.5" fill="none"/>
-            </symbol>
-            <symbol id="j" viewBox="-500 -500 1000 1000">
-                <path d="M50 -460L250 -460M150 -460L150 250A100 100 0 0 1 -250 250L-250 220" stroke-width="80" stroke-linecap="square" stroke-miterlimit="1.5" fill="none"/>
-            </symbol>
-            <symbol id="kc" viewBox="0 0 640 640">
+            <symbol id="k" viewBox="0 0 640 640">
                 <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
+            </symbol>
+            <symbol id="j" viewBox="0 0 640 640">
+                <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
+            </symbol>
+            <symbol id="$" viewBox="0 0 640 640">
+                <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
+            </symbol>
+            <symbol id="q" viewBox="0 0 640 640">
+                <path d="M102.3 626C132.98 626.75 157.45 620.25 175.71 606.5C193.97 592.75 206.76 572.58 214.08 546C227.71 583.67 244.76 602.33 265.25 602C285.73 601.67 307.6 567 330.87 498C355.99 565.5 377.86 600.17 396.49 602C415.12 603.83 433.84 585.17 452.66 546C467.12 574.25 481.02 594.42 494.37 606.5C507.71 618.58 525.88 625.08 548.87 626L548.87 640C494.43 632.52 460.41 627.84 446.8 625.97C367.3 615.04 286.69 614.97 207.17 625.77C193.19 627.66 158.23 632.41 102.3 640L102.3 626Z"></path>
+                <path d="M235 531.83C235 543.42 225.59 552.83 214 552.83C202.41 552.83 193 543.42 193 531.83C193 520.24 202.41 510.83 214 510.83C225.59 510.83 235 520.24 235 531.83Z"></path>
+                <path d="M355.5 481.58C355.5 495.52 344.19 506.83 330.25 506.83C316.31 506.83 305 495.52 305 481.58C305 467.65 316.31 456.33 330.25 456.33C344.19 456.33 355.5 467.65 355.5 481.58Z"></path>
+                <path d="M474 532.33C474 543.65 464.81 552.83 453.5 552.83C442.19 552.83 433 543.65 433 532.33C433 521.02 442.19 511.83 453.5 511.83C464.81 511.83 474 521.02 474 532.33Z"></path>
             </symbol>
         </defs>
     </svg>
-
-    <svg viewBox="-120 -168 240 336" class="card club">
-        <use href="#c" height="70" width="70" x="-90" y="-150"/>
-        <use href="#s" height="70" width="70" x="-25" y="-150"/>
-        <use href="#h" height="70" width="70" x="35" y="-150"/>
-        <use href="#k" height="70" width="70" x="-90" y="-30"/>
-        <use href="#q" height="70" width="70" x="35" y="-30"/>
-        <use href="#j" height="70" width="70" x="-25" y="90"/>
-        <use href="#kc" height="70" width="70" x="35" y="90"/>
+</div>
+<div id="asd">
+    <svg viewBox="0 0 250 350" class="card club">
+        <use href="#k" height="90" width="90" x="80" y="130"/>
+    </svg>
+    <svg viewBox="0 0 250 350" class="card club">
+        <use href="#q" height="90" width="90" x="80" y="130"/>
     </svg>
 </div>
-<div id="asd"></div>
 <script type="module">
     import OrdinaryNormalDeck from '../src/game/constants/OrdinaryNormalDeck.js';
     import DeckConfig from '../src/game/model/DeckConfig.js';
@@ -153,8 +150,10 @@
 
         static addClass(svg, card) {
             svg.classList.add('card');
-            svg.classList.add(card.suit.name.toLowerCase());
-            svg.classList.add(card.suit.color.toLowerCase());
+            if (card.suit) {
+                svg.classList.add(card.suit.name.toLowerCase());
+                // svg.classList.add(card.suit.color.toLowerCase());
+            }
         }
 
         static addPips(svg, card, layout) {
@@ -203,18 +202,21 @@
                 return;
             }
 
-            const [char, ] = card.suit.name.toLowerCase();
             const value = '' + card.value;
             const symbolSize = layout.getSymbolSize() * (3 + (value === 'A'));
             const symbol = this.getElement('use');
-            symbol.setAttribute('href', `#${char}`);
-            symbol.setAttribute('height', symbolSize);
-            symbol.setAttribute('width', symbolSize);
-            symbol.setAttribute('x', layout.width / 2 - symbolSize / 2);
-            symbol.setAttribute('y', layout.height / 2  - symbolSize / 2);
+            if (card.suit) {
+                const [char, ] = card.suit.name.toLowerCase();
+                symbol.setAttribute('href', `#${char}`);
+                symbol.setAttribute('height', symbolSize);
+                symbol.setAttribute('width', symbolSize);
+                symbol.setAttribute('x', layout.width / 2 - symbolSize / 2);
+                symbol.setAttribute('y', layout.height / 2  - symbolSize / 2);
+                svg.appendChild(symbol);
+            }
+
             if (value !== 'A') {
                 symbol.setAttribute('opacity', 0.5);
-
                 const pip = this.getElement('text');
                 pip.textContent = value;
                 const textSize = symbolSize/2;
@@ -225,7 +227,6 @@
                 pip.setAttribute('y', layout.height / 2 + textSize / 3);
                 svg.appendChild(pip);
             }
-            svg.appendChild(symbol);
         }
 
         static applySymbolMap(svg, card, layout, symbolMap) {
@@ -255,13 +256,15 @@
 
     const div = document.getElementById('asd');
 
+    const cards = [];
     for (const suit of config.suits) {
-        const cards = Deck.buildSuitNumberCards(suit, config, 1, 18);
         Deck.buildSuitPictureCards(suit, config, config.suitPictureCards, cards);
-        for (const card of cards) {
-            const svg = CardBuilderThing.getSVG(card, cardLayout);
-            div.appendChild(svg);
-        }
+        Deck.buildSuitNumberCards(suit, config, 1, 20, cards);
+    }
+    // const cards = Deck.buildDeck(config);
+    for (const card of cards) {
+        const svg = CardBuilderThing.getSVG(card, cardLayout);
+        div.appendChild(svg);
     }
 </script>
 </body>
