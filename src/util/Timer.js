@@ -18,11 +18,6 @@ export default class Timer {
         this.endTime = null;
     }
 
-    resume() {
-        if (!this.startTime) return this.start();
-        this.endTime = null;
-    }
-
     getDurationMs() {
         if (!this.startTime) return 0;
         return (this.endTime || Date.now()) - this.startTime;

@@ -4,13 +4,13 @@ import OrdinaryNormalDeck from '../../../../src/game/constants/OrdinaryNormalDec
 import should from 'should';
 import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 
-const config = new DeckConfig(OrdinaryNormalDeck.getConfig())
+const config = new DeckConfig(OrdinaryNormalDeck.config)
 const testBids = [
     ['M:250', new Bid(null, null, null, 'M', 250, config)],
-    ['6♠:40', new Bid(6, config.suits.getSuit('♠'), null, null, 40, config)],
-    ['7♠!♣:140', new Bid(7, config.suits.getSuit('♠'), config.suits.getSuit('♣'), null, 140, config)],
+    ['6S:40', new Bid(6, config.suits.getSuit('S'), null, null, 40, config)],
+    ['7S!C:140', new Bid(7, config.suits.getSuit('S'), config.suits.getSuit('C'), null, 140, config)],
     ['6:100', new Bid(6, null, null, null, 100, config)],
-    ['6!♠:40', new Bid(6, null, config.suits.getSuit('♠'), null, 40, config)],
+    ['6!S:40', new Bid(6, null, config.suits.getSuit('S'), null, 40, config)],
 ];
 describe('Bid Unit', function() {
     describe('toString()', function() {

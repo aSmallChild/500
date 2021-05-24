@@ -5,6 +5,8 @@
         :root {
             --suit-red: #c00;
             --suit-black: #ccc;
+            --suit-blue: #0040ff;
+            --suit-green: #0c0;
         }
 
         * {
@@ -25,14 +27,19 @@
             stroke: var(--suit-black);
         }
 
-        .spade, .club {
-            fill: var(--suit-black);
-            stroke: var(--suit-black);
-        }
-
-        .heart, .diamond {
+        .red {
             fill: var(--suit-red);
             stroke: var(--suit-red);
+        }
+
+        .blue {
+            fill: var(--suit-blue);
+            stroke: var(--suit-blue);
+        }
+
+        .green {
+            fill: var(--suit-green);
+            stroke: var(--suit-green);
         }
     </style>
     <title></title>
@@ -40,19 +47,7 @@
 <body>
 <div>
     <svg width="0" height="0">
-        <defs>
-            <symbol id="s" viewBox="-600 -600 1200 1200">
-                <path d="M0 -500C100 -250 355 -100 355 185A150 150 0 0 1 55 185A10 10 0 0 0 35 185C35 385 85 400 130 500L-130 500C-85 400 -35 385 -35 185A10 10 0 0 0 -55 185A150 150 0 0 1 -355 185C-355 -100 -100 -250 0 -500Z"></path>
-            </symbol>
-            <symbol id="c" viewBox="-600 -600 1200 1200">
-                <path d="M30 150C35 385 85 400 130 500L-130 500C-85 400 -35 385 -30 150A10 10 0 0 0 -50 150A210 210 0 1 1 -124 -51A10 10 0 0 0 -110 -65A230 230 0 1 1 110 -65A10 10 0 0 0 124 -51A210 210 0 1 1 50 150A10 10 0 0 0 30 150Z"></path>
-            </symbol>
-            <symbol id="h" viewBox="-600 -600 1200 1200">
-                <path d="M0 -300C0 -400 100 -500 200 -500C300 -500 400 -400 400 -250C400 0 0 400 0 500C0 400 -400 0 -400 -250C-400 -400 -300 -500 -200 -500C-100 -500 0 -400 -0 -300Z"></path>
-            </symbol>
-            <symbol id="d" viewBox="-600 -600 1200 1200">
-                <path d="M-400 0C-350 0 0 -450 0 -500C0 -450 350 0 400 0C350 0 0 450 0 500C0 450 -350 0 -400 0Z"></path>
-            </symbol>
+        <defs id="svg_defs">
             <symbol id="k" viewBox="0 0 640 640">
                 <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
             </symbol>
@@ -80,182 +75,16 @@
     </svg>
 </div>
 <script type="module">
-    import OrdinaryNormalDeck from '../src/game/constants/OrdinaryNormalDeck.js';
+    import CardSVGBuilder from '../src/game/view/CardSVGBuilder.js';
     import DeckConfig from '../src/game/model/DeckConfig.js';
     import Deck from '../src/game/model/Deck.js';
-    const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
-    const cardLayout = {
-        width: 250,
-        height: 350,
-        margin: 8,
-        pipSymbolSize: 30,
-        symbolRowsMax: 4,
-        symbolsColumnsMax: 3,
-        symbolLayouts: [
-            [[50, 50]],
-            [[50, 0], [50, 100]],
-            [[50, 0], [50, 50], [50, 100]],
-            [[0, 0], [0, 100], [100, 0], [100, 100]],
-            [[0, 0], [0, 100], [100, 0], [100, 100], [50, 50]],
-            [[0, 0], [0, 50], [0, 100], [100, 0], [100, 50], [100, 100]],
-            [[0, 0], [0, 50], [0, 100], [100, 0], [100, 50], [100, 100], [50, 25]],
-            [[0, 0], [0, 50], [0, 100], [100, 0], [100, 50], [100, 100], [50, 25], [50, 75]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, 50], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, 100/6], [50, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, 100/6], [50, 50], [50, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, 0], [50, 100/3], [50, 200/3], [50, 100], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [50, -100/6], [50, 100/6], [50, 50], [50, 500/6], [50, 700/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [25, 100/6], [50, 0], [50, 100/3], [50, 200/3], [50, 100], [75, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [25, 100/6], [25, 50], [50, 0], [50, 100/3], [50, 200/3], [50, 100], [75, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [25, 100/6], [25, 50], [50, 0], [50, 100/3], [50, 200/3], [50, 100], [75, 50], [75, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [25, 100/6], [25, 50], [50, 0], [50, 100/3], [50, 200/3], [50, 100], [75, 100/6], [75, 50], [75, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-            [[0, 0], [0, 100/3], [0, 200/3], [0, 100], [25, 100/6], [25, 50], [25, 500/6], [50, 0], [50, 100/3], [50, 200/3], [50, 100], [75, 100/6], [75, 50], [75, 500/6], [100, 0], [100, 100/3], [100, 200/3], [100, 100]],
-        ],
-        getSymbolArea: function() {
-            const horizontalMargin = this.margin * 4 + this.pipSymbolSize;
-            const verticalMargin = this.margin + this.pipSymbolSize / 2;
-            return {
-                horizontalMargin,
-                verticalMargin,
-                width: this.width - horizontalMargin * 2,
-                height: this.width - verticalMargin * 2,
-            };
-        },
-        getSymbolSize: function() {
-            const area = this.getSymbolArea();
-            const availableHeight = area.height - (this.symbolRowsMax - 1) * this.margin;
-            const symbolHeight = availableHeight / this.symbolRowsMax;
-            const availableWidth = area.width - (this.symbolsColumnsMax - 1) * this.margin;
-            const symbolWidth = availableWidth / this.symbolsColumnsMax;
-            return Math.max(symbolWidth, symbolHeight);
-        },
-        getSymbolMap: function(numberOfSymbols) {
-            if (this.symbolLayouts.length < numberOfSymbols) {
-                return null;
-            }
-            return this.symbolLayouts[numberOfSymbols - 1];
-        }
-    };
+    import OrdinaryNormalDeck from '../src/game/constants/OrdinaryNormalDeck.js';
 
-    class CardBuilderThing {
-        static namespace = 'http://www.w3.org/2000/svg';
-        static getSVG(card, layout) {
-            const svg = document.createElementNS(this.namespace, 'svg');
-            svg.setAttributeNS(null, 'viewBox', `0 0 ${layout.width} ${layout.height}`);
-            this.addClass(svg, card);
-            this.addPips(svg, card, layout);
-            this.addSymbols(svg, card, layout);
-            return svg;
-        }
-
-        static addClass(svg, card) {
-            svg.classList.add('card');
-            if (card.suit) {
-                svg.classList.add(card.suit.name.toLowerCase());
-                // svg.classList.add(card.suit.color.toLowerCase());
-            }
-        }
-
-        static addPips(svg, card, layout) {
-            if (card.value) {
-                const pip = this.getElement('text');
-                pip.textContent = card.value;
-                const pipYOffset = layout.pipSymbolSize + layout.margin / 2;
-                const pipXOffset = layout.margin + (card.value > 9 ? 0 : layout.margin - 2);
-                const textLength = card.value > 9 ? layout.pipSymbolSize : layout.pipSymbolSize / 2;
-                pip.setAttribute('style', `font: ${layout.pipSymbolSize}px sans-serif`);
-                pip.setAttribute('textLength', `${textLength}px`);
-                pip.setAttribute('lengthAdjust', `spacingAndGlyphs`);
-                pip.setAttribute('x', pipXOffset);
-                pip.setAttribute('y', pipYOffset);
-                svg.appendChild(pip);
-                const pip2 = pip.cloneNode();
-                pip2.textContent = (card.value + '').split('').reverse().join('');
-                pip2.setAttribute('x', layout.width - (card.value > 9 ? layout.margin + layout.pipSymbolSize / 2 : layout.margin + layout.pipSymbolSize / 4));
-                pip2.setAttribute('y', layout.height - pipYOffset);
-                pip2.setAttribute('rotate', '180')
-                svg.appendChild(pip2);
-            }
-
-            if (card.suit) {
-                const [char, ] = card.suit.name.toLowerCase(); // should be using the symbol
-                const suit = this.getElement('use');
-                const suitYOffset = layout.margin * 1.5 + layout.pipSymbolSize;
-                suit.setAttribute('href', `#${char}`);
-                suit.setAttribute('height', layout.pipSymbolSize);
-                suit.setAttribute('width', layout.pipSymbolSize);
-                suit.setAttribute('x', layout.margin);
-                suit.setAttribute('y', suitYOffset);
-                svg.appendChild(suit);
-                const suit2 = suit.cloneNode();
-                suit2.setAttribute('x', layout.width - layout.margin);
-                suit2.setAttribute('y', layout.height - suitYOffset);
-                suit2.setAttribute('transform', `rotate(180, ${suit2.getAttribute('x')}, ${suit2.getAttribute('y')})`)
-                svg.appendChild(suit2);
-            }
-        }
-
-        static addSymbols(svg, card, layout) {
-            const symbolMap = layout.getSymbolMap(card.value);
-            if (symbolMap) {
-                this.applySymbolMap(svg, card, layout, symbolMap);
-                return;
-            }
-
-            const value = '' + card.value;
-            const symbolSize = layout.getSymbolSize() * (3 + (value === 'A'));
-            const symbol = this.getElement('use');
-            if (card.suit) {
-                const [char, ] = card.suit.name.toLowerCase();
-                symbol.setAttribute('href', `#${char}`);
-                symbol.setAttribute('height', symbolSize);
-                symbol.setAttribute('width', symbolSize);
-                symbol.setAttribute('x', layout.width / 2 - symbolSize / 2);
-                symbol.setAttribute('y', layout.height / 2  - symbolSize / 2);
-                svg.appendChild(symbol);
-            }
-
-            if (value !== 'A') {
-                symbol.setAttribute('opacity', 0.5);
-                const pip = this.getElement('text');
-                pip.textContent = value;
-                const textSize = symbolSize/2;
-                pip.setAttribute('style', `font: ${textSize}px sans-serif`);
-                pip.setAttribute('textLength', `${textSize/2}px`);
-                pip.setAttribute('lengthAdjust', `spacingAndGlyphs`);
-                pip.setAttribute('x', layout.width / 2 - textSize / 4);
-                pip.setAttribute('y', layout.height / 2 + textSize / 3);
-                svg.appendChild(pip);
-            }
-        }
-
-        static applySymbolMap(svg, card, layout, symbolMap) {
-            const symbolSize = layout.getSymbolSize();
-            const symbolArea = layout.getSymbolArea();
-            const [char, ] = card.suit.name.toLowerCase();
-            for (const [x, y] of symbolMap) {
-                const symbol = this.getElement('use');
-                symbol.setAttribute('href', `#${char}`);
-                symbol.setAttribute('height', symbolSize);
-                symbol.setAttribute('width', symbolSize);
-                const offsetX = symbolArea.horizontalMargin - symbolSize/2 + symbolArea.width * x/100;
-                const offsetY = symbolArea.verticalMargin + symbolSize/2 + symbolArea.height * y/100;
-                symbol.setAttribute('x', offsetX);
-                symbol.setAttribute('y', offsetY);
-                if (y > 50) {
-                    symbol.setAttribute('transform', `rotate(180, ${symbolSize/2 + offsetX}, ${symbolSize/2 + offsetY})`)
-                }
-                svg.appendChild(symbol);
-            }
-        }
-
-        static getElement(type) {
-            return document.createElementNS(this.namespace, type);
-        }
-    }
-
+    const layout = OrdinaryNormalDeck.layout;
+    const config = new DeckConfig(OrdinaryNormalDeck.config);
     const div = document.getElementById('asd');
 
+    document.getElementById('svg_defs').innerHTML += OrdinaryNormalDeck.svg;
     const cards = [];
     for (const suit of config.suits) {
         Deck.buildSuitPictureCards(suit, config, config.suitPictureCards, cards);
@@ -263,7 +92,7 @@
     }
     // const cards = Deck.buildDeck(config);
     for (const card of cards) {
-        const svg = CardBuilderThing.getSVG(card, cardLayout);
+        const svg = CardSVGBuilder.getSVG(card, layout);
         div.appendChild(svg);
     }
 </script>

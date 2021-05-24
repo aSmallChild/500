@@ -17,32 +17,32 @@ describe('Deal Stage Unit', function() {
         });
     });
     describe(`onBid()`, function() {
-        // "P","6♠","6♣","6♦","6♥","6","7♠","7♣","7♦","7♥","7","8♠","M","8♣","8♦","8♥","8","9♠","9♣","9♦","9♥","9","10♠","10♣","10♦","O","10♥","10","B"
+        // "P","6S","6C","6D","6H","6","7S","7C","7D","7H","7","8S","M","8C","8D","8H","8","9S","9C","9D","9H","9","10S","10C","10D","O","10H","10","B"
         const scenarios = [
             {
                 name: 'one bid one pass',
                 players: 2,
                 firstBidder: 0,
                 bids: [
-                    [0, '6♠'],
+                    [0, '6S'],
                     [1, 'P'],
                 ],
-                winner: [0, '6♠'],
+                winner: [0, '6S'],
             },
             {
                 name: 'one bid one pass with more players',
                 players: 10,
                 firstBidder: 0,
                 bids: [
-                    [0, '6♠'],
-                    [1, '6♣'],
-                    [2, '6♦'],
-                    [3, '6♥'],
+                    [0, '6S'],
+                    [1, '6C'],
+                    [2, '6D'],
+                    [3, '6H'],
                     [4, '6'],
-                    [5, '7♠'],
-                    [6, '7♣'],
-                    [7, '7♦'],
-                    [8, '7♥'],
+                    [5, '7S'],
+                    [6, '7C'],
+                    [7, '7D'],
+                    [8, '7H'],
                     [9, '7'],
                     [0, 'P'],
                     [1, 'P'],
@@ -61,33 +61,33 @@ describe('Deal Stage Unit', function() {
                 players: 3,
                 firstBidder: 0,
                 bids: [
-                    [0, '6♠'],
-                    [1, '6♣'],
-                    [2, '6♦'],
+                    [0, '6S'],
+                    [1, '6C'],
+                    [2, '6D'],
                     [0, 'P'],
                     [1, 'P'],
-                    [2, '7♠'],
+                    [2, '7S'],
                     [0, 'P'],
                     [1, 'P'],
                 ],
-                winner: [2, '7♠'],
+                winner: [2, '7S'],
             },
             {
                 name: 'highest bidder raises own bid, and then someone out bids them',
                 players: 3,
                 firstBidder: 0,
                 bids: [
-                    [0, '6♠'],
-                    [1, '6♣'],
-                    [2, '6♦'],
+                    [0, '6S'],
+                    [1, '6C'],
+                    [2, '6D'],
                     [0, 'P'],
                     [1, 'P'],
-                    [2, '7♠'],
+                    [2, '7S'],
                     [0, 'P'],
-                    [1, '8♠'],
+                    [1, '8S'],
                     [2, 'P'],
                 ],
-                winner: [1, '8♠'],
+                winner: [1, '8S'],
             },
         ];
         for (const scenario of scenarios) {

@@ -11,7 +11,7 @@ export default class Bidding extends GameStage {
         // this.kitty = Deck.fromString(dataFromPreviousStage.kitty, this.config);
         this.firstBidder = typeof this.dataStore.firstBidder === 'undefined' ? 0 : this.dataStore.firstBidder;
         this.dataStore.firstBidder = (this.firstBidder + 1) % this.players.length;
-        const config = OrdinaryNormalDeck.getConfig();
+        const config = OrdinaryNormalDeck.config;
         config.kittySize = 3;
         config.cardsPerPlayer = 10;
         config.totalHands = this.players.length;

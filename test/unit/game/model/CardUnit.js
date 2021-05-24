@@ -4,12 +4,12 @@ import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
-const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
+const config = new DeckConfig(OrdinaryNormalDeck.config);
 const testCards = [
     [new Card(null, '$', config), '$'],
-    [new Card(config.suits.getSuit('♣'), 'Q', config), `♣Q`],
-    [new Card(config.suits.getSuit('♦'), 5, config), `♦5`],
-    [new Card(config.suits.getSuit('♥'), 20, config), `♥20`],
+    [new Card(config.suits.getSuit('C'), 'Q', config), `CQ`],
+    [new Card(config.suits.getSuit('D'), 5, config), `D5`],
+    [new Card(config.suits.getSuit('H'), 20, config), `H20`],
 ];
 describe('Card Unit', function() {
     describe('toString()', function() {

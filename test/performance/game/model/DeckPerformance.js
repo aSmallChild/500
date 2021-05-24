@@ -19,7 +19,7 @@ describe('Deck Performance', function() {
                 _maxDurationMs: 100,
 
             }]) {
-            const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
+            const config = new DeckConfig(OrdinaryNormalDeck.config);
             for (const x in c) {
                 if (c.hasOwnProperty(x)) config[x] = c[x];
             }

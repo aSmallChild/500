@@ -5,11 +5,11 @@ import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
-const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
+const config = new DeckConfig(OrdinaryNormalDeck.config);
 const suits = config.suits;
-const heart = suits.getSuit('♥');
-const club = suits.getSuit('♣');
-const spade = suits.getSuit('♠');
+const heart = suits.getSuit('H');
+const club = suits.getSuit('C');
+const spade = suits.getSuit('S');
 
 describe('Deck Unit', function() {
     describe('buildDeck()', function() {
@@ -65,7 +65,7 @@ describe('Deck Unit', function() {
                 _highestBlackCard: 5,
             },
         ]) {
-            const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
+            const config = new DeckConfig(OrdinaryNormalDeck.config);
             for (const x in c) {
                 if (c.hasOwnProperty(x)) config[x] = c[x];
             }
@@ -86,7 +86,7 @@ describe('Deck Unit', function() {
     });
 
     function testShuffle(positionsToMove) {
-        const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
+        const config = new DeckConfig(OrdinaryNormalDeck.config);
         config.totalHands = 5;
         const deck = Deck.buildDeck(config);
         const originalOrder = [];
@@ -126,10 +126,10 @@ describe('Deck Unit', function() {
 
     describe('toString()', function() {
         it(`should produce a full deck`, function() {
-            const config = new DeckConfig(OrdinaryNormalDeck.getConfig());
+            const config = new DeckConfig(OrdinaryNormalDeck.config);
             config.totalHands = 5;
             const deck = Deck.buildDeck(config);
-            (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
+            (deck + '').should.equal('$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2');
         });
         it(`should produce correct ranges`, function() {
             const deck = new Deck([
@@ -146,22 +146,22 @@ describe('Deck Unit', function() {
                 new Card(spade, 2, config),
             ], config);
             deck.shuffle();
-            (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
+            (deck + '').should.equal('HAJ20-18,16C3S5-2');
         });
     });
 
     describe('fromString()', function() {
         it(`should produce a full deck by default`, function() {
-            const deck = Deck.fromString('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2', config);
-            (deck + '').should.equal('$♥AKQJ10-2♦AKQJ10-2♣AKQJ10-2♠AKQJ10-2');
+            const deck = Deck.fromString('$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2', config);
+            (deck + '').should.equal('$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2');
         });
         it(`should produce correct ranges`, function() {
-            const deck = Deck.fromString('♥AJ20-18,16♣3♠5-2', config);
-            (deck + '').should.equal('♥AJ20-18,16♣3♠5-2');
+            const deck = Deck.fromString('HAJ20-18,16C3S5-2', config);
+            (deck + '').should.equal('HAJ20-18,16C3S5-2');
         });
         it(`should not fail on that weird edge case where it didn't add all the commas`, function() {
-            const deck = Deck.fromString('♥Q♦K10,6,5♣10,8,7♠10,7', config);
-            (deck + '').should.equal('♥Q♦K10,6,5♣10,8,7♠10,7');
+            const deck = Deck.fromString('HQDK10,6,5C10,8,7S10,7', config);
+            (deck + '').should.equal('HQDK10,6,5C10,8,7S10,7');
         });
     });
 });
