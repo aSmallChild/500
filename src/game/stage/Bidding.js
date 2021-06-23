@@ -1,5 +1,5 @@
-import GameStage from '../model/GameStage.js';
-import OrdinaryNormalDeck from '../constants/OrdinaryNormalDeck.js';
+import GameStage from '../GameStage.js';
+import OrdinaryNormalDeck from '../model/OrdinaryNormalDeck.js';
 import Deck from '../model/Deck.js';
 import DeckConfig from '../model/DeckConfig.js';
 import Bid from '../model/Bid.js';

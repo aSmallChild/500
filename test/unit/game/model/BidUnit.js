@@ -1,5 +1,5 @@
 import Bid from '../../../../src/game/model/Bid.js';
-import OrdinaryNormalDeck from '../../../../src/game/constants/OrdinaryNormalDeck.js';
+import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 import DeckConfig from '../../../../src/game/model/DeckConfig.js';

@@ -1,4 +1,4 @@
-import GameStage from '../model/GameStage.js';
+import GameStage from '../GameStage.js';
 import Deck from '../model/Deck.js';
 import DeckConfig from '../model/DeckConfig.js';
 

@@ -1,4 +1,4 @@
-import OrdinaryNormalDeck from '../../../../src/game/constants/OrdinaryNormalDeck.js';
+import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
 import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 // noinspection ES6UnusedImports
 import should from 'should';

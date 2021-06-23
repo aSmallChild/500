@@ -1,4 +1,4 @@
-import GameStage from '../model/GameStage.js';
+import GameStage from '../GameStage.js';
 
 export default class Lobby extends GameStage {
     start(dataFromPreviousStage) {

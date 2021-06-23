@@ -1,7 +1,7 @@
 // noinspection ES6UnusedImports
 import should from 'should';
-import GameStage from '../../../../src/game/model/GameStage.js';
-import Game from '../../../../src/game/model/Game.js';
+import GameStage from '../../../../src/game/GameStage.js';
+import Game from '../../../../src/game/Game.js';
 
 class SampleStage1 extends GameStage {
     static startCallback;
