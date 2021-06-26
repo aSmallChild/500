@@ -84,7 +84,7 @@
     const config = new DeckConfig(OrdinaryNormalDeck.config);
     const div = document.getElementById('asd');
 
-    document.getElementById('svg_defs').innerHTML += OrdinaryNormalDeck.svg;
+    document.getElementById('svg_defs').innerHTML += OrdinaryNormalDeck.svgDefs;
     const cards = [];
     for (const suit of config.suits) {
         Deck.buildSuitPictureCards(suit, config, config.suitPictureCards, cards);
