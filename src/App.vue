@@ -3,7 +3,7 @@
     <svg width="0" height="0">
         <defs ref="svgDefs"></defs>
     </svg>
-    <Table ref="table"></Table>
+    <Table ref="table" class="animate-all"></Table>
 </template>
 
 <script>
@@ -28,14 +28,20 @@ export default {
     mounted() {
         this.$refs.svgDefs.innerHTML += OrdinaryNormalDeck.svgDefs;
         const cards = Deck.buildDeck(config);
+        const spinCard = (cardSvg) => {
+            cardSvg.rotate(360);
+            setTimeout(() => cardSvg.resetTransform(), 777);
+        }
         for (const card of cards) {
             const svg = CardSVGBuilder.getSVG(card, layout);
             const cardSvg = new CardSVG(card, svg);
             cardSvg.svg.addEventListener('mouseover', () => {
                 this.msg = card.getName();
+                spinCard(cardSvg);
             });
             cardSvg.svg.addEventListener('click', () => {
                 this.msg = card.getName() + ' clicked!';
+                spinCard(cardSvg);
             });
             this.$refs.table.playCard(cardSvg);
         }
@@ -93,5 +99,9 @@ html {
 .green {
     fill: var(--suit-green);
     stroke: var(--suit-green);
+}
+
+.animate-all .card {
+    transition: ease all 777ms;
 }
 </style>
