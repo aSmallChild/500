@@ -28,20 +28,20 @@ export default {
     mounted() {
         this.$refs.svgDefs.innerHTML += OrdinaryNormalDeck.svgDefs;
         const cards = Deck.buildDeck(config);
-        const spinCard = (cardSvg) => {
-            cardSvg.rotate(360);
-            setTimeout(() => cardSvg.resetTransform(), 777);
-        }
         for (const card of cards) {
             const svg = CardSVGBuilder.getSVG(card, layout);
             const cardSvg = new CardSVG(card, svg);
-            cardSvg.svg.addEventListener('mouseover', () => {
-                this.msg = card.getName();
-                spinCard(cardSvg);
-            });
+            // cardSvg.svg.addEventListener('mouseover', () => {
+            //     cardSvg.animateSiblings(() => {
+            //         this.$refs.table.playCard(cardSvg);
+            //     });
+            // });
             cardSvg.svg.addEventListener('click', () => {
                 this.msg = card.getName() + ' clicked!';
-                spinCard(cardSvg);
+
+                cardSvg.animateSiblings(() => {
+                    this.$refs.table.playCard(cardSvg);
+                });
             });
             this.$refs.table.playCard(cardSvg);
         }
@@ -102,6 +102,6 @@ html {
 }
 
 .animate-all .card {
-    transition: ease all 777ms;
+    transition: ease-out all 777ms;
 }
 </style>
