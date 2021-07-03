@@ -19,11 +19,6 @@ export default class CardSVG {
         this.transforms.set('rotate', angle);
     }
 
-    resetTransform() {
-        this.transforms.clear();
-        this.instantTransform();
-    }
-
     _getTransformValue() {
         let newTransformValue = '';
         for (const [key, value] of this.transforms.entries()) {
@@ -61,17 +56,16 @@ export default class CardSVG {
         this.rotate(-360 * 3);
         this.instantTransform();
         this.svg.style.visibility = '';
-        this.moveTo(0, 0);
-        this.rotate(0);
+        this.transforms.clear();
         this.animateTransform();
     }
 
     animateSiblings(setPosition) {
+        // todo include previous siblings and avoid animating the same element twice if the card retains the same parent
         const originalSiblingPositions = [];
         let nextSibling = this.svg.nextSibling;
         while (nextSibling) {
             if (!nextSibling.cardSvg) {
-                debugger;
                 nextSibling = nextSibling.nextSibling;
                 continue;
             }
@@ -112,11 +106,10 @@ export default class CardSVG {
         }
         this.svg.style.display = '';
         this.svg.style.visibility = '';
-        this.moveTo(0, 0);
-        this.rotate(0);
+        this.transforms.clear();
         this.animateTransform();
         for (const {sibling} of originalSiblingPositions) {
-            sibling.cardSvg.moveTo(0, 0);
+            sibling.cardSvg.transforms.clear();
             sibling.cardSvg.animateTransform();
         }
 
@@ -127,7 +120,7 @@ export default class CardSVG {
             if (x || y) {
                 sibling.cardSvg.moveTo(x, y);
                 sibling.cardSvg.instantTransform();
-                sibling.cardSvg.moveTo(0, 0);
+                sibling.cardSvg.transforms.clear();
                 sibling.cardSvg.animateTransform();
             }
         }

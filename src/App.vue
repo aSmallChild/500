@@ -3,11 +3,14 @@
     <svg width="0" height="0">
         <defs ref="svgDefs"></defs>
     </svg>
-    <Table ref="table" class="animate-all"></Table>
+    <card-table ref="table" class="animate-all"></card-table>
+    <fan ref="fan1" class="animate-all"></fan>
+    <fan ref="fan2" class="animate-all"></fan>
 </template>
 
 <script>
 import Table from '../components/Table.vue';
+import Fan from '../components/Fan.vue';
 import CardSVGBuilder from './view/CardSVGBuilder.js';
 import CardSVG from './view/CardSVG.js';
 import DeckConfig from '../src/game/model/DeckConfig.js';
@@ -19,7 +22,10 @@ const config = new DeckConfig(OrdinaryNormalDeck.config);
 
 export default {
     name: 'App',
-    components: {Table},
+    components: {
+        'card-table': Table,
+        'fan': Fan,
+    },
     data() {
         return {
             msg: '',
@@ -28,6 +34,7 @@ export default {
     mounted() {
         this.$refs.svgDefs.innerHTML += OrdinaryNormalDeck.svgDefs;
         const cards = Deck.buildDeck(config);
+        let count = 0;
         for (const card of cards) {
             const svg = CardSVGBuilder.getSVG(card, layout);
             const cardSvg = new CardSVG(card, svg);
@@ -37,13 +44,24 @@ export default {
             //     });
             // });
             cardSvg.svg.addEventListener('click', () => {
-                this.msg = card.getName() + ' clicked!';
-
+                const moveToTable = cardSvg.svg.parentElement !== this.$refs.table.$el;
                 cardSvg.animateSiblings(() => {
-                    this.$refs.table.playCard(cardSvg);
+                    if (moveToTable) {
+                        this.$refs.table.playCard(cardSvg);
+                    } else {
+                        this.$refs.fan1.addCard(cardSvg);
+                    }
                 });
+                this.msg = card.getName() + ' clicked!';
             });
-            this.$refs.table.playCard(cardSvg);
+            if (count < 10) {
+                this.$refs.fan1.addCard(cardSvg);
+            } else if (count < 20) {
+                this.$refs.fan2.addCard(cardSvg);
+            } else {
+                this.$refs.table.playCard(cardSvg);
+            }
+            count++;
         }
     },
 };
