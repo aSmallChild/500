@@ -3,14 +3,12 @@
     <svg width="0" height="0">
         <defs ref="svgDefs"></defs>
     </svg>
-    <card-table ref="table" class="animate-cards"></card-table>
-    <card-group ref="fan1" class="animate-cards fan"></card-group>
-    <card-group ref="fan2" class="animate-cards fan"></card-group>
-<!--    <card-group class="animate-cards fan" v-for="hand in hands" :cards="hand" :key="hand"></card-group>-->
+    <card-group class="animate-cards" :cards="table"></card-group>
+    <card-group class="animate-cards fan" :cards="hand1"></card-group>
+    <card-group class="animate-cards fan" :cards="hand2"></card-group>
 </template>
 
 <script>
-import CardTable from '../components/CardTable.vue';
 import CardGroup from '../components/CardGroup.vue';
 import CardSVGBuilder from './view/CardSVGBuilder.js';
 import CardSVG from './view/CardSVG.js';
@@ -22,47 +20,49 @@ const layout = OrdinaryNormalDeck.layout;
 const config = new DeckConfig(OrdinaryNormalDeck.config);
 
 export default {
-    name: 'App',
     components: {
-        CardTable,
         CardGroup,
     },
     data() {
         return {
             msg: '',
+            table: [],
+            hand1: [],
+            hand2: [],
         };
     },
     mounted() {
         this.$refs.svgDefs.innerHTML += OrdinaryNormalDeck.svgDefs;
         const cards = Deck.buildDeck(config);
-        let count = 0;
         for (const card of cards) {
             const svg = CardSVGBuilder.getSVG(card, layout);
             const cardSvg = new CardSVG(card, svg);
-            // cardSvg.svg.addEventListener('mouseover', () => {
-            //     cardSvg.animateSiblings(() => {
-            //         this.$refs.table.playCard(cardSvg);
-            //     });
-            // });
             cardSvg.svg.addEventListener('click', () => {
-                const moveToTable = cardSvg.svg.parentElement !== this.$refs.table.$el;
-                cardSvg.animateTo(() => {
-                    if (moveToTable) {
-                        this.$refs.table.playCard(cardSvg);
-                    } else {
-                        this.$refs.fan1.addCard(cardSvg);
+                let index = -1;
+                let current = null;
+                for (const array of [this.table, this.hand1, this.hand2]) {
+                    index = array.indexOf(cardSvg);
+                    if (index >= 0) {
+                        current = array;
+                        break;
                     }
-                });
+                }
+
+                const target = current === this.table ? this.hand1 : this.table;
+                if (!current) {
+                    return;
+                }
+                current.splice(index, 1);
+                target.push(cardSvg);
                 this.msg = card.getName() + ' clicked!';
             });
-            if (count < 10) {
-                this.$refs.fan1.addCard(cardSvg);
-            } else if (count < 20) {
-                this.$refs.fan2.addCard(cardSvg);
-            } else {
-                this.$refs.table.playCard(cardSvg);
-            }
-            count++;
+            this.table.push(cardSvg);
+        }
+        for (let i = 0; i < 10; i++) {
+            this.hand1.push(this.table.pop());
+        }
+        for (let i = 0; i < 10; i++) {
+            this.hand2.push(this.table.pop());
         }
     },
 };

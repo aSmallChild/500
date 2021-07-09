@@ -46,7 +46,9 @@ export default class CardSVG {
 
     animateTo(setPosition) {
         const originalPosition = this.svg.getBoundingClientRect();
-        this.svg.parentElement.removeChild(this.svg);
+        if (this.svg.parentElement) {
+            this.svg.parentElement.removeChild(this.svg);
+        }
         this.svg.style.visibility = 'hidden';
         setPosition();
         const newPosition = this.svg.getBoundingClientRect();
