@@ -4,8 +4,7 @@
         <defs ref="svgDefs"></defs>
     </svg>
     <card-group class="animate-cards" :cards="table"></card-group>
-    <card-group class="animate-cards fan" :cards="hand1"></card-group>
-    <card-group class="animate-cards fan" :cards="hand2"></card-group>
+    <card-group class="animate-cards fan" v-for="hand in hands" :cards="hand" :key="hand"/>
 </template>
 
 <script>
@@ -27,8 +26,7 @@ export default {
         return {
             msg: '',
             table: [],
-            hand1: [],
-            hand2: [],
+            hands: [],
         };
     },
     mounted() {
@@ -38,9 +36,10 @@ export default {
             const svg = CardSVGBuilder.getSVG(card, layout);
             const cardSvg = new CardSVG(card, svg);
             cardSvg.svg.addEventListener('click', () => {
+                this.msg = card.getName() + ' clicked!';
                 let index = -1;
                 let current = null;
-                for (const array of [this.table, this.hand1, this.hand2]) {
+                for (const array of [this.table, ...this.hands]) {
                     index = array.indexOf(cardSvg);
                     if (index >= 0) {
                         current = array;
@@ -48,21 +47,28 @@ export default {
                     }
                 }
 
-                const target = current === this.table ? this.hand1 : this.table;
-                if (!current) {
-                    return;
+                if (current) {
+                    current.splice(index, 1);
                 }
-                current.splice(index, 1);
-                target.push(cardSvg);
-                this.msg = card.getName() + ' clicked!';
+                let target = current !== this.table ? this.table : null;
+                if (!target) {
+                    for (const hand of this.hands) {
+                        if (!target || target.length > hand.length) {
+                            target = hand;
+                        }
+                    }
+                }
+                target.push(cardSvg.freeze());
             });
-            this.table.push(cardSvg);
+            this.table.push(cardSvg.freeze());
         }
-        for (let i = 0; i < 10; i++) {
-            this.hand1.push(this.table.pop());
-        }
-        for (let i = 0; i < 10; i++) {
-            this.hand2.push(this.table.pop());
+
+        for (let i = 0; i <= (this.table.length / config.totalHands); i++) {
+            const hand = [];
+            for (let j = 0; j < config.cardsPerPlayer; j++) {
+                hand.push(this.table.pop());
+            }
+            this.hands.push(hand);
         }
     },
 };

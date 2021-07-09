@@ -3,25 +3,31 @@ export default class CardSVG {
         this.card = card;
         this.svg = svg;
         this.svg.cardSvg = this;
-        this.transforms = new Map();
-        this.transformTimeout = null;
+        this.unfrozen = {
+            transforms: new Map(),
+            transformTimeout: null,
+        };
+    }
+
+    freeze() {
+        return Object.freeze(this);
     }
 
     moveTo(x, y) {
         x = typeof x === 'number' ? x + 'px' : x;
         y = typeof y === 'number' ? y + 'px' : y;
-        this.transforms.set('translateX', x);
-        this.transforms.set('translateY', y);
+        this.unfrozen.transforms.set('translateX', x);
+        this.unfrozen.transforms.set('translateY', y);
     }
 
     rotate(angle) {
         angle = typeof angle === 'number' ? angle + 'deg' : angle;
-        this.transforms.set('rotate', angle);
+        this.unfrozen.transforms.set('rotate', angle);
     }
 
     _getTransformValue() {
         let newTransformValue = '';
-        for (const [key, value] of this.transforms.entries()) {
+        for (const [key, value] of this.unfrozen.transforms.entries()) {
             newTransformValue += ` ${key}(${value})`;
         }
         return newTransformValue;
@@ -33,8 +39,8 @@ export default class CardSVG {
     }
 
     animateTransform(value) {
-        clearTimeout(this.transformTimeout);
-        this.transformTimeout = setTimeout(() => {
+        clearTimeout(this.unfrozen.transformTimeout);
+        this.unfrozen.transformTimeout = setTimeout(() => {
             this.svg.style.transition = '';
             this.transform(value);
         }, 1);
@@ -58,7 +64,7 @@ export default class CardSVG {
         this.rotate(-360 * 3);
         this.instantTransform();
         this.svg.style.visibility = '';
-        this.transforms.clear();
+        this.unfrozen.transforms.clear();
         this.animateTransform();
     }
 
@@ -108,10 +114,10 @@ export default class CardSVG {
         }
         this.svg.style.display = '';
         this.svg.style.visibility = '';
-        this.transforms.clear();
+        this.unfrozen.transforms.clear();
         this.animateTransform();
         for (const {sibling} of originalSiblingPositions) {
-            sibling.cardSvg.transforms.clear();
+            sibling.cardSvg.unfrozen.transforms.clear();
             sibling.cardSvg.animateTransform();
         }
 
@@ -122,7 +128,7 @@ export default class CardSVG {
             if (x || y) {
                 sibling.cardSvg.moveTo(x, y);
                 sibling.cardSvg.instantTransform();
-                sibling.cardSvg.transforms.clear();
+                sibling.cardSvg.unfrozen.transforms.clear();
                 sibling.cardSvg.animateTransform();
             }
         }
