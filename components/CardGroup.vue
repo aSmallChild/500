@@ -9,16 +9,26 @@ export default {
     },
     computed: {
         _cards() {
-            this.cards.forEach((cardSvg/*, index*/) => {
-                // todo use the index to put cards in order
-                if (this.$el && cardSvg.svg.parentElement !== this.$el) {
+            return this.placeCards();
+        },
+    },
+    methods: {
+        placeCards() {
+            // must access a property of cards prior to checking this.$el or reactivity breaks
+            if (!this.cards.length || !this.$el) {
+                return;
+            }
+            this.cards.forEach((cardSvg, index) => {
+                if (cardSvg.svg.parentElement !== this.$el || this.$el.children[index] !== cardSvg.svg) {
                     cardSvg.animateTo(() => {
                         this.$el.appendChild(cardSvg.svg);
                     });
                 }
             });
-            return 'a';
         },
+    },
+    mounted() {
+        this.placeCards();
     },
 };
 </script>

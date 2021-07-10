@@ -81,7 +81,6 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #fff;
-    margin-top: 30px;
 }
 
 :root {
@@ -166,6 +165,7 @@ $cardHeight: 150px;
     width: $cardHeight * 2.2;
     height: $cardHeight * 1.4;
     position: relative;
+    display: inline-block;
     @include allTheFans(16, 90deg);
 
     .card {
