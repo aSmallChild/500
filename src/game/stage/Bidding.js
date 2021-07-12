@@ -13,7 +13,7 @@ export default class Bidding extends GameStage {
         this.dataStore.firstBidder = (this.firstBidder + 1) % this.players.length;
         const config = OrdinaryNormalDeck.config;
         config.kittySize = 3;
-        config.cardsPerPlayer = 10;
+        config.cardsPerHand = 10;
         config.totalHands = this.players.length;
         this.config = new DeckConfig(config);
         this.possibleBids = Bid.getAvondaleBids(this.config);
@@ -44,7 +44,7 @@ export default class Bidding extends GameStage {
         const kitty = deck.deal(config.kittySize);
         const hands = [];
         for (const player of this.players) {
-            const hand = deck.deal(config.cardsPerPlayer);
+            const hand = deck.deal(config.cardsPerHand);
             hands.push(hand);
             player.emit('hand', player);
         }

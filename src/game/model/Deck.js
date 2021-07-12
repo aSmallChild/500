@@ -136,22 +136,37 @@ export default class Deck {
         const suits = config.suits;
         const totalHands = config.totalHands;
         const kittySize = config.kittySize;
-        const cardsPerPlayer = config.cardsPerPlayer;
+        const cardsPerHand = config.cardsPerHand;
         const pictureCards = config.suitPictureCards;
-        const totalCards = (totalHands < 3 ? 4 : totalHands) * cardsPerPlayer + kittySize;
-        const totalNumberCards = totalCards - (pictureCards.length * suits.length + config.specialCards.length);
-        const cardsPerSuit = Math.floor(totalNumberCards / suits.length);
-        let unallocatedCards = totalNumberCards % suits.length;
+        const totalCards = totalHands * cardsPerHand + kittySize;
+        const totalPictureCards = Math.max(0, Math.min(totalCards - config.specialCards.length, pictureCards.length * suits.length));
+        const pictureCardsPerSuit = Math.floor(totalPictureCards / suits.length);
+        let unallocatedPictureCards = totalPictureCards % suits.length;
+        const totalNumberCards = Math.max(0, totalCards - (totalPictureCards + config.specialCards.length));
+        const numberCardsPerSuit = Math.floor(totalNumberCards / suits.length);
+        let unallocatedNumberCards = totalNumberCards % suits.length;
 
         const cards = [];
         for (const specialCard of config.specialCards) {
             cards.push(new Card(null, specialCard.symbol, config));
         }
+        if (cards.length >= totalCards) {
+            if (cards.length > totalCards) {
+                cards.splice(totalCards);
+            }
+            return cards;
+        }
+
         for (const suit of suits) {
-            const [lowest, highest] = Deck.getStartEndNumberCards(cardsPerSuit + (unallocatedCards-- > 0));
-            Deck.buildSuitPictureCards(suit, config, pictureCards, cards);
+            Deck.buildSuitPictureCards(suit, config, pictureCards, cards, pictureCardsPerSuit + (unallocatedPictureCards-- > 0));
+            const numberCardsForThisSuit = numberCardsPerSuit + (unallocatedNumberCards-- > 0);
+            if (numberCardsForThisSuit < 1) {
+                continue;
+            }
+            const [lowest, highest] = Deck.getStartEndNumberCards(numberCardsForThisSuit);
             Deck.buildSuitNumberCards(suit, config, lowest, highest, cards);
         }
+
         return new Deck(cards, config);
     }
 
@@ -164,9 +179,16 @@ export default class Deck {
         return [lowest, highest];
     }
 
-    static buildSuitPictureCards(suit, config, pictureCards, cards = []) {
+    static buildSuitPictureCards(suit, config, pictureCards, cards = [], limit=pictureCards.length) {
+        let count = 0;
+        if (count === limit) {
+            return cards;
+        }
         for (const card of pictureCards) {
             cards.push(new Card(suit, card.symbol, config));
+            if (++count === limit) {
+                return cards;
+            }
         }
         return cards;
     }

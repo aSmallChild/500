@@ -9,7 +9,7 @@ export default class DeckConfig {
         this.specialBids = config.SPECIAL_BIDS_HIGH_TO_LOW;
         config.totalHands = config.totalHands ?? 4;
         config.kittySize = config.kittySize ?? 3;
-        config.cardsPerPlayer = config.cardsPerPlayer ?? 10;
+        config.cardsPerHand = config.cardsPerHand ?? 10;
     }
 
     set totalHands(value) {
@@ -28,12 +28,12 @@ export default class DeckConfig {
         this.config.kittySize = value;
     }
 
-    get cardsPerPlayer() {
-        return this.config.cardsPerPlayer;
+    get cardsPerHand() {
+        return this.config.cardsPerHand;
     }
 
-    set cardsPerPlayer(value) {
-        this.config.cardsPerPlayer = value;
+    set cardsPerHand(value) {
+        this.config.cardsPerHand = value;
     }
 
     getCardName(value) {

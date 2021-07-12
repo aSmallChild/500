@@ -63,9 +63,9 @@ export default {
             this.table.push(cardSvg.freeze());
         }
 
-        for (let i = 0; i <= (this.table.length / config.totalHands); i++) {
+        for (let i = 0; i < config.totalHands; i++) {
             const hand = [];
-            for (let j = 0; j < config.cardsPerPlayer; j++) {
+            for (let j = 0; j < config.cardsPerHand; j++) {
                 hand.push(this.table.pop());
             }
             this.hands.push(hand);

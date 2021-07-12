@@ -18,12 +18,27 @@ export default {
             if (!this.cards.length || !this.$el) {
                 return;
             }
-            this.cards.forEach((cardSvg, index) => {
-                if (cardSvg.svg.parentElement !== this.$el || this.$el.children[index] !== cardSvg.svg) {
-                    cardSvg.animateTo(() => {
-                        this.$el.appendChild(cardSvg.svg);
-                    });
+            const hasSVG = (svg) => {
+                for (const cardSvg of this.cards) {
+                    if (cardSvg.svg === svg) {
+                        return true;
+                    }
                 }
+                return false;
+            }
+            const cardsAlreadyHere = [];
+            this.$el.children.forEach(svg => {
+                if (hasSVG(svg)) {
+                    cardsAlreadyHere.push(svg);
+                }
+            })
+            this.cards.forEach((cardSvg, index) => {
+                if (cardSvg.svg.parentElement === this.$el && cardsAlreadyHere[index] === cardSvg.svg) {
+                    return;
+                }
+                cardSvg.animateTo(() => {
+                    this.$el.appendChild(cardSvg.svg);
+                });
             });
         },
     },

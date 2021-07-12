@@ -16,6 +16,7 @@ describe('Deck Unit', function() {
         for (const c of [
             {
                 totalHands: 2,
+                cardsPerHand: 20, // todo needs sorting out when two player is made
                 _totalCards: 43,
                 _lowestRedCard: 4,
                 _highestRedCard: 10,
@@ -63,6 +64,21 @@ describe('Deck Unit', function() {
                 _highestRedCard: 4,
                 _lowestBlackCard: 5,
                 _highestBlackCard: 5,
+            }, {
+                totalHands: 1,
+                cardsPerHand: 1,
+                kittySize: 1,
+                _totalCards: 2,
+            }, {
+                totalHands: 1,
+                cardsPerHand: 10,
+                kittySize: 1,
+                _totalCards: 11,
+            }, {
+                totalHands: 1,
+                cardsPerHand: 17,
+                kittySize: 1,
+                _totalCards: 18,
             },
         ]) {
             const config = new DeckConfig(OrdinaryNormalDeck.config);

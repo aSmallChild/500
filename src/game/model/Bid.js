@@ -60,10 +60,10 @@ export default class Bid {
     }
 
     static getAvondaleBids(config) {
-        const minTricks = parseInt(config.cardsPerPlayer / 2) + 1;
+        const minTricks = parseInt(config.cardsPerHand / 2) + 1;
         const bids = Bid.buildSpecialBids(config.specialBids);
         let points = 40;
-        for (let tricks = minTricks; tricks <= config.cardsPerPlayer; tricks++) {
+        for (let tricks = minTricks; tricks <= config.cardsPerHand; tricks++) {
             for (const suit of config.suits.lowToHigh) {
                 bids.push(new Bid(tricks, suit, null, null, points, config));
                 points += 20;
