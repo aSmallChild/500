@@ -28,7 +28,7 @@ export default class Game {
     }
 
     onSpectatorConnect(spectator) {
-        player.emit('players', this.players);
+        spectator.emit('players', this.players);
         if (!this.currentStage) return;
         spectator.emit('stage', this.currentStage.name.toLowerCase());
         this.currentStage.onSpectatorConnect(spectator);

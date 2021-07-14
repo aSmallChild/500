@@ -54,14 +54,14 @@ export default class Bid {
     static buildSpecialBids(specialBids, config) {
         const bids = [];
         for (const specialBid of specialBids) {
-            bids.push(new Bid(null, null, null, specialBid.symbol, parseInt(specialBid.points), config));
+            bids.push(new Bid(0, null, null, specialBid.symbol, parseInt(specialBid.points), config));
         }
         return bids;
     }
 
     static getAvondaleBids(config) {
         const minTricks = parseInt(config.cardsPerHand / 2) + 1;
-        const bids = Bid.buildSpecialBids(config.specialBids);
+        const bids = Bid.buildSpecialBids(config.specialBids, config);
         let points = 40;
         for (let tricks = minTricks; tricks <= config.cardsPerHand; tricks++) {
             for (const suit of config.suits.lowToHigh) {

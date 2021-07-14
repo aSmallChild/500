@@ -5,7 +5,7 @@ import DeckConfig from '../model/DeckConfig.js';
 import Bid from '../model/Bid.js';
 
 export default class Bidding extends GameStage {
-    start(dataFromPreviousStage) {
+    start() {
         // this.config = new DeckConfig(dataFromPreviousStage.config);
         // this.hands = dataFromPreviousStage.hands.map(hand => Deck.fromString(hand, this.config));
         // this.kitty = Deck.fromString(dataFromPreviousStage.kitty, this.config);
@@ -101,7 +101,7 @@ export default class Bidding extends GameStage {
 
     nextBidder() {
         const pass = this.getBid('P');
-        for (const _ of this.players) {
+        for (let i = 0; i < this.players.length; i++) {
             this.currentBidder = (this.currentBidder + 1) % this.players.length;
             const bids = this.playerBids[this.currentBidder];
             if (bids.length && bids[bids.length - 1].special === 'P' && !this.highestBidderRaisedOwnBid) {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 // noinspection ES6UnusedImports
 import should from 'should';
 import GameStage from '../../../../src/game/GameStage.js';

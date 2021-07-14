@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Card from '../../../../src/game/model/Card.js';
 import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
 import DeckConfig from '../../../../src/game/model/DeckConfig.js';
