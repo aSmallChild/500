@@ -5,7 +5,7 @@
             <svg width="0" height="0">
                 <defs ref="svgDefs"></defs>
             </svg>
-            <bid-selector :config="config" v-model="bid"></bid-selector>
+            <bid-selector :config="config" v-model="bid" :scoring="scoring"></bid-selector>
             <card-group class="animate-cards" :cards="table"></card-group>
             <card-group class="animate-cards fan" v-for="hand in hands" :cards="hand" :key="hand"/>
         </v-main>
@@ -18,9 +18,10 @@ import BidSelector from '../components/BidSelector.vue';
 import CardGroup from '../components/CardGroup.vue';
 import CardSVGBuilder from './view/CardSVGBuilder.js';
 import CardSVG from './view/CardSVG.js';
-import DeckConfig from '../src/game/model/DeckConfig.js';
-import Deck from '../src/game/model/Deck.js';
-import OrdinaryNormalDeck from '../src/game/model/OrdinaryNormalDeck.js';
+import DeckConfig from './game/model/DeckConfig.js';
+import Deck from './game/model/Deck.js';
+import OrdinaryNormalDeck from './game/model/OrdinaryNormalDeck.js';
+import ScoringAvondale from './game/model/ScoringAvondale.js';
 
 export default {
     components: {
@@ -29,7 +30,7 @@ export default {
     },
     data() {
         this.config = new DeckConfig(OrdinaryNormalDeck.config);
-        // this.bids = Bid.getAvondaleBids(this.config);
+        this.scoring = new ScoringAvondale(this.config);
         return {
             msg: '',
             bid: null,
