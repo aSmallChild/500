@@ -11,10 +11,11 @@ export default class Bidding extends GameStage {
         // this.kitty = Deck.fromString(dataFromPreviousStage.kitty, this.config);
         this.firstBidder = typeof this.dataStore.firstBidder === 'undefined' ? 0 : this.dataStore.firstBidder;
         this.dataStore.firstBidder = (this.firstBidder + 1) % this.players.length;
-        const config = OrdinaryNormalDeck.config;
+        const config = OrdinaryNormalDeck.config; // todo this needs to be set in the lobby
         config.kittySize = 3;
         config.cardsPerHand = 10;
         config.totalHands = this.players.length;
+        this.playersThatHaveLookedAtTheirCards = new Set();
         this.config = new DeckConfig(config);
         this.possibleBids = Bid.getAvondaleBids(this.config);
         this.resetBids();
@@ -22,17 +23,20 @@ export default class Bidding extends GameStage {
 
     onPlayerAction(player, actionName, actionData) {
         if (actionName === 'bid') return this.onBid(player, actionData);
+        if (actionName === 'take_hand') return this.onTakeHand(player, actionData);
         if (actionName === 'take_kitty') return this.onTakeKitty(player, actionData);
     }
 
     onPlayerConnect(player) {
         this.onSpectatorConnect(player);
-        player.emit('hand', this.hands[player.position]);
+        if (this.playersThatHaveLookedAtTheirCards.has(player)) {
+            this.onTakeHand(player);
+        }
     }
 
     onSpectatorConnect(spectator) {
         spectator.emit('deck_config', this.config);
-        spectator.emit('possible_bids', this.possibleBids);
+        spectator.emit('possible_bids', this.possibleBids); // todo needs to be scoring type
         spectator.emit('bids', this.bids);
         spectator.emit('current_bidder', this.currentBidder);
         spectator.emit('highest_bid', this.highestBid);
@@ -42,12 +46,7 @@ export default class Bidding extends GameStage {
         const deck = Deck.buildDeck(config);
         deck.shuffle();
         const kitty = deck.deal(config.kittySize);
-        const hands = [];
-        for (const player of this.players) {
-            const hand = deck.deal(config.cardsPerHand);
-            hands.push(hand);
-            player.emit('hand', player);
-        }
+        const hands = this.players.map(() => deck.deal(config.cardsPerHand));
         return {hands, kitty};
     }
 
@@ -58,6 +57,7 @@ export default class Bidding extends GameStage {
         this.currentBidder = this.firstBidder;
         this.highestBidderRaisedOwnBid = null;
         this.handsDealt = this.deal(this.config);
+        this.playersThatHaveLookedAtTheirCards.clear();
         this.onSpectatorConnect(this.clients);
     }
 
@@ -79,6 +79,10 @@ export default class Bidding extends GameStage {
         if (bid.special === 'P') {
             if (player === this.highestBidder) return player.emit('bid_error', 'Cannot pass when you are the highest bidder.');
             return this.recordBid(player, bid);
+        }
+
+        if (bid.special === 'B' && this.playersThatHaveLookedAtTheirCards.has(player)) {
+            return player.emit('bid_error', `You can only call ${bid.getName()} before looking at your hand.`);
         }
 
         if (this.highestBid && this.highestBid.points >= bid.points) return player.emit('bid_error', 'Bid must be higher than the leading bid.');
@@ -113,6 +117,11 @@ export default class Bidding extends GameStage {
             return this.clients.emit('current_bidder', this.currentBidder);
         }
         if (!this.highestBid) this.resetBids(); // no next bidder, everyone has passed
+    }
+
+    onTakeHand(player) {
+        player.emit('hand', this.hands[player.position]);
+        this.playersThatHaveLookedAtTheirCards.add(player);
     }
 
     onTakeKitty(player) {

@@ -24,6 +24,10 @@ export default class SuitCollection {
         return this.suits.slice().reverse();
     }
 
+    indexOf(suit) {
+        return this.suits.indexOf(suit);
+    }
+
     getSuit(symbol) {
         for (const suit of this.suits) {
             if (suit.symbol === symbol) return suit;
