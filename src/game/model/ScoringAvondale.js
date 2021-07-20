@@ -34,8 +34,8 @@ export default class ScoringAvondale {
     calculateStandardBidPoints(tricks, trumps, antiTrumps) {
         const suits = this.config.suits;
         const trickIncrement = (suits.length + 1) * this.pointsIncrement;
-        const index = suits.lowToHigh.indexOf(trumps);
-        const suitValue = index < 0 ? suits.length : index;
+        const index = suits.getSuitIndex(trumps);
+        const suitValue = index < 0 ? suits.length : suits.length - 1 - index;
         const antiTrumpsPoints = antiTrumps ? -5 : 0;
         return trickIncrement * (tricks - this.minTricks) + suitValue * this.pointsIncrement + this.startingBidPoints + antiTrumpsPoints;
     }

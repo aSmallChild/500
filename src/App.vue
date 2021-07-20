@@ -6,8 +6,8 @@
                 <defs ref="svgDefs"></defs>
             </svg>
             <bid-selector :config="config" v-model="bid" :scoring="scoring"></bid-selector>
-            <card-group class="animate-cards" :cards="table"></card-group>
             <card-group class="animate-cards fan" v-for="hand in hands" :cards="hand" :key="hand"/>
+            <card-group class="animate-cards" :cards="table"></card-group>
         </v-main>
     </v-app>
 </template>

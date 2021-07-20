@@ -35,6 +35,20 @@ export default class SuitCollection {
         return null;
     }
 
+    getSuitIndex(suit) {
+        if (!suit) {
+            return -1;
+        }
+        let i = 0;
+        for (const s of this.suits) {
+            if (s.symbol === suit.symbol) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+
     get symbols() {
         return this._symbols;
     }

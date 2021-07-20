@@ -33,7 +33,7 @@ export default class CardSVGBuilder {
             pip2.textContent = (card.value + '').split('').reverse().join('');
             pip2.setAttribute('x', layout.width - (card.value > 9 ? layout.margin + layout.pipSymbolSize / 2 : layout.margin + layout.pipSymbolSize / 4));
             pip2.setAttribute('y', layout.height - pipYOffset);
-            pip2.setAttribute('rotate', '180')
+            pip2.setAttribute('rotate', '180');
             svg.appendChild(pip2);
         }
 
@@ -49,7 +49,7 @@ export default class CardSVGBuilder {
             const suit2 = suit.cloneNode();
             suit2.setAttribute('x', layout.width - layout.margin);
             suit2.setAttribute('y', layout.height - suitYOffset);
-            suit2.setAttribute('transform', `rotate(180, ${suit2.getAttribute('x')}, ${suit2.getAttribute('y')})`)
+            suit2.setAttribute('transform', `rotate(180, ${suit2.getAttribute('x')}, ${suit2.getAttribute('y')})`);
             svg.appendChild(suit2);
         }
     }
@@ -62,7 +62,7 @@ export default class CardSVGBuilder {
         }
 
         const value = '' + card.value;
-        const symbolSize = layout.getSymbolSize() * (3 + (value === 'A'));
+        const symbolSize = layout.getSymbolSize() * 4;
         const symbol = this.getElement('use');
         if (card.suit) {
             symbol.setAttribute('href', `#${card.suit.symbol}`);
@@ -74,7 +74,7 @@ export default class CardSVGBuilder {
         }
 
         if (value !== 'A') {
-            symbol.setAttribute('opacity', 0.5);
+            symbol.setAttribute('opacity', 0.15);
             const pip = this.getElement('text');
             pip.textContent = value;
             const textSize = symbolSize/2;
@@ -95,12 +95,12 @@ export default class CardSVGBuilder {
             symbol.setAttribute('href', `#${card.suit.symbol}`);
             symbol.setAttribute('height', symbolSize);
             symbol.setAttribute('width', symbolSize);
-            const offsetX = symbolArea.horizontalMargin - symbolSize/2 + symbolArea.width * x/100;
-            const offsetY = symbolArea.verticalMargin + symbolSize/2 + symbolArea.height * y/100;
+            const offsetX = symbolArea.horizontalMargin - symbolSize / 2 + symbolArea.width * x / 100;
+            const offsetY = symbolArea.verticalMargin + symbolSize / 2 + symbolArea.height * y / 100;
             symbol.setAttribute('x', offsetX);
             symbol.setAttribute('y', offsetY);
             if (y > 50) {
-                symbol.setAttribute('transform', `rotate(180, ${symbolSize/2 + offsetX}, ${symbolSize/2 + offsetY})`)
+                symbol.setAttribute('transform', `rotate(180, ${symbolSize / 2 + offsetX}, ${symbolSize / 2 + offsetY})`);
             }
             svg.appendChild(symbol);
         }
