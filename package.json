@@ -6,6 +6,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "watch": "vue-cli-service build --watch",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "test": "mocha --recursive ./test"
@@ -16,7 +17,8 @@
     "core-js": "^3.6.5",
     "roboto-fontface": "*",
     "vue": "^3.0.0",
-    "vuetify": "^3.0.0-alpha.0"
+    "vuetify": "^3.0.0-alpha.0",
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
