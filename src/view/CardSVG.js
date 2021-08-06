@@ -61,7 +61,7 @@ export default class CardSVG {
         const x = originalPosition.right - newPosition.right;
         const y = originalPosition.top - newPosition.top;
         this.moveTo(x, y);
-        this.rotate(-360 * 3);
+        this.rotate(-360 * 2);
         this.instantTransform();
         this.svg.style.visibility = '';
         this.unfrozen.transforms.clear();

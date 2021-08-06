@@ -1,6 +1,6 @@
 import {createServer} from 'http';
 import WebSocket from 'ws';
-import serverConfig from '../../config.js';
+import serverConfig from '../../config.cjs';
 import fs from 'fs';
 
 const port = serverConfig.serverPort;
@@ -20,14 +20,15 @@ server.on('upgrade', (request, socket, head) => {
 });
 
 server.on('request', (request, response) => {
-    const filePath = request.url === '/' ? '/index.html' : request.url;
+    const indexFilePath = '/index.html';
+    const filePath = request.url === '/' ? indexFilePath : request.url;
     fs.readFile('./../../dist/' + filePath, (err, data) => {
             if (err) {
                 response.writeHead(404);
                 response.end(JSON.stringify(err));
                 return;
             }
-            response.writeHead(200);
+            response.writeHead(filePath === indexFilePath ? 500 : 200); // 500 is the name of the game
             response.end(data);
         },
     );

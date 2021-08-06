@@ -1,6 +1,4 @@
 export default class Card {
-    static JOKER = '$';
-
     constructor(suit, value, config) {
         this.suit = suit;
         if (!value) throw new Error('value missing while creating card');

@@ -24,10 +24,7 @@ import Deck from './game/model/Deck.js';
 import OrdinaryNormalDeck from './game/model/OrdinaryNormalDeck.js';
 import ScoringAvondale from './game/model/ScoringAvondale.js';
 
-// todo look at this https://github.com/bminer/ws-wrapper
-const url = new URL(window.location);
-const protocol = url.protocol === 'http:' ? 'ws:' : 'wss:';
-const socket = new WebSocket(`${protocol}//${url.host}`);
+const socket = new WebSocket(window.socketURL);
 socket.onopen = () => {
     socket.send('TEST');
     socket.send('TEST2');
@@ -188,7 +185,7 @@ $cardHeight: 150px;
 }
 
 .animate-cards .card {
-    transition: ease-out transform 777ms;
+    transition: ease-out transform 444ms;
 }
 
 @mixin fan($count, $angle) {
