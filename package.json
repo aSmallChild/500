@@ -11,7 +11,6 @@
     "lint": "vue-cli-service lint",
     "test": "mocha --recursive ./test"
   },
-  "main": "src/500.js",
   "dependencies": {
     "@mdi/font": "5.9.55",
     "core-js": "^3.6.5",
