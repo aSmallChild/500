@@ -9,10 +9,6 @@ export default class CardSVG {
         };
     }
 
-    freeze() {
-        return Object.freeze(this);
-    }
-
     moveTo(x, y) {
         x = typeof x === 'number' ? x + 'px' : x;
         y = typeof y === 'number' ? y + 'px' : y;

@@ -1,7 +1,6 @@
 <template>
     <v-app>
         <v-main>
-            <div>{{ msg }}</div>
             <svg width="0" height="0">
                 <defs ref="svgDefs"></defs>
             </svg>
@@ -39,11 +38,44 @@ export default {
         this.config = new DeckConfig(OrdinaryNormalDeck.config);
         this.scoring = new ScoringAvondale(this.config);
         return {
-            msg: '',
             highestBid: null,
             table: [],
             hands: [],
         };
+    },
+    methods: {
+        getSmallestHand() {
+            let smallestHand = null;
+            for (const hand of this.hands) {
+                if (!smallestHand || smallestHand.length > hand.length) {
+                    smallestHand = hand;
+                }
+            }
+            return smallestHand;
+        },
+        takeCardFromGroup(cardSvg) {
+            for (const cards of [this.table, ...this.hands]) {
+                const index = cards.indexOf(cardSvg);
+                if (index >= 0) {
+                    cards.splice(index, 1);
+                    return cards;
+                }
+            }
+            return null;
+        },
+        placeCardSomewhereElse(cardSvg, oldGroup) {
+            const target = oldGroup !== this.table ? this.table : this.getSmallestHand();
+            target.push(cardSvg);
+        },
+        dealCards() {
+            for (let i = 0; i < this.config.totalHands; i++) {
+                const hand = [];
+                for (let j = 0; j < this.config.cardsPerHand; j++) {
+                    hand.push(this.table.pop());
+                }
+                this.hands.push(hand);
+            }
+        }
     },
     mounted() {
         this.$refs.svgDefs.innerHTML += OrdinaryNormalDeck.svgDefs;
@@ -52,40 +84,12 @@ export default {
             const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
             const cardSvg = new CardSVG(card, svg);
             cardSvg.svg.addEventListener('click', () => {
-                this.msg = card.getName() + ' clicked!';
-                let index = -1;
-                let current = null;
-                for (const array of [this.table, ...this.hands]) {
-                    index = array.indexOf(cardSvg);
-                    if (index >= 0) {
-                        current = array;
-                        break;
-                    }
-                }
-
-                if (current) {
-                    current.splice(index, 1);
-                }
-                let target = current !== this.table ? this.table : null;
-                if (!target) {
-                    for (const hand of this.hands) {
-                        if (!target || target.length > hand.length) {
-                            target = hand;
-                        }
-                    }
-                }
-                target.push(cardSvg.freeze());
+                const oldGroup = this.takeCardFromGroup(cardSvg);
+                this.placeCardSomewhereElse(cardSvg, oldGroup);
             });
-            this.table.push(cardSvg.freeze());
+            this.table.push(Object.freeze(cardSvg));
         }
-
-        for (let i = 0; i < this.config.totalHands; i++) {
-            const hand = [];
-            for (let j = 0; j < this.config.cardsPerHand; j++) {
-                hand.push(this.table.pop());
-            }
-            this.hands.push(hand);
-        }
+        this.dealCards();
     },
 };
 </script>
