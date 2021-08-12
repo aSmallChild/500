@@ -9,7 +9,8 @@
     "watch": "vue-cli-service build --watch",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "test": "mocha --recursive ./test"
+    "test": "mocha --recursive ./test",
+    "server": "node src/server/server.js"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",

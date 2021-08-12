@@ -21,15 +21,20 @@ server.on('upgrade', (request, socket, head) => {
 
 server.on('request', (request, response) => {
     const indexFilePath = '/index.html';
-    const filePath = request.url === '/' ? indexFilePath : request.url;
-    fs.readFile('./../../dist/' + filePath, (err, data) => {
+    const filePath = './dist' + (request.url === '/' ? indexFilePath : request.url);
+    const sendResponse = (status, data = null) => {
+        response.writeHead(status);
+        response.end(data);
+        console.log(`${request.method} ${status} ${filePath}`);
+    };
+    if (request.method !== 'GET') {
+        return sendResponse(405);
+    }
+    fs.readFile(filePath, (err, data) => {
             if (err) {
-                response.writeHead(404);
-                response.end(JSON.stringify(err));
-                return;
+                return sendResponse(404);
             }
-            response.writeHead(filePath === indexFilePath ? 500 : 200); // 500 is the name of the game
-            response.end(data);
+            sendResponse(200, data);
         },
     );
 });
