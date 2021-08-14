@@ -7,13 +7,15 @@
 
 :root {
   --suit-red: #c00;
-  --suit-black: #ccc;
+  --suit-black: #111;
   --suit-blue: #0040ff;
   --suit-green: #0c0;
+  --text-color: #efefdd;
+  --card-background: #efefdd;
 }
 
 .v-theme--light.v-theme--light {
-  --v-theme-background: 17, 85, 17;
+  --v-theme-background: 23, 23, 23;
   --v-theme-background-overlay-multiplier: 1;
   --v-theme-surface: 255, 255, 255;
   --v-theme-surface-overlay-multiplier: 1;
@@ -54,19 +56,19 @@
 }
 
 * {
-  color: var(--suit-black)
+  color: var(--text-color)
 }
 
 $cardHeight: 150px;
 
 .card {
-  border: solid 1px var(--suit-black);
+  //border: solid 1px var(--suit-black);
   border-radius: 4px;
-  background: #111;
+  background: var(--card-background);
   height: $cardHeight;
   margin: 0.3%;
   padding: 0.1%;
-  box-shadow: #000a 2px 2px 4px;
+  box-shadow: #000b 3px 3px 6px;
   fill: var(--suit-black);
   stroke: var(--suit-black);
 }

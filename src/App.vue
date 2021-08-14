@@ -21,10 +21,12 @@
 </template>
 
 <script>
+import Client from './server/Client.js';
 import CreateGame from '../components/menu/CreateGame.vue';
 import JoinGame from '../components/menu/JoinGame.vue';
 import Doodle from '../components/menu/Doodle.vue';
 
+const client = new Client(window.socketURL);
 export default {
     components: {
         CreateGame,
@@ -32,14 +34,38 @@ export default {
         Doodle
     },
     data() {
-        this.menuItems = {
-            'Create': 'CreateGame',
-            'Sandbox': 'Doodle',
-        };
+        this.client = client;
         return {
             selectedItem: null,
+            menuItems: {
+                'Create': 'CreateGame',
+                'Sandbox': 'Doodle',
+            }
         };
     },
+    methods: {
+        woot(socket, wootCount) {
+            if (wootCount > 3) {
+                return;
+            }
+            console.log(`starting woot ${wootCount}`);
+            const woot = socket.of('woot');
+            let calls = 0;
+            woot.on('woot2', data => {
+                if (calls > 3) {
+                    return;
+                }
+                calls++;
+                console.log(`WOOT ${calls}/${wootCount} GOT: ${JSON.stringify(data)}`);
+                woot.removeAllListeners();
+                this.woot(socket, ++wootCount);
+            });
+            woot.emit('woot1', {dog: 'woof'});
+        }
+    },
+    mounted() {
+        this.woot(this.client, 1);
+    }
 };
 </script>
 
