@@ -17,8 +17,8 @@
             </v-col>
             <v-col cols="12" md="2"><b>AntiTrumps</b></v-col>
             <v-col cols="12" md="10">
-                <v-btn color="secondary" v-for="suit in config.suits.lowToHigh" :key="suit" :disabled="antiTrumpAllowed(suit)" @click="setAntiTrumps(suit)">{{ suit.name }}s</v-btn>
-                <v-btn color="secondary" @click="setAntiTrumps(null)">None</v-btn>
+                <v-btn color="secondary" v-for="suit in config.suits.lowToHigh" :key="suit" :disabled="canHaveAntiTrump(modelValue, suit)" @click="setAntiTrumps(suit)">{{ suit.name }}s</v-btn>
+                <v-btn color="secondary" @click="setAntiTrumps(null)" :disabled="!!modelValue.special">None</v-btn>
             </v-col>
             <v-col cols="12" md="2"><b>Special</b></v-col>
             <v-col cols="12" md="10">
@@ -35,8 +35,19 @@
 <script>
 import Bid from '../src/game/model/Bid.js';
 
+// todo disable trick numbers if n * no trumps is < highest bid
+// todo disable special bids if bid.points < highest bid
+// todo disable suits if maxTricks * suit < highest bid
 export default {
     props: {
+        hasSeenHand: { // todo don't allow blind misere if they have seen their hand
+            required: true,
+            type: Boolean
+        },
+        hasLeadingBid: { // todo don't allow passing if they have the leading bid
+            required: true,
+            type: Boolean
+        },
         scoring: {
             required: true,
         },
@@ -90,12 +101,15 @@ export default {
         _bid() {
             this.$emit('bid', this.modelValue);
         },
+        canHaveAntiTrump(modelValue, antiTrumpSuit) {
+            return !!modelValue.special || modelValue.trumps && modelValue.trumps.symbol === antiTrumpSuit.symbol;
+        },
         antiTrumpAllowed(suit) {
             if (this.modelValue.special || !suit) {
                 return false;
             }
             if (this.modelValue.trumps) {
-                return this.modelValue.trumps.symbol === suit.symbol;
+                return this.modelValue.trumps.symbol !== suit.symbol;
             }
             return true;
         }

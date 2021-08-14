@@ -27,8 +27,37 @@ export default class ScoringAvondale {
         return !!bid.special;
     }
 
-    canHaveAntiTrumps(bid) {
-        return !!bid.special;
+    canHaveAntiTrumps(bid, suit = null) {
+        if (bid.special) {
+            return false;
+        }
+
+        if (suit) {
+            return bid.trumps !== suit;
+        }
+
+        return true;
+    }
+
+    isValid(bid) {
+        if (bid.trumps && !this.canHaveTrumps(bid)) {
+            return false;
+        }
+
+        if (bid.antiTrumps && !this.canHaveTrumps(bid, bid.antiTrumps)) {
+            return false;
+        }
+
+        if (bid.tricks && (bid.tricks < this.minTricks || this.maxTricks < bid.tricks)) {
+            return false;
+        }
+
+        if (bid.special && (bid.trumps || bid.antiTrumps)) {
+            return false;
+        }
+
+        // todo need serverside validation for bids, that matches how the bid selector renders things
+        return true;
     }
 
     calculateStandardBidPoints(tricks, trumps, antiTrumps) {

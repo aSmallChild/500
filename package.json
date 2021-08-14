@@ -18,7 +18,8 @@
     "roboto-fontface": "*",
     "vue": "^3.0.0",
     "vuetify": "^3.0.0-alpha.0",
-    "ws": "^7.4.6"
+    "ws": "^7.4.6",
+    "ws-wrapper": "^2.0.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
