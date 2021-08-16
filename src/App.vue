@@ -24,7 +24,7 @@
 import Client from './server/Client.js';
 import CreateGame from '../components/menu/CreateGame.vue';
 import JoinGame from '../components/menu/JoinGame.vue';
-import Doodle from '../components/menu/Doodle.vue';
+import Doodle from '../doodle/Doodle.vue';
 
 const client = new Client(window.socketURL);
 export default {

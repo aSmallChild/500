@@ -1,3 +1,4 @@
+import DoodleServer from '../../doodle/DoodleServer.js';
 import WebsocketWrapper from 'ws-wrapper';
 import {v4 as uuidv4} from 'uuid';
 
@@ -5,12 +6,14 @@ export default class ClientManager {
     constructor() {
         this.sessions = new Map();
         this.deadSessions = new Map();
+        this.doodleServer = new DoodleServer();
     }
 
     socketConnected(nativeSocket) {
         const socket = new WebsocketWrapper(nativeSocket);
         this._bindClientEvents(socket);
         this._syncSessionId(socket, nativeSocket);
+        this.doodleServer.socketConnected(socket);
         return socket;
     }
 
@@ -20,7 +23,6 @@ export default class ClientManager {
             if (!sessionId) {
                 return;
             }
-            console.log(`ENDING SESSION ${sessionId}`);
             this.sessions.delete(sessionId);
             this.deadSessions.set(sessionId, socket);
         });
