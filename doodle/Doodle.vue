@@ -30,6 +30,7 @@ export default {
     data() {
         this.channel = null;
         this.config = null;
+        this.cardMap = new Map();
         return {
             scoring: null,
             highestBid: null,
@@ -57,43 +58,33 @@ export default {
         },
         setCards(groups) {
             const [table, ...hands] = groups;
-            this.setGroupCards(this.table, table);
+            this.setGroupCards(table);
+            this.table = table;
             hands.forEach((hand, index) => {
                 if (this.hands.length < index + 1) {
                     this.hands.push([]);
                 }
-                this.setGroupCards(this.hands[index], hand);
+                this.setGroupCards(hand);
+                this.hands[index] = hand;
             });
         },
-        setGroupCards(thisGroup, otherGroup) {
-            for (const serializedCard of otherGroup) {
-                let [card, group, index] = this.findCard(serializedCard);
-                if (!card) {
-                    this.createNewCard(thisGroup, serializedCard);
-                    continue;
+        setGroupCards(otherGroup) {
+            otherGroup.forEach((serializedCard, index) => {
+                let cardSvg = this.cardMap.get(serializedCard);
+                if (!cardSvg) {
+                    cardSvg = this.createNewCard(serializedCard);
                 }
-                if (group && group !== thisGroup) {
-                    group.splice(index, 1);
-                }
-                const thisGroupIndex = this.findCardIndex(group, serializedCard);
-                if (group === thisGroup && index !== thisGroupIndex) {
-                    if (thisGroup[index]) {
-                        const otherCard = thisGroup[index];
-                        thisGroup[index] = card;
-                        thisGroup.push(otherCard);
-                        continue;
-                    }
-                }
-                thisGroup.push(card);
-            }
+                otherGroup[index] = cardSvg;
+            });
         },
-        createNewCard(thisGroup, serializedCard) {
+        createNewCard(serializedCard) {
             const card = Card.fromString(serializedCard, this.config);
             const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
             const cardSvg = new CardSVG(card, svg);
             cardSvg.svg.addEventListener('click', () => this.channel.emit('card', serializedCard));
             Object.freeze(cardSvg);
-            thisGroup.push(cardSvg);
+            this.cardMap.set(card.toString(), cardSvg);
+            return cardSvg;
         },
     },
     mounted() {
