@@ -11,6 +11,7 @@ export default class ClientManager {
         const socket = new WebsocketWrapper(nativeSocket);
         this._bindClientEvents(socket);
         this._syncSessionId(socket, nativeSocket);
+        return socket;
     }
 
     _bindClientEvents(socket) {
@@ -23,59 +24,14 @@ export default class ClientManager {
             this.sessions.delete(sessionId);
             this.deadSessions.set(sessionId, socket);
         });
-
-        this.woot(socket, 1);
-    }
-
-    woot(socket, wootCount) {
-        if (wootCount > 3) {
-            return;
-        }
-        console.log(`starting woot ${wootCount}`);
-        const woot = socket.of('woot');
-        let calls = 0;
-        woot.on('woot1', data => {
-            if (calls > 3) {
-                return;
-            }
-            calls++;
-            console.log(`WOOT ${calls}/${wootCount} GOT: ${JSON.stringify(data)}`);
-            woot.emit('woot2', {cat: 'meow'});
-            woot.removeAllListeners();
-            this.woot(socket, ++wootCount);
-        });
     }
 
     _syncSessionId(socket, nativeSocket) {
-        const startSession = sessionId => {
-            console.log(`STARTING SESSION: ${sessionId}`);
-            let existingSocket = this.sessions.get(sessionId);
-            if (existingSocket) {
-                existingSocket.emit('disconnecting');
-                existingSocket.disconnect();
-                existingSocket.bind(nativeSocket);
-                socket = existingSocket;
-            }
-
-            if (!existingSocket) {
-                existingSocket = this.deadSessions.get(sessionId);
-                this.deadSessions.delete(sessionId);
-                if (existingSocket) {
-                    existingSocket.bind(nativeSocket);
-                    socket = existingSocket;
-                }
-            }
-
-            socket.set('session_id', sessionId);
-            this.sessions.set(sessionId, socket);
-            socket.of('session').emit('session_id', socket.get('session_id'));
-        };
-
         socket.of('session').on('session_id', sessionId => {
             if (socket.get('session_id')) {
                 return;
             }
-            startSession(sessionId);
+            this.startSession(socket, nativeSocket, sessionId);
         });
 
         socket.of('session').on('request_session_id', () => {
@@ -83,7 +39,46 @@ export default class ClientManager {
                 socket.of('session').emit('session_id', socket.get('session_id'));
                 return;
             }
-            startSession(uuidv4());
+            this.startSession(socket, nativeSocket, uuidv4());
         });
+    }
+
+    startSession(socket, nativeSocket, sessionId) {
+        let previousSocket = this.disconnectSession(sessionId, nativeSocket);
+        if (!previousSocket) {
+            previousSocket = this.reviveDeadSession(sessionId, nativeSocket);
+        }
+        if (previousSocket) {
+            socket.removeAllListeners();
+            socket = previousSocket;
+        }
+
+        socket.set('session_id', sessionId);
+        this.sessions.set(sessionId, socket);
+        socket.of('session').emit('session_id', sessionId);
+        // todo this needs to emit some kind of connect event so that things
+        //      running on the server know that the socket has connected/reconnected
+    }
+
+    disconnectSession(sessionId, nativeSocket) {
+        const existingSocket = this.sessions.get(sessionId);
+        if (!existingSocket) {
+            return null;
+        }
+        console.log(`Disconnecting previous socket: ${sessionId}`);
+        // existingSocket.emit('disconnecting');
+        existingSocket.disconnect();
+        existingSocket.bind(nativeSocket);
+        return existingSocket;
+    }
+
+    reviveDeadSession(sessionId, nativeSocket) {
+        const deadSocket = this.deadSessions.get(sessionId);
+        if (!deadSocket) {
+            return null;
+        }
+        this.deadSessions.delete(sessionId);
+        deadSocket.bind(nativeSocket);
+        return deadSocket;
     }
 }

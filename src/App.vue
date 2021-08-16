@@ -43,29 +43,6 @@ export default {
             }
         };
     },
-    methods: {
-        woot(socket, wootCount) {
-            if (wootCount > 3) {
-                return;
-            }
-            console.log(`starting woot ${wootCount}`);
-            const woot = socket.of('woot');
-            let calls = 0;
-            woot.on('woot2', data => {
-                if (calls > 3) {
-                    return;
-                }
-                calls++;
-                console.log(`WOOT ${calls}/${wootCount} GOT: ${JSON.stringify(data)}`);
-                woot.removeAllListeners();
-                this.woot(socket, ++wootCount);
-            });
-            woot.emit('woot1', {dog: 'woof'});
-        }
-    },
-    mounted() {
-        this.woot(this.client, 1);
-    }
 };
 </script>
 

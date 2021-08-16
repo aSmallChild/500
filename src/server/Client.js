@@ -9,7 +9,6 @@ export default class Client {
 
     set sessionId(sessionId) {
         // todo set cookie
-        console.log(`GOT SESSIONID: ${sessionId}`);
         this._sessionId = sessionId;
     }
 
@@ -26,17 +25,22 @@ export default class Client {
         if (this.socket) {
             return;
         }
+
         const newSocket = new WebSocket(this.url);
-        if (this.oldSocket) {
-            this.oldSocket.bind(newSocket);
-            this.socket = this.oldSocket;
-            this.oldSocket = null;
+        if (!this.oldSocket) {
+            this.setSocket(newSocket);
+            this.requestSessionId();
             return;
         }
 
-        this.socket = new WebsocketWrapper(newSocket);
+        this.oldSocket.bind(newSocket);
+        this.socket = this.oldSocket;
+        this.oldSocket = null;
+    }
+
+    setSocket(socket) {
+        this.socket = new WebsocketWrapper(socket);
         this._bindClientEvents();
-        this._syncSessionId();
     }
 
     of(...args) {
@@ -52,7 +56,7 @@ export default class Client {
         });
     }
 
-    _syncSessionId() {
+    requestSessionId() {
         const sessionChannel = this.socket.of('session');
         sessionChannel.on('session_id', sessionId => this.sessionId = sessionId);
         if (!this.sessionId) {
