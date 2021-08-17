@@ -58,24 +58,28 @@ export default {
         },
         setCards(groups) {
             const [table, ...hands] = groups;
-            this.setGroupCards(table);
-            this.table = table;
+            this.setGroupCards(this.table, table);
             hands.forEach((hand, index) => {
                 if (this.hands.length < index + 1) {
                     this.hands.push([]);
                 }
-                this.setGroupCards(hand);
-                this.hands[index] = hand;
+                this.setGroupCards(this.hands[index], hand);
             });
         },
-        setGroupCards(otherGroup) {
+        setGroupCards(thisGroup, otherGroup) {
             otherGroup.forEach((serializedCard, index) => {
                 let cardSvg = this.cardMap.get(serializedCard);
                 if (!cardSvg) {
                     cardSvg = this.createNewCard(serializedCard);
                 }
-                otherGroup[index] = cardSvg;
+                if (thisGroup[index] === cardSvg) {
+                    return;
+                }
+                thisGroup[index] = cardSvg;
             });
+            if (thisGroup.length > otherGroup.length) {
+                thisGroup.splice(otherGroup.length - 1);
+            }
         },
         createNewCard(serializedCard) {
             const card = Card.fromString(serializedCard, this.config);

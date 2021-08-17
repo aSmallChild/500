@@ -58,13 +58,15 @@ export default class DoodleServer {
     }
 
     announceCardPositions() {
+        const cards = this.serializeCards()
         for (const client of this.clients) {
-            this.updateClientCardPositions(client);
+            this.updateClientCardPositions(client, cards);
         }
     }
 
-    updateClientCardPositions(client) {
-        client.emit('cards', this.serializeCards());
+    updateClientCardPositions(client, cards = null) {
+        cards = cards || this.serializeCards();
+        client.emit('cards', cards);
     }
 
     serializeCards() {
