@@ -36,7 +36,7 @@ export default {
                 callbacks.push(cardSvg.animateTo(() => this.$el.appendChild(cardSvg.svg)));
             });
             this.$nextTick(() => {
-                setTimeout(() => callbacks.forEach(callback => callback()), 2);
+                setTimeout(() => callbacks.forEach(callback => callback()), 7);
             });
         },
         hasSVG(svg) {
