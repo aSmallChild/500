@@ -28,13 +28,15 @@ export default {
             }
 
             const cardsAlreadyHere = this.getCardsAlreadyPlaced();
+            const callbacks = [];
             this.cards.forEach((cardSvg, index) => {
                 if (cardSvg.svg.parentElement === this.$el && cardsAlreadyHere[index] === cardSvg.svg) {
                     return;
                 }
-                cardSvg.animateTo(() => {
-                    this.$el.appendChild(cardSvg.svg);
-                });
+                callbacks.push(cardSvg.animateTo(() => this.$el.appendChild(cardSvg.svg)));
+            });
+            this.$nextTick(() => {
+                setTimeout(() => callbacks.forEach(callback => callback()), 2);
             });
         },
         hasSVG(svg) {
@@ -50,13 +52,13 @@ export default {
                 return [];
             }
             const cardsAlreadyHere = [];
-                this.$el.children.forEach(svg => {
-                    if (this.hasSVG(svg)) {
-                        cardsAlreadyHere.push(svg);
-                    }
-                });
+            this.$el.children.forEach(svg => {
+                if (this.hasSVG(svg)) {
+                    cardsAlreadyHere.push(svg);
+                }
+            });
             return cardsAlreadyHere;
-        }
+        },
     },
     mounted() {
         this.placeCards();

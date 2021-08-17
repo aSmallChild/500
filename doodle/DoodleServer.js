@@ -8,6 +8,7 @@ export default class DoodleServer {
         this.clients = new Set();
         this.hands = [];
         this.table = [];
+        this.clickedCardQueue = [];
 
         const cards = Deck.buildDeck(this.config);
         for (const card of cards) {
@@ -22,12 +23,32 @@ export default class DoodleServer {
         client.on('open', () => this.clients.delete(client));
         client.on('close', () => this.clients.add(client));
         client.on('card', serializedCard => {
+            // if (this.clickedCardQueue.length > 1) {
+            //     console.log(`clicks waiting in queue: ${this.clickedCardQueue.length}`);
+            //     return;
+            // }
+            // this.processQueue();
+            // console.time('card');
+            console.log(`Card: ${serializedCard}`);
             const [card, group] = this.takeCardFromGroup(serializedCard);
             this.placeCardSomewhereElse(card, group);
             this.announceCardPositions();
+            // console.timeEnd('card');
         });
         client.emit('config', this.config);
         this.updateClientCardPositions(client);
+    }
+
+    processQueue() {
+        while (this.clickedCardQueue.length) {
+            console.time('card');
+            const serializedCard = this.clickedCardQueue.shift();
+            console.log(`Card: ${serializedCard}`);
+            const [card, group] = this.takeCardFromGroup(serializedCard);
+            this.placeCardSomewhereElse(card, group);
+            this.announceCardPositions();
+            console.timeEnd('card');
+        }
     }
 
     takeCardFromGroup(serializedCard) {
@@ -58,7 +79,7 @@ export default class DoodleServer {
     }
 
     announceCardPositions() {
-        const cards = this.serializeCards()
+        const cards = this.serializeCards();
         for (const client of this.clients) {
             this.updateClientCardPositions(client, cards);
         }
@@ -70,7 +91,7 @@ export default class DoodleServer {
     }
 
     serializeCards() {
-        const newGroups = []
+        const newGroups = [];
         for (const group of [this.table, ...this.hands]) {
             const newGroup = [];
             for (const card of group) {

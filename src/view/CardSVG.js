@@ -35,11 +35,14 @@ export default class CardSVG {
     }
 
     animateTransform(value) {
-        clearTimeout(this.unfrozen.transformTimeout);
-        this.unfrozen.transformTimeout = setTimeout(() => {
+        // clearTimeout(this.unfrozen.transformTimeout);
+        // this needs to happen on the next tick the timeout below is just a backup that has race conditions
+        return () => {
             this.svg.style.transition = '';
             this.transform(value);
-        }, 1);
+        };
+        // this.unfrozen.transformTimeout = setTimeout(callback, 5);
+        // return callback;
     }
 
     transform(value) {
@@ -61,7 +64,7 @@ export default class CardSVG {
         this.instantTransform();
         this.svg.style.visibility = '';
         this.unfrozen.transforms.clear();
-        this.animateTransform();
+        return this.animateTransform();
     }
 
     animateSiblings(setPosition) {
