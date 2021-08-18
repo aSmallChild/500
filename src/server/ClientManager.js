@@ -2,6 +2,8 @@ import DoodleServer from '../../doodle/DoodleServer.js';
 import WebsocketWrapper from 'ws-wrapper';
 import {v4 as uuidv4} from 'uuid';
 
+WebsocketWrapper.MAX_SEND_QUEUE_SIZE = 0;
+
 export default class ClientManager {
     constructor() {
         this.sessions = new Map();
@@ -58,8 +60,6 @@ export default class ClientManager {
         socket.set('session_id', sessionId);
         this.sessions.set(sessionId, socket);
         socket.of('session').emit('session_id', sessionId);
-        // todo this needs to emit some kind of connect event so that things
-        //      running on the server know that the socket has connected/reconnected
     }
 
     disconnectSession(sessionId, nativeSocket) {
@@ -68,7 +68,6 @@ export default class ClientManager {
             return null;
         }
         console.log(`Disconnecting previous socket: ${sessionId}`);
-        // existingSocket.emit('disconnecting');
         existingSocket.disconnect();
         existingSocket.bind(nativeSocket);
         return existingSocket;

@@ -19,16 +19,24 @@ export default class DoodleServer {
     socketConnected(socket) {
         const client = socket.of('doodle');
         this.clients.add(client);
-        socket.on('connect', () => this.clients.add(client));
-        socket.on('disconnect', () => this.clients.delete(client));
+        socket.on('connect', () => this.clientConnected(client));
+        socket.on('disconnect', () => this.clientDisconnected(client));
         client.on('card', serializedCard => {
-            console.log(`Card: ${serializedCard}`);
             const [card, group] = this.takeCardFromGroup(serializedCard);
             this.placeCardSomewhereElse(card, group);
             this.announceCardPositions();
         });
+        this.clientConnected(client);
+    }
+
+    clientConnected(client) {
+        this.clients.add(client);
         client.emit('config', this.config);
         this.updateClientCardPositions(client);
+    }
+
+    clientDisconnected(client) {
+        this.clients.delete(client);
     }
 
     takeCardFromGroup(serializedCard) {
@@ -67,7 +75,11 @@ export default class DoodleServer {
 
     updateClientCardPositions(client, cards = null) {
         cards = cards || this.serializeCards();
-        client.emit('cards', cards);
+        try {
+            client.emit('cards', cards);
+        } catch (error) {
+            this.clientDisconnected(client);
+        }
     }
 
     serializeCards() {
