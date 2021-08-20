@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import Bid from '../src/game/model/Bid.js';
+import Bid from '../../src/game/model/Bid.js';
 
 // todo disable trick numbers if n * no trumps is < highest bid
 // todo disable special bids if bid.points < highest bid

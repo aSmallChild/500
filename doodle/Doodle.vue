@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import BidSelector from '../components/BidSelector.vue';
-import CardGroup from '../components/CardGroup.vue';
+import BidSelector from '../vue/components/BidSelector.vue';
+import CardGroup from '../vue/components/CardGroup.vue';
 import DeckConfig from '../src/game/model/DeckConfig.js';
 import OrdinaryNormalDeck from '../src/game/model/OrdinaryNormalDeck.js';
 import ScoringAvondale from '../src/game/model/ScoringAvondale.js';

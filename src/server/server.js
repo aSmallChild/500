@@ -16,7 +16,7 @@ server.on('upgrade', (request, socket, head) => {
 
 server.on('request', (request, response) => {
     const indexFilePath = '/index.html';
-    const filePath = './dist' + (request.url === '/' ? indexFilePath : request.url);
+    const filePath = './dist' + (request.url === '/' || request.url.indexOf('.') < 0 ? indexFilePath : request.url);
     const sendResponse = (status, data = null) => {
         response.writeHead(status);
         response.end(data);
