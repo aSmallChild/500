@@ -1,17 +1,17 @@
 import {createServer} from 'http';
 import WebSocket from 'ws';
-import ClientManager from './ClientManager.js';
+import SocketManager from './SocketManager.js';
 import serverConfig from '../../config.cjs';
 import fs from 'fs';
 
 const port = serverConfig.serverPort;
 const server = createServer();
 const wss = new WebSocket.Server({noServer: true});
-const clientManager = new ClientManager();
+const socketManager = new SocketManager();
 
 server.on('upgrade', (request, socket, head) => {
     wss.handleUpgrade(request, socket, head,
-        ws => clientManager.socketConnected(ws));
+        ws => socketManager.socketConnected(ws));
 });
 
 server.on('request', (request, response) => {

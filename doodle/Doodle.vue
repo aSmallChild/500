@@ -3,7 +3,6 @@
         <svg width="0" height="0">
             <defs ref="svgDefs"></defs>
         </svg>
-        <bid-selector v-if="scoring" @bid="(bid) => highestBid = bid" :scoring="scoring" :highest-bid="highestBid" :has-seen-hand="false" :has-leading-bid="false"></bid-selector>
         <div style="text-align: center;">
             <card-group class="animate-cards fan" v-for="hand in hands" :cards="hand" :key="hand"/>
             <card-group class="animate-cards" :cards="table"></card-group>
@@ -12,12 +11,10 @@
 </template>
 
 <script>
-import BidSelector from '../vue/components/BidSelector.vue';
 import CardGroup from '../vue/components/CardGroup.vue';
 import DeckConfig from '../src/game/model/DeckConfig.js';
 import OrdinaryNormalDeck from '../src/game/model/OrdinaryNormalDeck.js';
-import ScoringAvondale from '../src/game/model/ScoringAvondale.js';
-import WebsocketWrapper from 'ws-wrapper';
+import Client from '../src/client/Client.js';
 import Card from '../src/game/model/Card.js';
 import CardSVGBuilder from '../src/view/CardSVGBuilder.js';
 import CardSVG from '../src/view/CardSVG.js';
@@ -25,15 +22,12 @@ import CardSVG from '../src/view/CardSVG.js';
 export default {
     components: {
         CardGroup,
-        BidSelector,
     },
     data() {
         this.channel = null;
         this.config = null;
         this.cardMap = new Map();
         return {
-            scoring: null,
-            highestBid: null,
             table: [],
             hands: [],
         };
@@ -41,7 +35,6 @@ export default {
     methods: {
         setConfig(config) {
             this.config = new DeckConfig(config);
-            this.scoring = new ScoringAvondale(this.config);
         },
         findCardIndex(group, serializedCard) {
             return group.findIndex(cardSvg => cardSvg.card.toString() === serializedCard);
@@ -93,8 +86,8 @@ export default {
     },
     mounted() {
         this.$refs.svgDefs.innerHTML += OrdinaryNormalDeck.svgDefs;
-        const socket = new WebsocketWrapper(new WebSocket(window.socketURL));
-        this.channel = socket.of('doodle');
+        const client = Client.client;
+        this.channel = client.of('doodle');
         this.channel.on('config', config => this.setConfig(config));
         this.channel.on('cards', cards => this.setCards(cards));
     },

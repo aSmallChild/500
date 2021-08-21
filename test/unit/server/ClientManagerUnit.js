@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars,no-undef */
 
-import ClientManager from '../../../src/server/ClientManager.js';
-import Client from '../../../src/server/Client.js';
+import SocketManager from '../../../src/server/SocketManager.js';
+import Client from '../../../src/client/Client.js';
 import SocketStub from '../../stubs/SocketStub.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
-const manager = new ClientManager();
+const manager = new SocketManager();
 
 function getPair() {
     const [clientSocket, serverSocket] = SocketStub.getSocketPair();
