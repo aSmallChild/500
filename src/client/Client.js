@@ -29,8 +29,8 @@ export default class Client {
 
     of(...args) {
         this.connect();
-        const channel = this.socket.of(...args); // todo emit join channel, check if the channels are cached (I think they are)
-        channel.emit('join');
+        const channel = this.socket.of(...args);
+        channel.emit('channel:login');
         return channel;
     }
 

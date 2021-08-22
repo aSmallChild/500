@@ -16,12 +16,12 @@ export default class ChannelClient {
         return this.password === submittedPassword;
     }
 
-    addSocket(socket, socketChannel) {
-        if (this.sockets.has(socketChannel)) {
-            return;
-        }
+    add(socketChannel) {
         this.sockets.add(socketChannel);
-        socket.on('disconnect', this.sockets.delete(socketChannel));
+    }
+
+    remove(socketChannel) {
+        this.sockets.delete(socketChannel);
     }
 
     emit(...args) {
