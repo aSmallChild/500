@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // noinspection ES6UnusedImports
 import should from 'should';
 import Lobby from '../../../../src/game/stage/Lobby.js';
@@ -22,7 +23,7 @@ describe('Lobby Stage Unit', function() {
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onPlayerAction(player, 'ready');
+                    lobby.onPlayerAction(player, player, 'ready');
                 }
             });
             it(`should complete stage when all players are ready`, function() {
@@ -32,7 +33,7 @@ describe('Lobby Stage Unit', function() {
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onPlayerAction(player, 'ready');
+                    lobby.onPlayerAction(player, player, 'ready');
                 }
             });
         });

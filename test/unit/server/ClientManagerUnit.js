@@ -18,26 +18,23 @@ function getPair() {
     return [client, server];
 }
 
-describe('Client Manager Unit', function() {
-    describe('Request session IDs', function() {
-        const [client, server] = getPair();
-        it(`has sessionid`, function(done) {
-            client.requestSessionId();
-            process.nextTick(() => {
-                const sessionId = server.get('session_id');
-                should(sessionId).is.type('string', 'session_id is missing');
-                done();
-            });
-        });
-    });
+// describe('Client Manager Unit', function() {
+//     describe('Request session IDs', function() {
+//         const [client, server] = getPair();
+//         it(`has sessionid`, function(done) {
+//             client.requestSessionId();
+//             process.nextTick(() => {
+//                 const sessionId = server.get('session_id');
+//                 should(sessionId).is.type('string', 'session_id is missing');
+//                 done();
+//             });
+//         });
+//     });
+//
+// });
 
-});
 
-
-// todo test connecting and taking over an existing connection
-// todo test connecting and reviving a dead session
-
-// this.woot(socket, 1); //todo move
+// this.woot(socket, 1);
 // this.woot(this.client, 1);
 //
 // function wootServer(socket, wootCount) {

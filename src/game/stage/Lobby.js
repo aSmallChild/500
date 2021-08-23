@@ -11,7 +11,7 @@ export default class Lobby extends GameStage {
         this.readyPlayers = new Set();
     }
 
-    onPlayerAction(player, actionName, actionData) {
+    onPlayerAction(player, socket, actionName, actionData) {
         if (actionName === 'partner') return this.requestPartner(player, actionData);
         if (actionName === 'ready') return this.playerReady(player, true);
         if (actionName === 'not_ready') return this.playerReady(player, false);
@@ -24,8 +24,6 @@ export default class Lobby extends GameStage {
             player.isAdmin = true;
         }
     }
-
-    onSpectatorConnect(spectator) {}
 
     requestPartner(player, partnerName) {
         const store = this.dataStore.preferredPartners;

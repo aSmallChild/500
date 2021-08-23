@@ -26,10 +26,6 @@ export default class Channel {
         return this.constructor.createChannelKey(this.prefix, this.name);
     }
 
-    getClientChannelName(client) {
-        return this.channelKey + this.delimiter + client.id;
-    }
-
     static isNameValid(name) {
         return name.indexOf(this.delimiter) >= 0;
     }
@@ -79,17 +75,13 @@ export default class Channel {
     sendClientLoginResponse(client, socket, socketChannel) {
         const response = {
             success: false,
-            channel: '',
         };
         if (client) {
-            const clientChannelName = this.getClientChannelName(client);
-            const clientChannel = socket.of(clientChannelName);
-            response.channel = clientChannelName;
             response.success = true;
-            client.add(clientChannel);
-            socket.on('disconnect', client.remove(clientChannel));
+            client.add(socketChannel);
+            socket.on('disconnect', client.remove(socketChannel));
             if (this.#onClient) {
-                this.#onClient(client, clientChannel);
+                this.#onClient(client, socketChannel);
             }
         }
         socketChannel.emit('client:login', response);

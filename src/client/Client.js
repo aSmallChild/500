@@ -2,6 +2,7 @@ import WebsocketWrapper from 'ws-wrapper';
 
 export default class Client {
     constructor(url) {
+        // todo set name somehow
         this.url = url;
         this.socket = null;
     }
@@ -30,7 +31,7 @@ export default class Client {
     of(...args) {
         this.connect();
         const channel = this.socket.of(...args);
-        channel.emit('channel:login');
+        channel.emit('channel:login'); // todo send name and password here
         return channel;
     }
 
