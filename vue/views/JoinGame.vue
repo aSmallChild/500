@@ -4,14 +4,13 @@
             <v-col>
                 <div class="menu-buttons">
                     <!-- waiting for vuetify to be finished so v-text-field is available -->
-                    <h1>Join</h1>
                     <label class="wrapper">
                         <span>Game</span>
                         <input>
                     </label>
                     <label class="wrapper">
                         <span>Name</span>
-                        <input :value="dog">
+                        <input>
                     </label>
                     <v-btn color="secondary">Join</v-btn>
                 </div>

@@ -26,15 +26,10 @@ export default class SocketManager {
             const [prefix, channelName] = channelKey.indexOf(Channel.delimiter) > 0 ? channelKey.split(Channel.delimiter) : [null, channelKey];
 
             const channel = this.channels.get(channelKey);
-            if (eventName === 'channel:login') {
+            if (eventName === 'channel:join') {
                 const password = data.password || null;
                 return this.handleChannelLogin(channel, socket, prefix, channelName, password);
             }
-            if (!channel) {
-                return;
-            }
-
-            // todo handle other methods here
         });
         return socket;
     }
@@ -43,17 +38,21 @@ export default class SocketManager {
         if (!channel) {
             channel = this.createChannelController(prefix, channelName, password);
         }
+
+        const socketChannel = socket.of(Channel.createChannelKey(prefix, channelName));
         if (!channel) {
-            socket.emit('channel:login', {success: false, error: 'Invalid channel prefix.'});
+            socketChannel.emit('channel:join', {success: false, error: 'Invalid channel prefix.'});
             return;
         }
-        channel.channelLogin(socket, password);
+        const response = {
+            success: channel.channelLogin(socket, password)
+        };
+        socketChannel.emit('channel:join', response);
     }
 
     createChannel(prefix, channelName, password) {
-        const channelKey = Channel.createChannelKey(prefix, channelName);
         const channel = new Channel(prefix, channelName, password);
-        this.channels.set(channelKey, channel);
+        this.channels.set(channel.channelKey, channel);
         return channel;
     }
 

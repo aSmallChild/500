@@ -1,4 +1,5 @@
 import WebsocketWrapper from 'ws-wrapper';
+import ClientChannel from './ClientChannel.js';
 
 export default class Client {
     constructor(url) {
@@ -28,11 +29,11 @@ export default class Client {
         this._bindClientEvents();
     }
 
-    of(...args) {
+    of(channelName) {
         this.connect();
-        const channel = this.socket.of(...args);
-        channel.emit('channel:login'); // todo send name and password here
-        return channel;
+        const channel = this.socket.of(channelName);
+        channel.removeAllListeners();
+        return new ClientChannel(channel);
     }
 
     _bindClientEvents() {

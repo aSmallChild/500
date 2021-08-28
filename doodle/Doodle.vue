@@ -69,16 +69,23 @@ export default {
             });
         };
 
-        onMounted(() => {
+        onMounted(async () => {
             svgDefs.value.innerHTML += OrdinaryNormalDeck.svgDefs;
-            channel = client.of('doodle:doodle');
-            channel.on('config', newConfig => config = new DeckConfig(newConfig));
-            channel.on('cards', cards => setCards(cards));
+            try {
+                channel = client.of('doodle:doodle');
+                channel.on('cards', cards => setCards(cards));
+                channel.on('config', newConfig => config = new DeckConfig(newConfig));
+                const response = await channel.join();
+                if (!response.success) {
+                    console.log('Failed to join channel');
+                }
+            } catch (err) {
+                console.error(err);
+            }
         });
         onUnmounted(() => {
-            channel.emit('channel:leave');
-            channel.removeAllListeners('config');
-            channel.removeAllListeners('cards');
+            channel.leave();
+            channel = null;
         });
 
         return {
