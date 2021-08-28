@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import {ref, onMounted, onUnmounted} from 'vue';
 import CardGroup from '../vue/components/CardGroup.vue';
 import DeckConfig from '../src/game/model/DeckConfig.js';
 import OrdinaryNormalDeck from '../src/game/model/OrdinaryNormalDeck.js';
@@ -23,47 +24,30 @@ export default {
     components: {
         CardGroup,
     },
-    data() {
-        this.channel = null;
-        this.config = null;
-        this.cardMap = new Map();
-        return {
-            table: [],
-            hands: [],
+    setup() {
+        let config = null;
+        const svgDefs = ref();
+        const table = ref([]);
+        const hands = ref([]);
+        const client = Client.client;
+        const cardMap = new Map();
+        let channel = null;
+
+        const createNewCard = (serializedCard) => {
+            const card = Card.fromString(serializedCard, config);
+            const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
+            const cardSvg = new CardSVG(card, svg);
+            cardSvg.svg.addEventListener('click', () => channel.emit('card', serializedCard));
+            Object.freeze(cardSvg);
+            cardMap.set(card.toString(), cardSvg);
+            return cardSvg;
         };
-    },
-    methods: {
-        setConfig(config) {
-            this.config = new DeckConfig(config);
-        },
-        findCardIndex(group, serializedCard) {
-            return group.findIndex(cardSvg => cardSvg.card.toString() === serializedCard);
-        },
-        findCard(serializedCard) {
-            for (const group of [this.table, ...this.hands]) {
-                const index = this.findCardIndex(group, serializedCard);
-                if (index >= 0) {
-                    const card = group[index];
-                    return [card, group, index];
-                }
-            }
-            return [null, null, -1];
-        },
-        setCards(groups) {
-            const [table, ...hands] = groups;
-            this.setGroupCards(this.table, table);
-            hands.forEach((hand, index) => {
-                if (this.hands.length < index + 1) {
-                    this.hands.push([]);
-                }
-                this.setGroupCards(this.hands[index], hand);
-            });
-        },
-        setGroupCards(thisGroup, otherGroup) {
+
+        const setGroupCards = (thisGroup, otherGroup) => {
             otherGroup.forEach((serializedCard, index) => {
-                let cardSvg = this.cardMap.get(serializedCard);
+                let cardSvg = cardMap.get(serializedCard);
                 if (!cardSvg) {
-                    cardSvg = this.createNewCard(serializedCard);
+                    cardSvg = createNewCard(serializedCard);
                 }
                 if (thisGroup[index] === cardSvg) {
                     return;
@@ -73,23 +57,36 @@ export default {
             if (thisGroup.length > otherGroup.length) {
                 thisGroup.splice(otherGroup.length - 1);
             }
-        },
-        createNewCard(serializedCard) {
-            const card = Card.fromString(serializedCard, this.config);
-            const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
-            const cardSvg = new CardSVG(card, svg);
-            cardSvg.svg.addEventListener('click', () => this.channel.emit('card', serializedCard));
-            Object.freeze(cardSvg);
-            this.cardMap.set(card.toString(), cardSvg);
-            return cardSvg;
-        },
-    },
-    mounted() {
-        this.$refs.svgDefs.innerHTML += OrdinaryNormalDeck.svgDefs;
-        const client = Client.client;
-        this.channel = client.of('doodle');
-        this.channel.on('config', config => this.setConfig(config));
-        this.channel.on('cards', cards => this.setCards(cards));
+        };
+        const setCards = groups => {
+            const [newTable, ...newHands] = groups;
+            setGroupCards(table.value, newTable);
+            newHands.forEach((hand, index) => {
+                if (hands.value.length < index + 1) {
+                    hands.value.push([]);
+                }
+                setGroupCards(hands.value[index], hand);
+            });
+        };
+
+        onMounted(() => {
+            svgDefs.value.innerHTML += OrdinaryNormalDeck.svgDefs;
+            channel = client.of('doodle:doodle');
+            channel.on('config', newConfig => config = new DeckConfig(newConfig));
+            channel.on('cards', cards => setCards(cards));
+        });
+        onUnmounted(() => {
+            channel.emit('channel:leave');
+            channel.removeAllListeners('config');
+            channel.removeAllListeners('cards');
+        });
+
+        return {
+            createNewCard,
+            svgDefs,
+            table,
+            hands,
+        };
     },
 };
 </script>

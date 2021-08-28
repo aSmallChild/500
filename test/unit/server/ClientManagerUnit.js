@@ -2,14 +2,14 @@
 
 import SocketManager from '../../../src/server/SocketManager.js';
 import Client from '../../../src/client/Client.js';
-import SocketStub from '../../stubs/SocketStub.js';
+import SocketBridge from '../../stubs/SocketBridge.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
 const manager = new SocketManager();
 
 function getPair() {
-    const [clientSocket, serverSocket] = SocketStub.getSocketPair();
+    const [clientSocket, serverSocket] = SocketBridge.getSocketPair();
     const client = new Client('aaa');
     client.setSocket(clientSocket);
     const server = manager.socketConnected(serverSocket);

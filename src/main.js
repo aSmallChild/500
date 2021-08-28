@@ -5,10 +5,12 @@ import {createRouter, createWebHistory} from 'vue-router';
 import MainMenu from '../vue/views/MainMenu.vue';
 import Doodle from '../doodle/Doodle.vue';
 import NewGame from '../vue/views/NewGame.vue';
+import JoinGame from '../vue/views/JoinGame.vue';
 
 const routes = [
     {path: '/', name: 'home', component: MainMenu},
-    {path: '/new', name: 'new_game', component: NewGame},
+    {path: '/new', name: 'game_new', component: NewGame},
+    {path: '/join', name: 'game_join', component: JoinGame},
     {path: '/sandbox', name: 'sandbox', component: Doodle},
 ];
 

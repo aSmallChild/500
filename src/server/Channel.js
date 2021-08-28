@@ -4,6 +4,7 @@ export default class Channel {
     static delimiter = ':';
 
     #onObserver = null;
+    #onObserverDisconnect = null;
     #onClient = null;
 
     constructor(prefix, name, password) {
@@ -11,13 +12,14 @@ export default class Channel {
         this.name = name;
         this.password = password;
         this.clients = new Map();
+        this.clientChannels = new WeakMap();
         this.observers = new Set();
     }
 
     static createChannelKey(prefix, name) {
         name = name.toLowerCase();
         if (prefix) {
-            return `${prefix}${this.delimiter}${name}`
+            return `${prefix}${this.delimiter}${name}`;
         }
         return name;
     }
@@ -42,18 +44,36 @@ export default class Channel {
             return false;
         }
         const socketChannel = socket.of(this.channelKey);
+        if (this.observers.has(socketChannel)) {
+            return true;
+        }
         this.observers.add(socketChannel);
-        socket.on('disconnect', () => this.observers.delete(socketChannel));
+        socket.once('disconnect', () => this.observerDisconnect(socketChannel));
 
         socketChannel.on('client:login', data => {
             const client = this.clientLogin(data.name, data.password);
             this.sendClientLoginResponse(client, socket, socketChannel);
         });
+        socketChannel.once('channel:leave', () => this.observerDisconnect(socketChannel));
 
         if (this.#onObserver) {
             this.#onObserver(socketChannel);
         }
         return true;
+    }
+
+    observerDisconnect(socketChannel) {
+        if (!this.observers.delete(socketChannel)) {
+            return;
+        }
+        socketChannel.removeAllListeners();
+        const client = this.clientChannels.get(socketChannel);
+        if (client) {
+            client.remove(socketChannel);
+        }
+        if (this.#onObserverDisconnect) {
+            this.#onObserverDisconnect(socketChannel, client);
+        }
     }
 
     clientLogin(name, password) {
@@ -79,10 +99,11 @@ export default class Channel {
         if (client) {
             response.success = true;
             client.add(socketChannel);
-            socket.on('disconnect', client.remove(socketChannel));
+            socket.once('disconnect', client.remove(socketChannel));
             if (this.#onClient) {
                 this.#onClient(client, socketChannel);
             }
+            this.clientChannels.set(socketChannel, client);
         }
         socketChannel.emit('client:login', response);
     }
@@ -96,7 +117,7 @@ export default class Channel {
             try {
                 observer.emit(...args);
             } catch (e) {
-                this.observers.delete(observer);
+                this.observerDisconnect(observer);
             }
         }
     }
@@ -106,6 +127,11 @@ export default class Channel {
     // observer.emit(...)
     onObserver(callback) {
         this.#onObserver = callback;
+    }
+
+    // callback(socketChannel, client), all event listeners on the channel are removed prior
+    onObserverDisconnect(callback) {
+        this.#onObserverDisconnect = callback;
     }
 
     // callback(client, channel)

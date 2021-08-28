@@ -1,6 +1,10 @@
 import DoodleServer from '../../doodle/DoodleServer.js';
 import WebsocketWrapper from 'ws-wrapper';
 import Channel from './Channel.js';
+import Lobby from '../game/stage/Lobby.js';
+import Bidding from '../game/stage/Bidding.js';
+import Kitty from '../game/stage/Kitty.js';
+import Game from '../game/Game.js';
 
 WebsocketWrapper.MAX_SEND_QUEUE_SIZE = 0;
 
@@ -20,28 +24,61 @@ export default class SocketManager {
             }
 
             const [prefix, channelName] = channelKey.indexOf(Channel.delimiter) > 0 ? channelKey.split(Channel.delimiter) : [null, channelKey];
-            const password = data.password || null;
+
+            const channel = this.channels.get(channelKey);
             if (eventName === 'channel:login') {
-                if (channelName === 'doodle') {
-                    return this.doodleChannelLogin(socket, prefix, channelName, password);
-                }
+                const password = data.password || null;
+                return this.handleChannelLogin(channel, socket, prefix, channelName, password);
             }
+            if (!channel) {
+                return;
+            }
+
+            // todo handle other methods here
         });
         return socket;
     }
 
-    doodleChannelLogin(socket, prefix, channelName, password) {
-        const channelKey = Channel.createChannelKey(prefix, channelName);
-        if (this.channels.has(channelKey)) {
-            const channel = this.channels.get(channelKey);
-            channel.channelLogin(socket, password);
+    handleChannelLogin(channel, socket, prefix, channelName, password) {
+        if (!channel) {
+            channel = this.createChannelController(prefix, channelName, password);
+        }
+        if (!channel) {
+            socket.emit('channel:login', {success: false, error: 'Invalid channel prefix.'});
             return;
         }
+        channel.channelLogin(socket, password);
+    }
+
+    createChannel(prefix, channelName, password) {
+        const channelKey = Channel.createChannelKey(prefix, channelName);
         const channel = new Channel(prefix, channelName, password);
         this.channels.set(channelKey, channel);
+        return channel;
+    }
 
+    createGame(channel) {
+        const stages = [
+            Lobby,
+            Bidding,
+            Kitty
+        ];
+        new Game(stages, channel);
+        return channel;
+    }
+
+    createDoodle(channel) {
         new DoodleServer(channel);
+        return channel;
+    }
 
-        channel.channelLogin(socket, password);
+    createChannelController(prefix, channelName, password) {
+        if (prefix === 'games') {
+            return this.createGame(this.createChannel(prefix, channelName, password));
+        }
+        if (prefix === 'doodle') {
+            return this.createDoodle(this.createChannel(prefix, channelName, password));
+        }
+        return null;
     }
 }

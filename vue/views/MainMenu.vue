@@ -4,7 +4,6 @@
             <v-col>
                 <div class="menu-buttons">
                     <h1>500</h1>
-                    <join-game></join-game>
                     <v-btn v-for="[label, route] of Object.entries(menuItems)" :key="label"
                            color="secondary" @click="$router.push(route)">
                         {{ label }}
@@ -16,17 +15,13 @@
 </template>
 
 <script>
-import JoinGame from '../components/menu/JoinGame.vue';
 export default {
     name: 'MainMenu',
-    components: {
-        JoinGame
-    },
     data() {
-        // this.client = client;
         return {
             menuItems: {
-                'New Game': 'new',
+                'New': 'new',
+                'Join': 'join',
                 'Sandbox': 'sandbox',
             },
         };
