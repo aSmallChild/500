@@ -1,9 +1,10 @@
 // noinspection ES6UnusedImports
+/* eslint-disable no-unused-vars,no-undef */
 import should from 'should';
 import Bidding from '../../../../src/game/stage/Bidding.js';
 import {getPlayers, getStage} from '../../util/stage.js';
 
-describe('Deal Stage Unit', function() {
+describe('Bidding Stage Unit', function() {
     describe(`start()`, function() {
         const stage = getStage(getPlayers(23), Bidding);
         it(`should deal cards to all players`, function() {
@@ -100,23 +101,31 @@ describe('Deal Stage Unit', function() {
                     const bid = stage.getBid(call);
                     stage.currentBidder.should.equal(position);
                     let bidAnnounced = false;
-                    player.emit = (name, data) => {
-                        name.should.not.equal('bid_error', `Received unexpected bid error: ${data}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
+                    const socket = {
+                        emit(event, action) {
+                            should(event).equal('stage:action');
+                            const {name, data} = action;
+                            name.should.not.equal('bid_error', `Received unexpected bid error: ${data}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
+                        }
                     };
-                    stage.clients.emit = (name, data) => {
+                    stage.channel.emit = (event, action) => {
+                        should(event).equal('stage:action');
+                        const {name, data} = action;
                         if (!bidAnnounced && name === 'bid') {
                             bidAnnounced = true;
                             data.player.position.should.equal(player.position);
                             data.bid.call.should.equal(bid.call);
                         }
                     };
-                    stage.onPlayerAction(player, 'bid', call);
+                    stage.onPlayerAction(player, socket, 'bid', call);
                     bidAnnounced.should.be.true('bid was not announced');
                 }
                 const [winnerPosition, winningCall] = scenario.winner;
                 const winner = stage.players[winnerPosition];
                 const expectedWinningBid = stage.getBid(winningCall);
-                winner.emit = (name, data) => {
+                winner.emit = (event, action) => {
+                    should(event).equal('stage:action');
+                    const {name, data} = action;
                     name.should.not.equal('kitty_error', `got kitty_error ${data}`);
                 };
                 let stageCompleted = false;
@@ -125,7 +134,7 @@ describe('Deal Stage Unit', function() {
                     dataForNextStage.winningBid.call.should.equal(expectedWinningBid.call);
                     dataForNextStage.winningBidder.should.equal(winner.position);
                 });
-                stage.onPlayerAction(winner, 'take_kitty');
+                stage.onPlayerAction(winner, winner, 'take_kitty');
                 stageCompleted.should.be.true('stage did not complete');
             });
         }

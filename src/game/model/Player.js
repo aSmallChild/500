@@ -1,24 +1,13 @@
 export default class Player {
     constructor(name, client) {
-        this.setClient(client);
-        this.name = name.toLowerCase();
+        this.client = client;
+        this.name = name;
         this.position = null;
         this.isAdmin = false;
         this.partner = null;
     }
 
-    setClient(client) {
-        if (!client) return this.client = null;
-        this.client = client;
-        client.onDisconnect(() => this.client = null);
-    }
-
-    isConnected() {
-        return !!this.client;
-    }
-
     emit(actionName, actionData) {
-        if (!this.isConnected()) return;
         this.client.emit(actionName, actionData);
     }
 
@@ -40,8 +29,7 @@ export default class Player {
         return {
             name: this.name,
             position: this.position,
-            partner: this.partner.position,
-            connected: !!this.client
+            partner: this.partner.position
         };
     }
 }

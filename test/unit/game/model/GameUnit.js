@@ -3,6 +3,7 @@
 import should from 'should';
 import GameStage from '../../../../src/game/GameStage.js';
 import Game from '../../../../src/game/Game.js';
+import Channel from '../../../../src/server/Channel.js';
 
 class SampleStage1 extends GameStage {
     static startCallback;
@@ -25,7 +26,7 @@ describe('Game Unit', function() {
         const game = new Game([
             SampleStage1,
             SampleStage2,
-        ]);
+        ], new Channel('a', 'b', 'c'));
         describe(`nextStage()`, function() {
             let stage1DataStore = null, stage2DataStore = null;
             it(`should start on stage 1`, function(done) {

@@ -1,7 +1,7 @@
 <template>
     <v-app>
-        <v-btn v-if="$router.currentRoute.value.fullPath !== '/'" color="secondary" @click="$router.push('/')">&lt; Back</v-btn>
         <v-main>
+            <v-btn v-if="$router.currentRoute.value.fullPath !== '/'" color="secondary" @click="$router.push('/')">Back</v-btn>
             <router-view/>
         </v-main>
     </v-app>

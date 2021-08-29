@@ -1,15 +1,15 @@
 /* eslint-disable no-unused-vars,no-undef */
 
-import ClientManager from '../../../src/server/ClientManager.js';
-import Client from '../../../src/server/Client.js';
-import SocketStub from '../../stubs/SocketStub.js';
+import SocketManager from '../../../src/server/SocketManager.js';
+import Client from '../../../src/client/Client.js';
+import SocketBridge from '../../stubs/SocketBridge.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 
-const manager = new ClientManager();
+const manager = new SocketManager();
 
 function getPair() {
-    const [clientSocket, serverSocket] = SocketStub.getSocketPair();
+    const [clientSocket, serverSocket] = SocketBridge.getSocketPair();
     const client = new Client('aaa');
     client.setSocket(clientSocket);
     const server = manager.socketConnected(serverSocket);
@@ -18,26 +18,23 @@ function getPair() {
     return [client, server];
 }
 
-describe('Client Manager Unit', function() {
-    describe('Request session IDs', function() {
-        const [client, server] = getPair();
-        it(`has sessionid`, function(done) {
-            client.requestSessionId();
-            process.nextTick(() => {
-                const sessionId = server.get('session_id');
-                should(sessionId).is.type('string', 'session_id is missing');
-                done();
-            });
-        });
-    });
+// describe('Client Manager Unit', function() {
+//     describe('Request session IDs', function() {
+//         const [client, server] = getPair();
+//         it(`has sessionid`, function(done) {
+//             client.requestSessionId();
+//             process.nextTick(() => {
+//                 const sessionId = server.get('session_id');
+//                 should(sessionId).is.type('string', 'session_id is missing');
+//                 done();
+//             });
+//         });
+//     });
+//
+// });
 
-});
 
-
-// todo test connecting and taking over an existing connection
-// todo test connecting and reviving a dead session
-
-// this.woot(socket, 1); //todo move
+// this.woot(socket, 1);
 // this.woot(this.client, 1);
 //
 // function wootServer(socket, wootCount) {

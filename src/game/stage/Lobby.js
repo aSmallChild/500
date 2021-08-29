@@ -1,4 +1,6 @@
 import GameStage from '../GameStage.js';
+import DeckConfig from '../model/DeckConfig.js';
+import OrdinaryNormalDeck from '../model/OrdinaryNormalDeck.js';
 
 export default class Lobby extends GameStage {
     start(dataFromPreviousStage) {
@@ -9,23 +11,27 @@ export default class Lobby extends GameStage {
             this.dataStore.preferredPartners = {};
         }
         this.readyPlayers = new Set();
+        this.deckConfig = new DeckConfig(OrdinaryNormalDeck.config);
     }
 
-    onPlayerAction(player, actionName, actionData) {
+    onPlayerAction(player, socket, actionName, actionData) {
         if (actionName === 'partner') return this.requestPartner(player, actionData);
         if (actionName === 'ready') return this.playerReady(player, true);
         if (actionName === 'not_ready') return this.playerReady(player, false);
         if (actionName === 'start_game' && player.isAdmin) return this.startGame();
         if (actionName === 'give_admin' && player.isAdmin) return this.grantAdmin(actionData);
+        if (actionName === 'game_config' && player.isAdmin) return this.updateGameConfig(player, socket, actionData);
     }
 
     onPlayerConnect(player) {
         if (this.players.length === 1) {
             player.isAdmin = true;
         }
+        if (this.deckConfig.totalHands !== this.players.length) {
+            this.deckConfig.totalHands = this.players.length;
+            this.emitGameConfig();
+        }
     }
-
-    onSpectatorConnect(spectator) {}
 
     requestPartner(player, partnerName) {
         const store = this.dataStore.preferredPartners;
@@ -126,5 +132,15 @@ export default class Lobby extends GameStage {
 
             player.setPartner(partner);
         }
+    }
+
+    updateGameConfig(player, socket, submittedConfig) {
+        this.deckConfig.cardsPerHand = submittedConfig.cardsPerHand;
+        this.deckConfig.kittySize = submittedConfig.kittySize;
+        this.emitGameConfig();
+    }
+
+    emitGameConfig() {
+        this.emitStageMessage('config', this.deckConfig);
     }
 }

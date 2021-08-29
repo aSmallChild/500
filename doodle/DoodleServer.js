@@ -3,9 +3,9 @@ import Deck from '../src/game/model/Deck.js';
 import OrdinaryNormalDeck from '../src/game/model/OrdinaryNormalDeck.js';
 
 export default class DoodleServer {
-    constructor() {
+    constructor(channel) {
         this.config = new DeckConfig(OrdinaryNormalDeck.config);
-        this.clients = new Set();
+        this.setChannel(channel);
         this.hands = [];
         this.table = [];
 
@@ -16,27 +16,21 @@ export default class DoodleServer {
         this.dealCards();
     }
 
-    socketConnected(socket) {
-        const client = socket.of('doodle');
-        this.clients.add(client);
-        socket.on('connect', () => this.clientConnected(client));
-        socket.on('disconnect', () => this.clientDisconnected(client));
-        client.on('card', serializedCard => {
-            const [card, group] = this.takeCardFromGroup(serializedCard);
-            this.placeCardSomewhereElse(card, group);
-            this.announceCardPositions();
+    setChannel(channel) {
+        this.channel = channel;
+        channel.onObserver(observer => {
+            this.clientConnected(observer);
+            observer.on('card', serializedCard => {
+                const [card, group] = this.takeCardFromGroup(serializedCard);
+                this.placeCardSomewhereElse(card, group);
+                this.updateChannelCardPositions();
+            });
         });
-        this.clientConnected(client);
     }
 
     clientConnected(client) {
-        this.clients.add(client);
         client.emit('config', this.config);
         this.updateClientCardPositions(client);
-    }
-
-    clientDisconnected(client) {
-        this.clients.delete(client);
     }
 
     takeCardFromGroup(serializedCard) {
@@ -66,20 +60,12 @@ export default class DoodleServer {
         return smallestHand;
     }
 
-    announceCardPositions() {
-        const cards = this.serializeCards();
-        for (const client of this.clients) {
-            this.updateClientCardPositions(client, cards);
-        }
+    updateChannelCardPositions() {
+        this.channel.emit('cards', this.serializeCards());
     }
 
-    updateClientCardPositions(client, cards = null) {
-        cards = cards || this.serializeCards();
-        try {
-            client.emit('cards', cards);
-        } catch (error) {
-            this.clientDisconnected(client);
-        }
+    updateClientCardPositions(client) {
+        client.emit('cards', this.serializeCards());
     }
 
     serializeCards() {

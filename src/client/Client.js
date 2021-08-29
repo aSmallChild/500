@@ -1,24 +1,11 @@
 import WebsocketWrapper from 'ws-wrapper';
+import ClientChannel from './ClientChannel.js';
 
 export default class Client {
     constructor(url) {
+        // todo set name somehow
         this.url = url;
         this.socket = null;
-        this._sessionId = null;
-    }
-
-    set sessionId(sessionId) {
-        // todo set cookie
-        this._sessionId = sessionId;
-    }
-
-    get sessionId() {
-        // todo get cookie
-        // if (!this._sessionId && !this._cookieChecked) {
-        //     this._cookieChecked = true
-        //     // get cookie?
-        // }
-        return this._sessionId;
     }
 
     connect() {
@@ -29,7 +16,6 @@ export default class Client {
         const newSocket = new WebSocket(this.url);
         if (!this.oldSocket) {
             this.setSocket(newSocket);
-            this.requestSessionId();
             return;
         }
 
@@ -43,9 +29,11 @@ export default class Client {
         this._bindClientEvents();
     }
 
-    of(...args) {
+    of(channelName) {
         this.connect();
-        return this.socket.of(...args);
+        const channel = this.socket.of(channelName);
+        channel.removeAllListeners();
+        return new ClientChannel(channel);
     }
 
     _bindClientEvents() {
@@ -56,13 +44,14 @@ export default class Client {
         });
     }
 
-    requestSessionId() {
-        const sessionChannel = this.socket.of('session');
-        sessionChannel.on('session_id', sessionId => this.sessionId = sessionId);
-        if (!this.sessionId) {
-            sessionChannel.emit('request_session_id');
-            return;
+    static get client() {
+        if (!this._client) {
+            this._client = new Client(window.socketURL);
         }
-        sessionChannel.emit('session_id', this.sessionId);
+        return this._client;
+    }
+
+    static set client(client) {
+        this._client = client;
     }
 }

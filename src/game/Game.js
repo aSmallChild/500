@@ -1,37 +1,76 @@
+import Player from './model/Player.js';
+
 export default class Game {
-    constructor(stages) {
+    constructor(stages, channel) {
         this.stages = stages;
         this.dataStore = {};
         this.currentStage = null;
         this.currentStageIndex = -1;
         this.players = [];
-        this.spectators = [];
-        this.clients = {
-            emit: (actionName, actionData) => {
-                for (const client of [...this.players, ...this.spectators]) {
-                    client.emit(actionName, actionData);
-                }
-            },
-        };
+        this.clientPlayers = new WeakMap();
+        this.setChannel(channel);
     }
 
-    onPlayerAction(player, actionName, actionData) {
-        if (!this.currentStage) return;
-        this.currentStage.onPlayerAction(player, actionName, actionData);
+    setChannel(channel) {
+        this.channel = channel;
+        channel.onObserver(observer => this.onObserver(observer));
+        channel.onClient((client, socket) => {
+            const player = this.getOrMaybeEvenCreatePlayerForClient(client);
+            if (!player) {
+                return;
+            }
+
+            this.onPlayerConnect(player, socket);
+
+            socket.on('player:action', data => {
+                this.onPlayerAction(player, socket, data.actionName, data.actionData); // todo implement this client side
+            });
+        });
     }
 
-    onPlayerConnect(player) {
-        player.emit('players', this.players);
-        if (!this.currentStage) return;
-        player.emit('stage', this.currentStage.name.toLowerCase());
-        this.currentStage.onPlayerConnect(player);
+    getOrMaybeEvenCreatePlayerForClient(client) {
+        const player = this.clientPlayers.get(client);
+        if (player) {
+            return player;
+        }
+
+        // create players for clients on the first stage
+        if (!this.currentStageIndex) {
+            return this.createPlayerForClient(client);
+        }
+
+        return null;
     }
 
-    onSpectatorConnect(spectator) {
-        spectator.emit('players', this.players);
-        if (!this.currentStage) return;
-        spectator.emit('stage', this.currentStage.name.toLowerCase());
-        this.currentStage.onSpectatorConnect(spectator);
+    createPlayerForClient(client) {
+        const player = new Player(client.name, client);
+        this.clientPlayers.set(client, player);
+        this.players.push(player);
+        return player;
+    }
+
+    emitPlayers(socket) {
+        (socket || this.channel).emit('game:players', this.players);
+    }
+
+    emitStage(socket) {
+        (socket || this.channel).emit('game:stage', this.currentStage.name.toLowerCase());
+    }
+
+    onPlayerAction(player, socket, actionName, actionData) {
+        this.currentStage.onPlayerAction(player, socket, actionName, actionData);
+    }
+
+    onPlayerConnect(player, socket) {
+        this.emitPlayers(socket);
+        this.emitStage(socket);
+        this.currentStage.onPlayerConnect(player, socket);
+    }
+
+    onObserver(observer) {
+        this.emitPlayers(observer);
+        this.emitStage(observer);
+        this.currentStage.onObserver(observer);
     }
 
     nextStage(dataFromPreviousStage) {
@@ -42,12 +81,11 @@ export default class Game {
         this.currentStage.onStageComplete((dataForNextStage, dataToStore) => {
             this.dataStore[this.currentStage.constructor.name] = JSON.parse(JSON.stringify(dataToStore));
             this.currentStage = null;
-            setTimeout(() => this.nextStage(JSON.parse(JSON.stringify(dataForNextStage))), 1);
+            process.nextTick(() => this.nextStage(JSON.parse(JSON.stringify(dataForNextStage))));
         });
         this.currentStage.setDataStore(this.dataStore[this.currentStage.constructor.name] || {});
         this.currentStage.setPlayers(this.players);
-        this.currentStage.setSpectators(this.spectators);
-        this.currentStage.setClients(this.clients);
+        this.currentStage.setChannel(this.channel);
         this.currentStage.start(dataFromPreviousStage);
     }
 }

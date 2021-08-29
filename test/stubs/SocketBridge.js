@@ -1,4 +1,4 @@
-export default class SocketStub {
+export default class SocketBridge {
     constructor() {
         this.onopen = this.onmessage = this.onerror = this.onclose = null;
         this.remoteSocket = null;

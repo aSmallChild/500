@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export default class GameStage {
     onStageComplete(onStageComplete) {
         this._onStageComplete = onStageComplete;
@@ -18,12 +19,8 @@ export default class GameStage {
         this.players = players;
     }
 
-    setSpectators(spectators) {
-        this.spectators = spectators;
-    }
-
-    setClients(clients) {
-        this.clients = clients;
+    setChannel(channel) {
+        this.channel = channel;
     }
 
     getPlayerByName(name) {
@@ -36,9 +33,21 @@ export default class GameStage {
 
     start(dataFromPreviousStage) {}
 
-    onPlayerAction(player, actionName, actionData) {}
+    /**
+     * @param player the player the action is from
+     * @param socket the individual socket that the request came from,
+     *               if there is an error it should be sent to the socket instead of the player
+     * @param actionName
+     * @param actionData
+     */
+    onPlayerAction(player, socket, actionName, actionData) {}
 
-    onPlayerConnect(player) {}
+    onPlayerConnect(player, socket) {}
 
-    onSpectatorConnect(spectator) {}
+    onObserver(observer) {}
+
+    emitStageMessage(name, data, socket) {
+        socket = socket || this.channel;
+        socket.emit('stage:action', {name, data});
+    }
 }
