@@ -1,17 +1,21 @@
 version: '3.8'
 services:
   server:
-    image: node:latest
+    image: node:14-alpine
     environment:
       TZ: Pacific/Auckland
     volumes:
       - .:/app
+      - ./node_modules:/app/node_modules
     working_dir: /app
     ports:
       - 80:80
+      - 9229:9229
+      - 5858:5858
     entrypoint: npm run nodemon
+
   vue:
-    image: node:latest
+    image: node:14-alpine
     environment:
       TZ: Pacific/Auckland
     volumes:

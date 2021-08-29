@@ -9,8 +9,9 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "server": "node src/server/server.js",
-    "nodemon": "nodemon src/server/server.js",
-    "test": "mocha --recursive ./test",
+    "nodemon": "nodemon --inspect=0.0.0.0:9229 src/server/server.js",
+    "test": "npm run mocha --recursive ./test",
+    "mocha": "mocha",
     "watch": "vue-cli-service build --watch"
   },
   "dependencies": {

@@ -3,6 +3,7 @@ import OrdinaryNormalDeck from '../model/OrdinaryNormalDeck.js';
 import Deck from '../model/Deck.js';
 import DeckConfig from '../model/DeckConfig.js';
 import Bid from '../model/Bid.js';
+import { GameAction } from '../GameAction.js';
 
 export default class Bidding extends GameStage {
     start() {
@@ -22,9 +23,9 @@ export default class Bidding extends GameStage {
     }
 
     onPlayerAction(player, socket, actionName, actionData) {
-        if (actionName === 'bid') return this.onBid(player, socket, actionData);
-        if (actionName === 'take_hand') return this.onTakeHand(player);
-        if (actionName === 'take_kitty') return this.onTakeKitty(player, socket, actionData);
+        if (actionName === GameAction.PLACE_BID) return this.onBid(player, socket, actionData);
+        if (actionName === GameAction.TAKE_HAND) return this.onTakeHand(player);
+        if (actionName === GameAction.TAKE_KITTY) return this.onTakeKitty(player, socket, actionData);
     }
 
     onPlayerConnect(player, socket) {
