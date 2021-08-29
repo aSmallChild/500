@@ -1,10 +1,21 @@
 export default class Card {
+    static JACK = 'J';
+    static JOKER = '$';
+
     constructor(suit, value, config) {
         this.suit = suit;
         if (!value) throw new Error('value missing while creating card');
         this.value = value;
         if (!config) throw new Error('DeckConfig missing while creating card');
         this.config = config;
+    }
+
+    isJack() {
+        return this.value == Card.JACK;
+    }
+
+    isJoker() {
+        return this.value == Card.JOKER;
     }
 
     getName() {

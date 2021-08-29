@@ -180,4 +180,34 @@ describe('Deck Unit', function() {
             (deck + '').should.equal('HQDK10,6,5C10,8,7S10,7');
         });
     });
+
+    describe('containsCard()', () => {
+        it('should pass if deck contains card', () => {
+            // Arrange
+            const deck = new Deck([
+                new Card(heart, 'A', config)
+            ]);
+
+            // Act
+            const result = deck.containsCard(new Card(heart, 'A', config));
+
+            // Assert
+            result.should.be.true();
+        });
+
+        it('should fail if deck does not contain card', () => {
+            // Arrange
+            const deck = new Deck([
+                new Card(spade, 'A', config),
+                new Card(club, 'A', config),
+                new Card(heart, 'K', config)
+            ]);
+
+            // Act
+            const result = deck.containsCard(new Card(heart, 'A', config));
+
+            // Assert
+            result.should.be.false();
+        });
+    });
 });

@@ -15,7 +15,18 @@ export default class Deck {
     deal(numberOfCards) {
         numberOfCards = Math.min(this.cards.length, Math.abs(numberOfCards));
         return new Deck(this.cards.splice(this.cards.length - numberOfCards), this.config);
+    }
 
+    /**
+     * Check if decks contains a card, useful for checking hands containing a played card
+     * @param {Card} card
+     */
+    containsCard(card) {
+        return this.cards.some(c => c.suit === card.suit && c.value === card.value);
+    }
+
+    removeCard(card) {
+        return this.cards.filter(c => c.suit === card.suit && c.value === card.value);
     }
 
     draw() {
