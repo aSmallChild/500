@@ -40,26 +40,27 @@ export default class Channel {
     }
 
     channelLogin(socket, password) {
-        if (!this.checkPassword(password)) {
-            return false;
-        }
         const socketChannel = socket.of(this.channelKey);
+        if (!this.checkPassword(password)) {
+            socketChannel.emit('channel:join', {success: false, message: 'Password incorrect.'});
+            return;
+        }
         if (this.observers.has(socketChannel)) {
-            return true;
+            socketChannel.emit('channel:join', {success: true, message: 'Already joined though.'});
+            return;
         }
         this.observers.add(socketChannel);
         socket.once('disconnect', () => this.observerDisconnect(socketChannel));
-
         socketChannel.on('client:login', data => {
             const client = this.clientLogin(data.name, data.password);
             this.sendClientLoginResponse(client, socket, socketChannel);
         });
         socketChannel.once('channel:leave', () => this.observerDisconnect(socketChannel));
 
+        socketChannel.emit('channel:join', {success: true});
         if (this.#onObserver) {
             this.#onObserver(socketChannel);
         }
-        return true;
     }
 
     observerDisconnect(socketChannel) {

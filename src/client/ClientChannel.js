@@ -1,23 +1,13 @@
+import Client from './Client.js';
+
 export default class ClientChannel {
     constructor(channel) {
         this.channel = channel;
+        this.name = '';
     }
 
     join(password) {
-        return new Promise((win, fail) => {
-            const timeout = setTimeout(() => {
-                this.channel.removeAllListeners('channel:join');
-                fail({
-                    success: false,
-                    error: 'Channel login timed out.',
-                });
-            }, 10000);
-            this.channel.once('channel:join', response => {
-                clearTimeout(timeout);
-                win(response);
-            });
-            this.channel.emit('channel:join', {password});
-        });
+        return Client.request(this.channel, 'channel:join', {password});
     }
 
     leave() {

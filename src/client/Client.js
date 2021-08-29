@@ -29,9 +29,10 @@ export default class Client {
         this._bindClientEvents();
     }
 
-    of(channelName) {
+    of(channelKey) {
+        channelKey = channelKey.toLowerCase();
         this.connect();
-        const channel = this.socket.of(channelName);
+        const channel = this.socket.of(channelKey);
         channel.removeAllListeners();
         return new ClientChannel(channel);
     }
@@ -44,6 +45,16 @@ export default class Client {
         });
     }
 
+    async requestNewChannel(type, password) {
+        const response = await this.request('channel:new', {type, password});
+        if (!response.success) {
+            return null;
+        }
+        const channel = this.of(response.channelKey);
+        channel.name = response.channelName;
+        return channel;
+    }
+
     static get client() {
         if (!this._client) {
             this._client = new Client(window.socketURL);
@@ -53,5 +64,27 @@ export default class Client {
 
     static set client(client) {
         this._client = client;
+    }
+
+    request(topic, payload) {
+        this.connect();
+        return this.constructor.request(this.socket, topic, payload);
+    }
+
+    static request(socket, topic, payload, ttlMs = 10000) {
+        return new Promise((win, fail) => {
+            const timeout = setTimeout(() => {
+                socket.removeAllListeners(topic);
+                fail({
+                    success: false,
+                    message: 'Request timed out.',
+                });
+            }, ttlMs);
+            socket.once(topic, response => {
+                clearTimeout(timeout);
+                win(response);
+            });
+            socket.emit(topic, payload);
+        });
     }
 }

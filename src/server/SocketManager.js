@@ -15,39 +15,69 @@ export default class SocketManager {
 
     socketConnected(nativeSocket) {
         const socket = new WebsocketWrapper(nativeSocket);
+
+        // events to join and create channels that aren't set on this socket connection yet.
         socket.on('message', (event, data) => {
             data = JSON.parse(data);
+            const [eventName, payload] = data.a;
+            if (eventName === 'channel:new') {
+                const prefix = payload.type ?? null;
+                const password = payload.password ?? null;
+                const channelName = this.createChannelName(prefix);
+                const channel = this.createChannelController(prefix, channelName, password);
+                const success = !!channel;
+                const response = {success, message: success ? 'Created new channel' : 'Invalid channel prefix.'};
+                if (success) {
+                    response.channelKey = Channel.createChannelKey(prefix, channelName);
+                    response.channelName = channelName;
+                }
+                socket.emit(eventName, response);
+                if (channel) {
+                    channel.channelLogin(socket, password);
+                }
+                return;
+            }
+
             const channelKey = data.c || '';
-            const eventName = data.a[0];
             if (!channelKey) {
                 return;
             }
 
             const [prefix, channelName] = channelKey.indexOf(Channel.delimiter) > 0 ? channelKey.split(Channel.delimiter) : [null, channelKey];
-
             const channel = this.channels.get(channelKey);
+            if (!channel) {
+                const socketChannel = socket.of(Channel.createChannelKey(prefix, channelName));
+                socketChannel.emit(eventName, {success: false, message: 'Invalid channel.'});
+                return;
+            }
+
             if (eventName === 'channel:join') {
-                const password = data.password || null;
-                return this.handleChannelLogin(channel, socket, prefix, channelName, password);
+                const password = payload.password ?? null;
+                return channel.channelLogin(socket, password);
             }
         });
         return socket;
     }
 
-    handleChannelLogin(channel, socket, prefix, channelName, password) {
-        if (!channel) {
-            channel = this.createChannelController(prefix, channelName, password);
+    createChannelName(prefix) {
+        const maxAttempts = 4;
+        for (let i = 0; i < maxAttempts; i++) {
+            const nameLength = i > 2 ? 5 : 4;
+            const channelName = this.constructor.createRandomString(nameLength);
+            if (!this.channels.has(Channel.createChannelKey(prefix, channelName))) {
+                return channelName;
+            }
         }
+        throw new Error('Failed to generate unique channel name');
+    }
 
-        const socketChannel = socket.of(Channel.createChannelKey(prefix, channelName));
-        if (!channel) {
-            socketChannel.emit('channel:join', {success: false, error: 'Invalid channel prefix.'});
-            return;
+    static createRandomString(length) {
+        let result = '';
+        const characters = 'abcdefghijklmnopqrstuvwxyz';
+        for (let i = 0; i < length; i++) {
+            result += characters[Math.floor(Math.random() * characters.length)];
         }
-        const response = {
-            success: channel.channelLogin(socket, password)
-        };
-        socketChannel.emit('channel:join', response);
+        return result;
     }
 
     createChannel(prefix, channelName, password) {
@@ -60,7 +90,7 @@ export default class SocketManager {
         const stages = [
             Lobby,
             Bidding,
-            Kitty
+            Kitty,
         ];
         new Game(stages, channel);
         return channel;
