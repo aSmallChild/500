@@ -1,18 +1,34 @@
 import Client from './Client.js';
 
 export default class ClientChannel {
-    constructor(channel) {
+    #onLeave = null;
+
+    constructor(channel, channelName) {
         this.channel = channel;
-        this.name = '';
+        this.name = channelName;
     }
 
-    join(password) {
-        return Client.request(this.channel, 'channel:join', {password});
+    login(password) {
+        return this.request('channel:login', {password});
+    }
+
+    join() {
+        return this.request('channel:join');
     }
 
     leave() {
         this.channel.emit('channel:leave');
         this.channel.removeAllListeners();
+        this.channel = null;
+        this.name = null;
+        if (this.#onLeave) {
+            this.#onLeave();
+        }
+        this.#onLeave = null;
+    }
+
+    onLeave(callback) {
+        this.#onLeave = callback;
     }
 
     on(...args) {
@@ -21,5 +37,9 @@ export default class ClientChannel {
 
     emit(...args) {
         this.channel.emit(...args);
+    }
+
+    request(topic, payload) {
+        return Client.request(this.channel, topic, payload);
     }
 }

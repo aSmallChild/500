@@ -51,7 +51,7 @@ export default class SocketManager {
                 return;
             }
 
-            if (eventName === 'channel:join') {
+            if (eventName === 'channel:login') {
                 const password = payload.password ?? null;
                 return channel.channelLogin(socket, password);
             }

@@ -2,10 +2,16 @@ import WebsocketWrapper from 'ws-wrapper';
 import ClientChannel from './ClientChannel.js';
 
 export default class Client {
+    #channels = new WeakMap();
+
     constructor(url) {
         // todo set name somehow
         this.url = url;
         this.socket = null;
+    }
+
+    isConnected() {
+        return !!this.socket;
     }
 
     connect() {
@@ -29,12 +35,21 @@ export default class Client {
         this._bindClientEvents();
     }
 
-    of(channelKey) {
+    of(channelKey, channelName) {
         channelKey = channelKey.toLowerCase();
         this.connect();
+
         const channel = this.socket.of(channelKey);
+        let clientChannel = this.#channels.get(channel);
+        if (clientChannel) {
+            return clientChannel;
+        }
+
         channel.removeAllListeners();
-        return new ClientChannel(channel);
+        clientChannel = new ClientChannel(channel, channelName);
+        this.#channels.set(channel, clientChannel);
+        clientChannel.onLeave(() => this.#channels.delete(channel));
+        return clientChannel;
     }
 
     _bindClientEvents() {
@@ -48,11 +63,10 @@ export default class Client {
     async requestNewChannel(type, password) {
         const response = await this.request('channel:new', {type, password});
         if (!response.success) {
-            return null;
+            return [null, response];
         }
-        const channel = this.of(response.channelKey);
-        channel.name = response.channelName;
-        return channel;
+        const channel = this.of(response.channelKey, response.channelName);
+        return [channel, response];
     }
 
     static get client() {

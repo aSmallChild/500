@@ -6,7 +6,7 @@
         <div style="text-align: center;">
             <v-btn color="secondary" @click="newChannel">New</v-btn>
             Name: <input v-model="channelName"/>
-            <v-btn color="secondary" @click="joinChannel">Join</v-btn>
+            <v-btn color="secondary" @click="channelLogin">Join</v-btn>
             <card-group class="animate-cards fan" v-for="hand in hands" :cards="hand" :key="hand"/>
             <card-group class="animate-cards" :cards="table"></card-group>
         </div>
@@ -86,14 +86,30 @@ export default {
         const newChannel = async () => {
             try {
                 leaveChannel();
-                channel = await client.requestNewChannel('doodle', 'password123');
-                if (!channel) {
-                    console.error('failed to create channel');
+                const [newChannel, response] = await client.requestNewChannel('doodle', 'password123');
+                if (!newChannel) {
+                    console.error(response.message);
                     return;
                 }
+                channel = newChannel;
                 channelName.value = channel.name;
-                channel.on('cards', cards => setCards(cards));
-                channel.on('config', newConfig => config = new DeckConfig(newConfig));
+                joinChannel();
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        const channelLogin = async () => {
+            try {
+                leaveChannel();
+                channel = client.of(`doodle:${channelName.value}`, channelName.value);
+                const response = await channel.login('password123');
+                if (!response.success) {
+                    console.error('Failed to login to channel');
+                    return;
+                }
+                joinChannel();
+
             } catch (err) {
                 console.error(err);
             }
@@ -101,14 +117,9 @@ export default {
 
         const joinChannel = async () => {
             try {
-                leaveChannel();
-                channel = client.of(`doodle:${channelName.value}`);
                 channel.on('cards', cards => setCards(cards));
                 channel.on('config', newConfig => config = new DeckConfig(newConfig));
-                const response = await channel.join('password123');
-                if (!response.success) {
-                    console.error('Failed to join channel');
-                }
+                await channel.join();
             } catch (err) {
                 console.error(err);
             }
@@ -128,7 +139,7 @@ export default {
             hands,
             channelName,
             newChannel,
-            joinChannel,
+            channelLogin,
         };
     },
 };
