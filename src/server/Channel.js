@@ -57,7 +57,7 @@ export default class Channel {
             this.sendClientLoginResponse(client, socket, socketChannel);
         });
 
-        socketChannel.once('channel:join', () => {
+        socketChannel.on('channel:join', () => {
             socketChannel.emit('channel:join', {success: true});
             if (this.#onObserver) {
                 this.#onObserver(socketChannel);

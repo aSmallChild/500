@@ -102,7 +102,7 @@ export default class SocketManager {
     }
 
     createChannelController(prefix, channelName, password) {
-        if (prefix === 'games') {
+        if (prefix === 'game') {
             return this.createGame(this.createChannel(prefix, channelName, password));
         }
         if (prefix === 'doodle') {

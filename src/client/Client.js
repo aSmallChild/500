@@ -35,7 +35,7 @@ export default class Client {
         this._bindClientEvents();
     }
 
-    of(channelKey, channelName) {
+    getChannel(channelKey, channelName) {
         channelKey = channelKey.toLowerCase();
         this.connect();
 
@@ -65,7 +65,7 @@ export default class Client {
         if (!response.success) {
             return [null, response];
         }
-        const channel = this.of(response.channelKey, response.channelName);
+        const channel = this.getChannel(response.channelKey, response.channelName);
         return [channel, response];
     }
 

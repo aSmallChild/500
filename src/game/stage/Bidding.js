@@ -99,7 +99,7 @@ export default class Bidding extends GameStage {
 
     recordBid(player, bid) {
         this.playerBids[player.position].push(bid);
-        this.emitStageMessage('bid', {player, bid});
+        this.emitStageMessage(GameAction.PLACE_BID, {player, bid});
         this.nextBidder();
     }
 
@@ -111,7 +111,7 @@ export default class Bidding extends GameStage {
             if (bids.length && bids[bids.length - 1].special === 'P' && !this.highestBidderRaisedOwnBid) {
                 const player = this.players[this.currentBidder];
                 bids.push(pass);
-                this.emitStageMessage('bid', {player, bid: pass});
+                this.emitStageMessage(GameAction.PLACE_BID, {player, bid: pass});
                 continue;
             }
             return this.emitStageMessage('current_bidder', this.currentBidder);

@@ -2,7 +2,8 @@
 /* eslint-disable no-unused-vars,no-undef */
 import should from 'should';
 import Bidding from '../../../../src/game/stage/Bidding.js';
-import {getPlayers, getStage} from '../../util/stage.js';
+import {getPlayers, getStage} from '../../../util/stage.js';
+import {GameAction} from '../../../../src/game/GameAction.js';
 
 describe('Bidding Stage Unit', function() {
     describe(`start()`, function() {
@@ -111,13 +112,13 @@ describe('Bidding Stage Unit', function() {
                     stage.channel.emit = (event, action) => {
                         should(event).equal('stage:action');
                         const {name, data} = action;
-                        if (!bidAnnounced && name === 'bid') {
+                        if (!bidAnnounced && name === GameAction.PLACE_BID) {
                             bidAnnounced = true;
                             data.player.position.should.equal(player.position);
                             data.bid.call.should.equal(bid.call);
                         }
                     };
-                    stage.onPlayerAction(player, socket, 'bid', call);
+                    stage.onPlayerAction(player, socket, GameAction.PLACE_BID, call);
                     bidAnnounced.should.be.true('bid was not announced');
                 }
                 const [winnerPosition, winningCall] = scenario.winner;
@@ -134,7 +135,7 @@ describe('Bidding Stage Unit', function() {
                     dataForNextStage.winningBid.call.should.equal(expectedWinningBid.call);
                     dataForNextStage.winningBidder.should.equal(winner.position);
                 });
-                stage.onPlayerAction(winner, winner, 'take_kitty');
+                stage.onPlayerAction(winner, winner, GameAction.TAKE_KITTY);
                 stageCompleted.should.be.true('stage did not complete');
             });
         }
