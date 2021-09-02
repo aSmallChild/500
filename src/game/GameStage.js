@@ -33,14 +33,7 @@ export default class GameStage {
 
     start(dataFromPreviousStage) {}
 
-    /**
-     * @param player the player the action is from
-     * @param socket the individual socket that the request came from,
-     *               if there is an error it should be sent to the socket instead of the player
-     * @param actionName
-     * @param actionData
-     */
-    onPlayerAction(player, socket, actionName, actionData) {}
+    onPlayerAction(player, actionName, actionData) {}
 
     onPlayerConnect(player, socket) {}
 

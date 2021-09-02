@@ -58,7 +58,10 @@ export default class Game {
     }
 
     onPlayerAction(player, socket, actionName, actionData) {
-        this.currentStage.onPlayerAction(player, socket, actionName, actionData);
+        const response = this.currentStage.onPlayerAction(player, actionName, actionData);
+        if (response) {
+            socket.emit(actionName, response);
+        }
     }
 
     onPlayerConnect(player, socket) {

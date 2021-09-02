@@ -118,7 +118,7 @@ describe('Bidding Stage Unit', function() {
                             data.bid.call.should.equal(bid.call);
                         }
                     };
-                    stage.onPlayerAction(player, socket, GameAction.PLACE_BID, call);
+                    stage.onPlayerAction(player, GameAction.PLACE_BID, call);
                     bidAnnounced.should.be.true('bid was not announced');
                 }
                 const [winnerPosition, winningCall] = scenario.winner;
@@ -135,7 +135,7 @@ describe('Bidding Stage Unit', function() {
                     dataForNextStage.winningBid.call.should.equal(expectedWinningBid.call);
                     dataForNextStage.winningBidder.should.equal(winner.position);
                 });
-                stage.onPlayerAction(winner, winner, GameAction.TAKE_KITTY);
+                stage.onPlayerAction(winner, GameAction.TAKE_KITTY);
                 stageCompleted.should.be.true('stage did not complete');
             });
         }
