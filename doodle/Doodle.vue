@@ -102,7 +102,7 @@ export default {
         const channelLogin = async () => {
             try {
                 leaveChannel();
-                channel = client.of(`doodle:${channelName.value}`, channelName.value);
+                channel = client.getChannel(`doodle:${channelName.value}`, channelName.value);
                 const response = await channel.login('password123');
                 if (!response.success) {
                     console.error('Failed to login to channel');

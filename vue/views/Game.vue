@@ -20,9 +20,8 @@ class GameChannel {
     async reconnect(channelName, channelKey) {
         const client = Client.client;
         const wasConnected = client.isConnected();
-        const channel = client.of(channelKey, channelName);
+        const channel = client.getChannel(channelKey, channelName);
         if (!wasConnected) {
-            console.log('woot');
             const response = await channel.login(this.getLastPassword());
             if (!response.success) {
                 return null;
