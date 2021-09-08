@@ -4,6 +4,7 @@ import OrdinaryNormalDeck from '../model/OrdinaryNormalDeck.js';
 
 export default class Lobby extends GameStage {
     start(dataFromPreviousStage) {
+        dataFromPreviousStage = dataFromPreviousStage || {};
         if (dataFromPreviousStage.gameOver) {
             this.dataStore.gameInProgress = false; // todo
         }

@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import Client from '../../src/client/Client.js';
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import ClientChannel from '../../src/client/ClientChannel.js';
