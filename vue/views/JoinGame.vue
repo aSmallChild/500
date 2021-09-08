@@ -2,8 +2,8 @@
     <v-container class="menu">
         <v-row align="center" justify="center">
             <v-col>
-                <div class="menu-buttons">
-                    <!-- waiting for vuetify to be finished so v-text-field is available -->
+                <!-- waiting for vuetify to be finished so v-text-field is available -->
+                <form @submit.prevent="submit" class="menu-buttons">
                     <label class="wrapper" v-if="!newGame">
                         <span>Game</span>
                         <input :disabled="newGame" v-model="gameCode" pattern="A-Z" maxlength="6" type="text">
@@ -16,7 +16,7 @@
                     <div class="error">
                         {{ error }}
                     </div>
-                </div>
+                </form>
             </v-col>
         </v-row>
     </v-container>
@@ -26,6 +26,7 @@
 import Client from '../../src/client/Client.js';
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
+import ClientChannel from '../../src/client/ClientChannel.js';
 
 export default {
     props: {
@@ -40,7 +41,6 @@ export default {
         const playerName = ref('');
         const error = ref('');
         const isSubmitting = ref(false);
-        const client = Client.client;
 
         const submit = async () => {
             if (isSubmitting.value) {
@@ -57,8 +57,8 @@ export default {
         const joinGame = async () => {
             try {
                 const playerPassword = '';  // todo
-                const channel = client.getChannel(`game:${gameCode.value}`, gameCode.value);
-                const response = await channel.login(playerPassword);
+                const gamePassword = ''; // todo
+                const [, response] = await ClientChannel.connect(`game:${gameCode.value}`, gameCode.value, gamePassword, playerName.value, playerPassword);
                 if (!response.success) {
                     error.value = `Failed to join game: ${response.message}`;
                     return;
@@ -72,10 +72,12 @@ export default {
 
         const newGame = async () => {
             try {
+                const playerPassword = '';  // todo
                 const gamePassword = '';  // todo
-                const [channel, response] = await client.requestNewChannel('game', gamePassword);
+                const [channel, response] = await ClientChannel.create('game', gamePassword, playerName.value, playerPassword);
+                console.error(response);
                 if (!response.success) {
-                    error.value = `Failed to join game: ${response.message}`;
+                    error.value = `Failed to create game: ${response.message}`;
                     return;
                 }
                 gameCode.value = channel.name;

@@ -4,8 +4,10 @@ import OrdinaryNormalDeck from '../model/OrdinaryNormalDeck.js';
 
 export default class Lobby extends GameStage {
     start(dataFromPreviousStage) {
-        this.isNewGame = !dataFromPreviousStage;
-        if (!this.isNewGame) return this.complete();
+        if (dataFromPreviousStage.gameOver) {
+            this.dataStore.gameInProgress = false; // todo
+        }
+        if (this.dataStore.gameInProgress) return this.complete();
 
         if (!this.dataStore.preferredPartners) {
             this.dataStore.preferredPartners = {};
@@ -73,14 +75,14 @@ export default class Lobby extends GameStage {
     }
 
     startGame() {
-        if (!this.isNewGame) return this.complete();
+        if (this.dataStore.gameInProgress) return this.complete();
 
         this.resetPlayerPositionsAndPartners();
         if (!(this.players.length % 2) && 4 <= this.players.length && this.players.length <= 10) {
             this.matchPartners(this.dataStore.preferredPartners);
         }
         this.setPlayerPositions();
-
+        this.dataStore.gameInProgress = true;
         this.complete();
     }
 

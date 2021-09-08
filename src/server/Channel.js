@@ -28,8 +28,8 @@ export default class Channel {
         return this.constructor.createChannelKey(this.prefix, this.name);
     }
 
-    static isNameValid(name) {
-        return name.indexOf(this.delimiter) >= 0;
+    isNameValid(name) {
+        return name.indexOf(this.delimiter) < 0;
     }
 
     checkPassword(submittedPassword) {
@@ -53,8 +53,12 @@ export default class Channel {
 
         socket.once('disconnect', () => this.observerDisconnect(socketChannel));
         socketChannel.on('client:login', data => {
-            const client = this.clientLogin(data.name, data.password);
-            this.sendClientLoginResponse(client, socket, socketChannel);
+            try {
+                const client = this.clientLogin(data.name, data.password);
+                this.sendClientLoginResponse(client, socket, socketChannel);
+            } catch (e) {
+                console.error(e);
+            }
         });
 
         socketChannel.on('channel:join', () => {
@@ -105,7 +109,7 @@ export default class Channel {
         if (client) {
             response.success = true;
             client.add(socketChannel);
-            socket.once('disconnect', client.remove(socketChannel));
+            socket.once('disconnect', () => client.remove(socketChannel));
             if (this.#onClient) {
                 this.#onClient(client, socketChannel);
             }

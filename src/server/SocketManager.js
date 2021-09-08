@@ -92,7 +92,8 @@ export default class SocketManager {
             Bidding,
             Kitty,
         ];
-        new Game(stages, channel);
+        const game = new Game(stages, channel);
+        game.nextStage({});
         return channel;
     }
 

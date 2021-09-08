@@ -12,6 +12,10 @@ export default class ClientChannel {
         return this.request('channel:login', {password});
     }
 
+    clientLogin(name, password) {
+        return this.request('client:login', {name, password});
+    }
+
     join() {
         return this.request('channel:join');
     }
@@ -41,5 +45,75 @@ export default class ClientChannel {
 
     request(topic, payload) {
         return Client.request(this.channel, topic, payload);
+    }
+
+    static getCredentials() {
+        const json = window.localStorage.getItem('last_game_credentials');
+        return json ? JSON.parse(json) : null;
+    }
+
+    static setCredentials(credentials) {
+        return window.localStorage.setItem('last_game_credentials', JSON.stringify(credentials));
+    }
+
+    static async reconnect(channelKey) {
+        const credentials = this.getCredentials();
+        if (!credentials || credentials.channelKey !== channelKey) {
+            return [null, {success: false, message: 'Cannot reconnect, channel key does not match stored credentials.'}];
+        }
+        const client = Client.client;
+        const channel = client.getChannel(channelKey, credentials.channelName);
+
+        const response = await channel.login(credentials.channelPassword);
+        if (!response.success) {
+            return [null, response];
+        }
+
+        if (credentials.clientName) {
+            const response = await channel.clientLogin(credentials.clientName, credentials.clientPassword);
+            if (!response.success) {
+                return [null, response];
+            }
+        }
+
+        return [channel, response];
+    }
+
+    static async connect(channelKey, channelName, channelPassword, clientName, clientPassword) {
+        const client = Client.client;
+        const channel = client.getChannel(channelKey, channelName);
+
+        const response = await channel.login(this.getLastPassword());
+        if (!response.success) {
+            return [null, response];
+        }
+
+        if (clientName) {
+            const response = await channel.clientLogin(clientName, clientPassword);
+            if (!response.success) {
+                return [null, response];
+            }
+        }
+
+        this.setCredentials({channelKey, channelName, channelPassword, clientName, clientPassword});
+        return [channel, response];
+    }
+
+    static async create(type, channelPassword, clientName, clientPassword) {
+        const client = Client.client;
+        const [channel, response] = await client.requestNewChannel(type, channelPassword);
+        if (!response.success) {
+            return [null, response];
+        }
+        const {channelKey, channelName} = response;
+        if (clientName) {
+            const response = await channel.clientLogin(clientName, clientPassword);
+            if (!response.success) {
+                return [null, response];
+            }
+        }
+
+        this.setCredentials({channelKey, channelName, channelPassword, clientName, clientPassword});
+        return [channel, response];
     }
 }

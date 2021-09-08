@@ -54,7 +54,11 @@ export default class Game {
     }
 
     emitStage(socket) {
-        (socket || this.channel).emit('game:stage', this.currentStage.name.toLowerCase());
+        try {
+            (socket || this.channel).emit('game:stage', this.currentStage.constructor.name.toLowerCase());
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     onPlayerAction(player, socket, actionName, actionData) {
@@ -84,7 +88,14 @@ export default class Game {
         this.currentStage.onStageComplete((dataForNextStage, dataToStore) => {
             this.dataStore[this.currentStage.constructor.name] = JSON.parse(JSON.stringify(dataToStore));
             this.currentStage = null;
-            process.nextTick(() => this.nextStage(JSON.parse(JSON.stringify(dataForNextStage))));
+            process.nextTick(() => {
+                try {
+                    const data = JSON.parse(JSON.stringify(dataForNextStage || {}));
+                    this.nextStage(data);
+                } catch (e) {
+                    console.error(e);
+                }
+            });
         });
         this.currentStage.setDataStore(this.dataStore[this.currentStage.constructor.name] || {});
         this.currentStage.setPlayers(this.players);
