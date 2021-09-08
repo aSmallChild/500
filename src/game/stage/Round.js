@@ -16,8 +16,8 @@ export default class Round extends GameStage {
         if (actionName === GameAction.PLACE_CARD) return this.#placeCard(player, actionData);
     }
 
-    #placeCard(player, actionData) {        
-        if (this.currentPlayer.position !== player.position) return player.emit(GameEvents.OUT_OF_TURN, GameEventsMessage.OUT_OF_TURN);
+    #placeCard(player, socket, actionData) {
+        if (this.currentPlayer.position !== player.position) return socket.emit(GameEvents.OUT_OF_TURN, GameEventsMessage.OUT_OF_TURN);
 
         const card = this.#getCard(player, actionData);
         if (!card) return player.emit(GameEvents.INVALID_CARD, GameEventsMessage.INVALID_CARD);

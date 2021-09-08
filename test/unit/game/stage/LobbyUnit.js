@@ -2,7 +2,7 @@
 // noinspection ES6UnusedImports
 import should from 'should';
 import Lobby from '../../../../src/game/stage/Lobby.js';
-import {getPlayers, getStage} from '../../util/stage.js';
+import {getPlayers, getStage} from '../../../util/stage.js';
 
 describe('Lobby Stage Unit', function() {
     describe('Cycle through the game', function() {
@@ -23,7 +23,7 @@ describe('Lobby Stage Unit', function() {
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onPlayerAction(player, player, 'ready');
+                    lobby.onPlayerAction(player, 'ready');
                 }
             });
             it(`should complete stage when all players are ready`, function() {
@@ -33,7 +33,7 @@ describe('Lobby Stage Unit', function() {
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onPlayerAction(player, player, 'ready');
+                    lobby.onPlayerAction(player, 'ready');
                 }
             });
         });

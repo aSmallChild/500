@@ -4,6 +4,9 @@
             <defs ref="svgDefs"></defs>
         </svg>
         <div style="text-align: center;">
+            <v-btn color="secondary" @click="newChannel">New</v-btn>
+            Name: <input v-model="channelName"/>
+            <v-btn color="secondary" @click="channelLogin">Join</v-btn>
             <card-group class="animate-cards fan" v-for="hand in hands" :cards="hand" :key="hand"/>
             <card-group class="animate-cards" :cards="table"></card-group>
         </div>
@@ -27,6 +30,7 @@ export default {
     setup() {
         let config = null;
         const svgDefs = ref();
+        const channelName = ref('');
         const table = ref([]);
         const hands = ref([]);
         const client = Client.client;
@@ -69,23 +73,63 @@ export default {
             });
         };
 
-        onMounted(async () => {
-            svgDefs.value.innerHTML += OrdinaryNormalDeck.svgDefs;
+        const leaveChannel = () => {
+            if (!channel) {
+                return;
+            }
+            channel.leave();
+            channel = null;
+            table.value = [];
+            hands.value = [];
+        };
+
+        const newChannel = async () => {
             try {
-                channel = client.of('doodle:doodle');
-                channel.on('cards', cards => setCards(cards));
-                channel.on('config', newConfig => config = new DeckConfig(newConfig));
-                const response = await channel.join();
-                if (!response.success) {
-                    console.log('Failed to join channel');
+                leaveChannel();
+                const [newChannel, response] = await client.requestNewChannel('doodle', 'password123');
+                if (!newChannel) {
+                    console.error(response.message);
+                    return;
                 }
+                channel = newChannel;
+                channelName.value = channel.name;
+                joinChannel();
             } catch (err) {
                 console.error(err);
             }
+        };
+
+        const channelLogin = async () => {
+            try {
+                leaveChannel();
+                channel = client.getChannel(`doodle:${channelName.value}`, channelName.value);
+                const response = await channel.login('password123');
+                if (!response.success) {
+                    console.error('Failed to login to channel');
+                    return;
+                }
+                joinChannel();
+
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        const joinChannel = async () => {
+            try {
+                channel.on('cards', cards => setCards(cards));
+                channel.on('config', newConfig => config = new DeckConfig(newConfig));
+                await channel.join();
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        onMounted(async () => {
+            svgDefs.value.innerHTML += OrdinaryNormalDeck.svgDefs;
         });
         onUnmounted(() => {
-            channel.leave();
-            channel = null;
+            leaveChannel();
         });
 
         return {
@@ -93,6 +137,9 @@ export default {
             svgDefs,
             table,
             hands,
+            channelName,
+            newChannel,
+            channelLogin,
         };
     },
 };

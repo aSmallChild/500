@@ -22,10 +22,10 @@ export default class Bidding extends GameStage {
         this.resetBids();
     }
 
-    onPlayerAction(player, socket, actionName, actionData) {
-        if (actionName === GameAction.PLACE_BID) return this.onBid(player, socket, actionData);
+    onPlayerAction(player, actionName, actionData) {
+        if (actionName === GameAction.PLACE_BID) return this.onBid(player, actionData);
         if (actionName === GameAction.TAKE_HAND) return this.onTakeHand(player);
-        if (actionName === GameAction.TAKE_KITTY) return this.onTakeKitty(player, socket, actionData);
+        if (actionName === GameAction.TAKE_KITTY) return this.onTakeKitty(player, actionData);
     }
 
     onPlayerConnect(player, socket) {
@@ -70,22 +70,22 @@ export default class Bidding extends GameStage {
         return null;
     }
 
-    onBid(player, socket, call) {
-        if (this.currentBidder !== player.position) return this.emitStageMessage('bid_error', 'It is not your turn to bid.', socket);
+    onBid(player, call) {
+        if (this.currentBidder !== player.position) return this.emitStageMessage('bid_error', 'It is not your turn to bid.', player);
 
         const bid = this.getBid(call);
-        if (!bid) return this.emitStageMessage('bid_error', 'Invalid bid.', socket);
+        if (!bid) return this.emitStageMessage('bid_error', 'Invalid bid.', player);
 
         if (bid.special === 'P') {
-            if (player === this.highestBidder) return this.emitStageMessage('bid_error', 'Cannot pass when you are the highest bidder.', socket);
+            if (player === this.highestBidder) return this.emitStageMessage('bid_error', 'Cannot pass when you are the highest bidder.', player);
             return this.recordBid(player, bid);
         }
 
         if (bid.special === 'B' && this.playersThatHaveLookedAtTheirCards.has(player)) {
-            return this.emitStageMessage('bid_error', `You can only call ${bid.getName()} before looking at your hand.`, socket);
+            return this.emitStageMessage('bid_error', `You can only call ${bid.getName()} before looking at your hand.`, player);
         }
 
-        if (this.highestBid && this.highestBid.points >= bid.points) return this.emitStageMessage('bid_error', 'Bid must be higher than the leading bid.', socket);
+        if (this.highestBid && this.highestBid.points >= bid.points) return this.emitStageMessage('bid_error', 'Bid must be higher than the leading bid.', player);
 
         this.setHighestBid(player, bid);
     }
@@ -99,7 +99,7 @@ export default class Bidding extends GameStage {
 
     recordBid(player, bid) {
         this.playerBids[player.position].push(bid);
-        this.emitStageMessage('bid', {player, bid});
+        this.emitStageMessage(GameAction.PLACE_BID, {player, bid});
         this.nextBidder();
     }
 
@@ -111,7 +111,7 @@ export default class Bidding extends GameStage {
             if (bids.length && bids[bids.length - 1].special === 'P' && !this.highestBidderRaisedOwnBid) {
                 const player = this.players[this.currentBidder];
                 bids.push(pass);
-                this.emitStageMessage('bid', {player, bid: pass});
+                this.emitStageMessage(GameAction.PLACE_BID, {player, bid: pass});
                 continue;
             }
             return this.emitStageMessage('current_bidder', this.currentBidder);
@@ -125,16 +125,16 @@ export default class Bidding extends GameStage {
         this.playersThatHaveLookedAtTheirCards.add(player);
     }
 
-    onTakeKitty(player, socket) {
+    onTakeKitty(player) {
         const bids = this.playerBids[player.position];
         if (!bids.length || bids[bids.length - 1] !== this.highestBid) {
-            return this.emitStageMessage('kitty_error', 'Only the player with the leading bid can take the kitty.', socket);
+            return this.emitStageMessage('kitty_error', 'Only the player with the leading bid can take the kitty.', player);
         }
         for (const otherPlayer of this.players) {
             if (otherPlayer === player) continue;
             const bids = this.playerBids[otherPlayer.position];
             if (!bids.length || bids[bids.length - 1].special !== 'P') {
-                this.emitStageMessage('kitty_error', 'Not all other players have passed.', socket);
+                this.emitStageMessage('kitty_error', 'Not all other players have passed.', player);
                 return;
             }
         }

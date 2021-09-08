@@ -6,7 +6,7 @@ import Deck from '../../../../src/game/model/Deck.js';
 import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
 import Round from '../../../../src/game/stage/Round.js';
-import {getPlayers, getStage} from '../../util/stage.js';
+import {getPlayers, getStage} from '../../../util/stage.js';
 
 describe('Round Stage Unit', function() {
     const config = new DeckConfig(OrdinaryNormalDeck.config);

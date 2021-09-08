@@ -4,8 +4,11 @@ import OrdinaryNormalDeck from '../model/OrdinaryNormalDeck.js';
 
 export default class Lobby extends GameStage {
     start(dataFromPreviousStage) {
-        this.isNewGame = !dataFromPreviousStage;
-        if (!this.isNewGame) return this.complete();
+        dataFromPreviousStage = dataFromPreviousStage || {};
+        if (dataFromPreviousStage.gameOver) {
+            this.dataStore.gameInProgress = false; // todo
+        }
+        if (this.dataStore.gameInProgress) return this.complete();
 
         if (!this.dataStore.preferredPartners) {
             this.dataStore.preferredPartners = {};
@@ -14,13 +17,13 @@ export default class Lobby extends GameStage {
         this.deckConfig = new DeckConfig(OrdinaryNormalDeck.config);
     }
 
-    onPlayerAction(player, socket, actionName, actionData) {
+    onPlayerAction(player, actionName, actionData) {
         if (actionName === 'partner') return this.requestPartner(player, actionData);
         if (actionName === 'ready') return this.playerReady(player, true);
         if (actionName === 'not_ready') return this.playerReady(player, false);
         if (actionName === 'start_game' && player.isAdmin) return this.startGame();
         if (actionName === 'give_admin' && player.isAdmin) return this.grantAdmin(actionData);
-        if (actionName === 'game_config' && player.isAdmin) return this.updateGameConfig(player, socket, actionData);
+        if (actionName === 'game_config' && player.isAdmin) return this.updateGameConfig(player, actionData);
     }
 
     onPlayerConnect(player) {
@@ -73,14 +76,14 @@ export default class Lobby extends GameStage {
     }
 
     startGame() {
-        if (!this.isNewGame) return this.complete();
+        if (this.dataStore.gameInProgress) return this.complete();
 
         this.resetPlayerPositionsAndPartners();
         if (!(this.players.length % 2) && 4 <= this.players.length && this.players.length <= 10) {
             this.matchPartners(this.dataStore.preferredPartners);
         }
         this.setPlayerPositions();
-
+        this.dataStore.gameInProgress = true;
         this.complete();
     }
 
@@ -134,7 +137,7 @@ export default class Lobby extends GameStage {
         }
     }
 
-    updateGameConfig(player, socket, submittedConfig) {
+    updateGameConfig(player, submittedConfig) {
         this.deckConfig.cardsPerHand = submittedConfig.cardsPerHand;
         this.deckConfig.kittySize = submittedConfig.kittySize;
         this.emitGameConfig();

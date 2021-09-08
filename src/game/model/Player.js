@@ -4,7 +4,7 @@ export default class Player {
         this.name = name;
         this.position = null;
         this.isAdmin = false;
-        this.partner = null;
+        this.partner = null; // todo should be team
     }
 
     emit(actionName, actionData) {
@@ -29,7 +29,7 @@ export default class Player {
         return {
             name: this.name,
             position: this.position,
-            partner: this.partner.position
+            partner: this.partner?.position
         };
     }
 }

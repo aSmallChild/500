@@ -6,7 +6,6 @@ services:
       TZ: Pacific/Auckland
     volumes:
       - .:/app
-      - ./node_modules:/app/node_modules
     working_dir: /app
     ports:
       - 80:80
