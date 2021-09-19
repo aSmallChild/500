@@ -28,7 +28,9 @@ export default class Player {
     toJSON() {
         return {
             name: this.name,
+            clientId: this.client.id,
             position: this.position,
+            isAdmin: this.isAdmin,
             partner: this.partner?.position
         };
     }

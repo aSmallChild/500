@@ -69,7 +69,7 @@ export default class Game {
     }
 
     onPlayerConnect(player, socket) {
-        this.emitPlayers(socket);
+        this.emitPlayers();
         this.emitStage(socket);
         this.currentStage.onPlayerConnect(player, socket);
     }

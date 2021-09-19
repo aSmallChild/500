@@ -74,7 +74,6 @@ export default {
                 const playerPassword = '';  // todo
                 const gamePassword = '';  // todo
                 const [channel, response] = await ClientChannel.create('game', gamePassword, playerName.value, playerPassword);
-                console.error(response);
                 if (!response.success) {
                     error.value = `Failed to create game: ${response.message}`;
                     return;
@@ -92,7 +91,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 label {
     display: block;
 }

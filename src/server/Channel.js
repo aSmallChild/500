@@ -108,6 +108,7 @@ export default class Channel {
         };
         if (client) {
             response.success = true;
+            response.clientId = client.id;
             client.add(socketChannel);
             socket.once('disconnect', () => client.remove(socketChannel));
             if (this.#onClient) {

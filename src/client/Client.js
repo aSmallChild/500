@@ -5,7 +5,6 @@ export default class Client {
     #channels = new WeakMap();
 
     constructor(url) {
-        // todo set name somehow
         this.url = url;
         this.socket = null;
     }

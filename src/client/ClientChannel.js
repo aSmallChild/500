@@ -69,11 +69,9 @@ export default class ClientChannel {
             return [null, response];
         }
 
-        if (credentials.clientName) {
-            const response = await channel.clientLogin(credentials.clientName, credentials.clientPassword);
-            if (!response.success) {
-                return [null, response];
-            }
+        const clientLoginResponse = await this.channelClientLogin(channel, credentials.clientName, credentials.clientPassword);
+        if (clientLoginResponse && !clientLoginResponse.success) {
+            return [null, clientLoginResponse];
         }
 
         return [channel, response];
@@ -83,16 +81,14 @@ export default class ClientChannel {
         const client = Client.client;
         const channel = client.getChannel(channelKey, channelName);
 
-        const response = await channel.login(this.getLastPassword());
+        const response = await channel.login(channelPassword);
         if (!response.success) {
             return [null, response];
         }
 
-        if (clientName) {
-            const response = await channel.clientLogin(clientName, clientPassword);
-            if (!response.success) {
-                return [null, response];
-            }
+        const clientLoginResponse = await this.channelClientLogin(channel, clientName, clientPassword);
+        if (clientLoginResponse && !clientLoginResponse.success) {
+            return [null, clientLoginResponse];
         }
 
         this.setCredentials({channelKey, channelName, channelPassword, clientName, clientPassword});
@@ -106,14 +102,26 @@ export default class ClientChannel {
             return [null, response];
         }
         const {channelKey, channelName} = response;
-        if (clientName) {
-            const response = await channel.clientLogin(clientName, clientPassword);
-            if (!response.success) {
-                return [null, response];
-            }
+        const clientLoginResponse = await this.channelClientLogin(channel, clientName, clientPassword);
+        if (clientLoginResponse && !clientLoginResponse.success) {
+            return [null, clientLoginResponse];
         }
 
         this.setCredentials({channelKey, channelName, channelPassword, clientName, clientPassword});
         return [channel, response];
+    }
+
+    static async channelClientLogin(channel, clientName, clientPassword) {
+        channel.clientId = null;
+        if (!clientName) {
+            return null;
+        }
+
+        const response = await channel.clientLogin(clientName, clientPassword);
+        if (response.success) {
+            channel.clientId = response.clientId;
+        }
+
+        return response;
     }
 }
