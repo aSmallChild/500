@@ -1,7 +1,7 @@
 version: '3.8'
 services:
-  server:
-    image: node:14-alpine
+  server-dev:
+    image: node:16-alpine
     environment:
       TZ: Pacific/Auckland
     volumes:
@@ -13,8 +13,19 @@ services:
       - 5858:5858
     entrypoint: npm run nodemon
 
+  server:
+    image: node:16-alpine
+    environment:
+      TZ: Pacific/Auckland
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - 80:80
+    entrypoint: npm run server
+
   vue:
-    image: node:14-alpine
+    image: node:16-alpine
     environment:
       TZ: Pacific/Auckland
     volumes:

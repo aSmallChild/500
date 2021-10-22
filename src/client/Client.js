@@ -70,7 +70,11 @@ export default class Client {
 
     static get client() {
         if (!this._client) {
-            this._client = new Client(window.socketURL);
+            const url = new URL(window.location);
+            const protocol = url.protocol === 'http:' ? 'ws:' : 'wss:';
+            const host = process.env.VUE_APP_SOCKET_HOST;
+            const socketURL = protocol + '//' + (host || url.host);
+            this._client = new Client(socketURL);
         }
         return this._client;
     }

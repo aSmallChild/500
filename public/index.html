@@ -8,11 +8,5 @@
 </head>
 <body>
 <div id="app"></div>
-<script>
-    const url = new URL(window.location);
-    const protocol = url.protocol === 'http:' ? 'ws:' : 'wss:';
-    const host = '<%= htmlWebpackPlugin.options.socketHost %>';
-    window.socketURL = protocol + '//' + (host || url.host);
-</script>
 </body>
 </html>
