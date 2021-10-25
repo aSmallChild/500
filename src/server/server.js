@@ -1,11 +1,18 @@
-import {createServer} from 'http';
-import { WebSocketServer } from 'ws';
+import {createServer} from 'https';
+import {WebSocketServer} from 'ws';
 import SocketManager from './SocketManager.js';
 import serverConfig from '../../config.cjs';
 import fs from 'fs';
 
+const options = {key: null, cert: null};
+if (serverConfig.sslKeyPath && serverConfig.sslCertPath) {
+    console.log(`Using cert: ${serverConfig.sslCertPath}`);
+    console.log(`With key: ${serverConfig.sslKeyPath}`);
+    options.key = fs.readFileSync(serverConfig.sslKeyPath);
+    options.cert = fs.readFileSync(serverConfig.sslCertPath);
+}
 const port = serverConfig.serverPort;
-const server = createServer();
+const server = createServer(options);
 const wss = new WebSocketServer({noServer: true});
 const socketManager = new SocketManager();
 

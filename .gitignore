@@ -3,6 +3,7 @@ package-lock.json
 
 .DS_Store
 /dist
+/config
 
 # local env files
 .env.local

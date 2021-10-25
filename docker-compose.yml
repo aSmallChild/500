@@ -3,7 +3,7 @@ services:
   server-dev:
     image: node:16-alpine
     environment:
-      TZ: Pacific/Auckland
+      TZ: ${TZ}
     volumes:
       - .:/app
     working_dir: /app
@@ -16,19 +16,39 @@ services:
   server:
     image: node:16-alpine
     environment:
-      TZ: Pacific/Auckland
+      TZ: ${TZ}
+      HTTPS_KEY_PATH: ./certs/privkey.pem
+      HTTPS_CERT_PATH: ./certs/fullchain.pem
+      SERVER_PORT: 443
     volumes:
       - .:/app
     working_dir: /app
     ports:
-      - 80:80
+      - 443:443
     entrypoint: npm run server
 
   vue:
     image: node:16-alpine
     environment:
-      TZ: Pacific/Auckland
+      TZ: ${TZ}
     volumes:
       - .:/app
     working_dir: /app
     entrypoint: npm run watch
+
+  certbot:
+    image: certbot/dns-cloudflare
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ./config/certs:/etc/letsencrypt
+      - ./config/letsencrypt:/var/lib/letsencrypt
+      - ./config/cloudflare.ini:/cloudflare.ini:ro
+    command:
+      - "certonly"
+      - "--dns-cloudflare"
+      - "--dns-cloudflare-credentials /cloudflare.ini"
+      - "-d ${HTTPS_API_DOMAIN}"
+      - "-m ${HTTPS_API_DOMAIN_EMAIL}"
+      - "-n"
+      - "--agree-tos"
