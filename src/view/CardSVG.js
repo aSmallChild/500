@@ -3,50 +3,33 @@ export default class CardSVG {
         this.card = card;
         this.svg = svg;
         this.svg.cardSvg = this;
-        this.unfrozen = {
-            transforms: new Map(),
-            transformTimeout: null,
-        };
     }
 
-    moveTo(x, y) {
+    static moveTo(x, y) {
         x = typeof x === 'number' ? x + 'px' : x;
         y = typeof y === 'number' ? y + 'px' : y;
-        this.unfrozen.transforms.set('translateX', x);
-        this.unfrozen.transforms.set('translateY', y);
+        return `translateX(${x}) translateY(${y})`;
     }
 
-    rotate(angle) {
+    static rotate(angle) {
         angle = typeof angle === 'number' ? angle + 'deg' : angle;
-        this.unfrozen.transforms.set('rotate', angle);
+        return `rotate(${angle})`;
     }
 
-    _getTransformValue() {
-        let newTransformValue = '';
-        for (const [key, value] of this.unfrozen.transforms.entries()) {
-            newTransformValue += ` ${key}(${value})`;
-        }
-        return newTransformValue;
-    }
-
-    instantTransform(value) {
+    instantTransform(transforms) {
         this.svg.style.transition = 'none';
-        this.transform(value);
+        this.transform(transforms);
     }
 
-    animateTransform(value) {
-        // clearTimeout(this.unfrozen.transformTimeout);
-        // this needs to happen on the next tick the timeout below is just a backup that has race conditions
+    animateTransform(transforms) {
         return () => {
             this.svg.style.transition = '';
-            this.transform(value);
+            this.transform(transforms);
         };
-        // this.unfrozen.transformTimeout = setTimeout(callback, 5);
-        // return callback;
     }
 
-    transform(value) {
-        this.svg.style.transform = value ?? this._getTransformValue();
+    transform(transforms) {
+        this.svg.style.transform = transforms.join(' ');
     }
 
     animateTo(setPosition) {
@@ -57,14 +40,12 @@ export default class CardSVG {
         this.svg.style.visibility = 'hidden';
         setPosition();
         const newPosition = this.svg.getBoundingClientRect();
-        const x = originalPosition.right - newPosition.right;
-        const y = originalPosition.top - newPosition.top;
-        this.moveTo(x, y);
-        this.rotate(-360 * 2);
-        this.instantTransform();
+        this.instantTransform([
+            this.constructor.moveTo(originalPosition.right - newPosition.right, originalPosition.top - newPosition.top),
+            this.constructor.rotate(-360 * 2),
+        ]);
         this.svg.style.visibility = '';
-        this.unfrozen.transforms.clear();
-        return this.animateTransform();
+        return this.animateTransform([]);
     }
 
     animateSiblings(setPosition) {
