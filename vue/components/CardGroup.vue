@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import {computed, nextTick, onMounted, ref} from 'vue';
+import {computed, nextTick, ref} from 'vue';
 
 export default {
     props: {
@@ -24,21 +24,21 @@ export default {
                 return [];
             }
             const cardsAlreadyHere = [];
-            root.value.children.forEach(svg => {
-                if (hasSVG(svg)) {
-                    cardsAlreadyHere.push(svg);
+            try {
+                for (const svg of root.value.children) {
+                    if (hasSVG(svg)) {
+                        cardsAlreadyHere.push(svg);
+                    }
                 }
-            });
+            } catch (err) {
+                console.error(err);
+                console.error(root.value);
+            }
             return cardsAlreadyHere;
         };
         const placeCards = () => {
-            // must access a property of cards prior to checking root.value or reactivity breaks
-            if (!props.cards.length || !root.value) {
-                return;
-            }
-
+            if (!root.value || !props.cards.length) return;
             const cardsAlreadyHere = getCardsAlreadyPlaced();
-
             const callbacks = [];
             let index = 0;
             for (const cardSvg of props.cards) {
@@ -47,11 +47,15 @@ export default {
                 }
                 index++;
             }
-
             if (!callbacks.length) return;
-            nextTick(() => setTimeout(() => callbacks.forEach(callback => callback()), 7));
+            nextTick(() => {
+                setTimeout(() => {
+                    for (const callback of callbacks) {
+                        callback();
+                    }
+                }, 7);
+            });
         };
-        onMounted(placeCards);
         return {
             root,
             cardSVGs: computed(placeCards),
