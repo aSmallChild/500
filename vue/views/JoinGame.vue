@@ -24,7 +24,7 @@
 
 <script>
 import {ref} from 'vue';
-import {useRouter} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import ClientChannel from '../../src/client/ClientChannel.js';
 
 export default {
@@ -35,8 +35,9 @@ export default {
         },
     },
     setup(props) {
+        const route = useRoute();
         const router = useRouter();
-        const gameCode = ref('');
+        const gameCode = ref(route.params.id || '');
         const playerName = ref('');
         const error = ref('');
         const isSubmitting = ref(false);

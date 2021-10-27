@@ -7,6 +7,10 @@ export default class Player {
         this.partner = null; // todo should be team
     }
 
+    get id() {
+        return this.client.id;
+    }
+
     emit(actionName, actionData) {
         this.client.emit(actionName, actionData);
     }
@@ -27,6 +31,7 @@ export default class Player {
 
     toJSON() {
         return {
+            id: this.id,
             name: this.name,
             clientId: this.client.id,
             position: this.position,

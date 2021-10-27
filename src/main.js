@@ -10,9 +10,10 @@ import Game from '../vue/views/Game.vue';
 const routes = [
     {path: '/', name: 'home', component: MainMenu},
     {path: '/new', name: 'game_new', component: JoinGame, props: {newGame: true}},
-    {path: '/join', name: 'game_join', component: JoinGame},
+    {path: '/join/:id?', name: 'game_join', component: JoinGame},
     {path: '/game/:id', name: 'game', component: Game},
     {path: '/sandbox', name: 'sandbox', component: Doodle},
+    {path: '/:pathNotFound(.*)*', name: 'not_found', component: MainMenu},
 ];
 
 const router = createRouter({

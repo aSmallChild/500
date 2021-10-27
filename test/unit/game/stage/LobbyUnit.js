@@ -42,9 +42,9 @@ describe('Lobby Stage Unit', function() {
                 {
                     name: 'all partners want each other',
                     playerCount: 4,
-                    partnerRequests: {a: 'b', b: 'a', c: 'd', d: 'c'},
-                    expectedPositions: ['a', 'c', 'b', 'd'],
-                    expectedMatches: ['ab', 'cd'],
+                    partnerRequests: {a: 'c', b: 'd', c: 'a', d: 'b'},
+                    expectedPositions: ['a', 'b', 'c', 'd'],
+                    expectedMatches: ['ac', 'bd'],
                 },
                 {
                     name: 'no players request a partner',
@@ -71,7 +71,14 @@ describe('Lobby Stage Unit', function() {
             for (const testCase of matchPartnerTests) {
                 it(testCase.name, function() {
                     const lobby = getStage(getPlayers(testCase.playerCount), Lobby);
-                    lobby.matchPartners(testCase.partnerRequests);
+                    const partnerRequestsToIds = partnerRequests => {
+                        const idRequests = {};
+                        for (const [k, v] of Object.entries(partnerRequests)) {
+                            idRequests[lobby.getPlayerByName(k).id] = lobby.getPlayerByName(v)?.id;
+                        }
+                        return idRequests;
+                    };
+                    lobby.matchPartners(partnerRequestsToIds(testCase.partnerRequests));
                     for (let [a, b] of testCase.expectedMatches) {
                         a = lobby.getPlayerByName(a);
                         b = lobby.getPlayerByName(b);

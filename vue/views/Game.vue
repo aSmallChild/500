@@ -1,16 +1,18 @@
 <template>
-    <div>
-        <h1>Game: {{ name }}</h1>
-        <game-config :players="players" :clientId="clientId"/>
-        <div>
-            <h2>Players {{ players.length }}</h2>
-            <div v-for="player in players" :key="player.name">{{ player.name }}, {{ player.clientId + (player.isAdmin ? '(admin)' : '') }}</div>
+    <div class="container">
+        <h1>Game: {{ name.toUpperCase() }}</h1>
+        <game-config :players="players" :current-player="currentPlayer"/>
+        <h2>Players {{ players.length }}</h2>
+        <div v-for="player in players" :key="player.name">
+            {{ player.name }}{{ player.isAdmin ? ' (admin)' : '' }}
+            <v-btn v-if="currentPlayer.isAdmin && !player.isAdmin" @click="lobby.giveAdmin(player)" size="small" color="primary">Admin</v-btn>
+            <v-btn v-if="currentPlayer.isAdmin && !player.isAdmin" @click="kickPlayer(player)" size="small" color="secondary">Kick</v-btn>
         </div>
     </div>
 </template>
 
 <script>
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import ClientChannel from '../../src/client/ClientChannel.js';
 import GameConfig from '../components/GameConfig.vue';
@@ -25,16 +27,41 @@ export default {
         const route = useRoute();
         const name = ref(route.params.id);
         const players = ref([]);
+        const gameConfig = ref({}); //todo
         const clientId = ref(null);
+        const currentPlayer = computed(() => players.value.find(player => player.clientId === clientId.value));
+        let channel = null;
 
         const channelName = route.params.id;
         const channelKey = `game:${channelName}`;
 
-        const redirectBack = () => router.push('/');
+        const sendPlayerAction = (actionName, actionData) => channel.emit('player:action', {actionName, actionData});
+
+        const redirectBack = () => router.push('/join' + (channelName ? '/' + channelName : ''));
+        const kickPlayer = player => channel.emit('game:kick', player.id); // todo
+
+        const lobby = {
+            giveAdmin(player) {
+                sendPlayerAction('give_admin', player.id); //todo make this game:admin, remove from lobby stage
+            },
+            ready(isReady) {//todo
+                sendPlayerAction(isReady ? 'ready' : 'not_ready', isReady);
+            },
+            requestPartner(player) { //todo
+                sendPlayerAction('partner', player.id);
+            },
+            startGame() {//todo
+                sendPlayerAction('start_game');
+            },
+            gameConfig() {// todo
+                sendPlayerAction('game_config', gameConfig.value);
+            }
+        };
 
         (async () => {
             try {
-                const [channel, response] = await ClientChannel.reconnect(channelKey);
+                let response;
+                [channel, response] = await ClientChannel.reconnect(channelKey);
                 if (!response.success) {
                     console.error(response);
                     redirectBack();
@@ -56,11 +83,15 @@ export default {
             }
         })();
 
-        return {name, players, clientId};
+        return {name, players, clientId, currentPlayer, kickPlayer, lobby};
     },
 };
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.container {
+    margin: 10px auto;
+    min-width: 200px;
+    max-width: 300px;
+}
 </style>

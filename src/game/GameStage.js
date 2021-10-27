@@ -31,6 +31,14 @@ export default class GameStage {
         return null;
     }
 
+    getPlayerById(clientId) {
+        if (!clientId) return null;
+        for (const player of this.players) {
+            if (player.id === clientId) return player;
+        }
+        return null;
+    }
+
     start(dataFromPreviousStage) {}
 
     onPlayerAction(player, actionName, actionData) {}
