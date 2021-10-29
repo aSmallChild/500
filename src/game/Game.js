@@ -16,14 +16,16 @@ export default class Game {
         channel.onObserver(observer => this.onObserver(observer));
         channel.onClient((client, socket) => {
             const player = this.getOrMaybeEvenCreatePlayerForClient(client);
-            if (!player) {
-                return;
-            }
+            if (!player) return;
 
             this.onPlayerConnect(player, socket);
 
-            socket.on('player:action', data => {
-                this.onPlayerAction(player, socket, data.actionName, data.actionData); // todo implement this client side
+            socket.on('player:action', ({actionName, actionData}) => {
+                this.onPlayerAction(player, socket, actionName, actionData);
+            });
+
+            socket.on('game:action', ({actionName, actionData}) => {
+                this.onGameAction(player, socket, actionName, actionData);
             });
         });
     }
@@ -101,5 +103,26 @@ export default class Game {
         this.currentStage.setPlayers(this.players);
         this.currentStage.setChannel(this.channel);
         this.currentStage.start(dataFromPreviousStage);
+    }
+
+    onGameAction(player, socket, actionName, actionData) {
+        if (!player.isAdmin) return;
+        if (actionName === 'grant_admin') return this.grantAdmin(actionData);
+        if (actionName === 'kick_player') return this.kickPlayer(actionData);
+    }
+
+    grantAdmin(clientId) {
+        const otherPlayer = this.currentStage.getPlayerById(clientId);
+        if (!otherPlayer || otherPlayer.isAdmin) return;
+        otherPlayer.isAdmin = true;
+        this.emitPlayers();
+    }
+
+    kickPlayer(clientId) {
+        const otherPlayer = this.currentStage.getPlayerById(clientId);
+        if (!otherPlayer) return;
+        this.channel.disconnectClient(otherPlayer.client, 4001, 'kicked');
+        this.players.splice(this.players.indexOf(otherPlayer), 1);
+        this.emitPlayers();
     }
 }

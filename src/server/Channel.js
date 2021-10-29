@@ -72,6 +72,12 @@ export default class Channel {
         socketChannel.emit('channel:login', {success: true});
     }
 
+    disconnectClient(client, code = 4000, reason = 'disconnect') {
+        this.clients.delete(client.id);
+        client.sockets.forEach(socketChannel => this.observers.delete(socketChannel));
+        client.disconnect(code, reason);
+    }
+
     observerDisconnect(socketChannel) {
         if (!this.observers.delete(socketChannel)) {
             return;

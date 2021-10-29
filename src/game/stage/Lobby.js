@@ -19,11 +19,11 @@ export default class Lobby extends GameStage {
 
     onPlayerAction(player, actionName, actionData) {
         if (actionName === 'partner') return this.requestPartner(player, actionData);
-        if (actionName === 'ready') return this.playerReady(player, true);
-        if (actionName === 'not_ready') return this.playerReady(player, false);
-        if (actionName === 'start_game' && player.isAdmin) return this.startGame();
-        if (actionName === 'give_admin' && player.isAdmin) return this.grantAdmin(actionData);
-        if (actionName === 'game_config' && player.isAdmin) return this.updateGameConfig(player, actionData);
+        if (actionName === 'ready') return this.playerReady(player, actionData);
+
+        if (!player.isAdmin) return;
+        if (actionName === 'start') return this.startGame();
+        if (actionName === 'config') return this.updateGameConfig(player, actionData);
     }
 
     onPlayerConnect(player) {
@@ -50,13 +50,6 @@ export default class Lobby extends GameStage {
         else this.readyPlayers.delete(player.id);
         if (this.players.length < 2) return;
         if (this.readyPlayers.size === this.players.length) this.startGame();
-    }
-
-    grantAdmin(clientId) {
-        const player = this.getPlayerById(clientId);
-        if (!player) return;
-        player.isAdmin = true;
-        // this.emitPlayers(); // todo this should move into the game (game:kick, game:admin)
     }
 
     resetPlayerPositionsAndPartners() {

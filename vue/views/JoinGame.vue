@@ -3,20 +3,20 @@
         <v-row align="center" justify="center">
             <v-col>
                 <!-- waiting for vuetify to be finished so v-text-field is available -->
-                <form @submit.prevent="submit" class="menu-buttons">
+                <div class="menu-buttons">
                     <label class="wrapper" v-if="!newGame">
                         <span>Game</span>
-                        <input :disabled="newGame" v-model="gameCode" pattern="A-Z" maxlength="6" type="text">
+                        <input :disabled="newGame" v-model="gameCode" pattern="A-Z" maxlength="6" type="text" @keyup.enter="submit">
                     </label>
                     <label class="wrapper">
                         <span>Name</span>
-                        <input v-model="playerName" type="text">
+                        <input v-model="playerName" type="text" @keyup.enter="submit">
                     </label>
                     <v-btn color="secondary" @click="submit" :disabled="isSubmitting">{{ playerName ? 'Play' : 'Watch' }}</v-btn>
                     <div class="error">
                         {{ error }}
                     </div>
-                </form>
+                </div>
             </v-col>
         </v-row>
     </v-container>

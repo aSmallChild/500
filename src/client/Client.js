@@ -52,8 +52,8 @@ export default class Client {
     }
 
     _bindClientEvents() {
-        this.socket.on('close', () => {
-            console.log('DISCONNECTED');
+        this.socket.on('close', event => {
+            console.log('DISCONNECTED', event.code, event.reason);
             this.oldSocket = this.socket;
             this.socket = null;
         });

@@ -1,13 +1,8 @@
 <template>
     <div class="container">
-        <h1>Game: {{ name.toUpperCase() }}</h1>
-        <game-config :players="players" :current-player="currentPlayer"/>
-        <h2>Players {{ players.length }}</h2>
-        <div v-for="player in players" :key="player.name">
-            {{ player.name }}{{ player.isAdmin ? ' (admin)' : '' }}
-            <v-btn v-if="currentPlayer.isAdmin && !player.isAdmin" @click="lobby.giveAdmin(player)" size="small" color="primary">Admin</v-btn>
-            <v-btn v-if="currentPlayer.isAdmin && !player.isAdmin" @click="kickPlayer(player)" size="small" color="secondary">Kick</v-btn>
-        </div>
+        <h1>{{ currentStage || 'Game' }} {{ name.toUpperCase() }}</h1>
+        <component :is="currentStage" :players="players" :current-player="currentPlayer"
+                   @player-action="playerAction" @game-action="gameAction"/>
     </div>
 </template>
 
@@ -15,19 +10,22 @@
 import {computed, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import ClientChannel from '../../src/client/ClientChannel.js';
-import GameConfig from '../components/GameConfig.vue';
+import Lobby from '../components/GameStage/Lobby.vue';
 
-// connects to the server, and displays the current stage of the game
+const stages = {
+    Lobby
+};
+
 export default {
     components: {
-        GameConfig,
+        ...stages
     },
     setup() {
         const router = useRouter();
         const route = useRoute();
+        const currentStage = ref(null);
         const name = ref(route.params.id);
         const players = ref([]);
-        const gameConfig = ref({}); //todo
         const clientId = ref(null);
         const currentPlayer = computed(() => players.value.find(player => player.clientId === clientId.value));
         let channel = null;
@@ -35,28 +33,9 @@ export default {
         const channelName = route.params.id;
         const channelKey = `game:${channelName}`;
 
-        const sendPlayerAction = (actionName, actionData) => channel.emit('player:action', {actionName, actionData});
-
         const redirectBack = () => router.push('/join' + (channelName ? '/' + channelName : ''));
-        const kickPlayer = player => channel.emit('game:kick', player.id); // todo
-
-        const lobby = {
-            giveAdmin(player) {
-                sendPlayerAction('give_admin', player.id); //todo make this game:admin, remove from lobby stage
-            },
-            ready(isReady) {//todo
-                sendPlayerAction(isReady ? 'ready' : 'not_ready', isReady);
-            },
-            requestPartner(player) { //todo
-                sendPlayerAction('partner', player.id);
-            },
-            startGame() {//todo
-                sendPlayerAction('start_game');
-            },
-            gameConfig() {// todo
-                sendPlayerAction('game_config', gameConfig.value);
-            }
-        };
+        const gameAction = data => channel.emit('game:action', data);
+        const playerAction = data => channel.emit('player:action', data);
 
         (async () => {
             try {
@@ -70,7 +49,7 @@ export default {
                 clientId.value = channel.clientId;
                 name.value = channel.name;
                 channel.on('game:stage', stage => {
-                    console.log(`current stage: ${stage}`);
+                    currentStage.value = stage;
                 });
                 channel.on('game:players', newList => {
                     players.value = newList;
@@ -83,12 +62,15 @@ export default {
             }
         })();
 
-        return {name, players, clientId, currentPlayer, kickPlayer, lobby};
+        return {name, players, clientId, currentPlayer, currentStage, playerAction, gameAction};
     },
 };
 </script>
 
 <style lang="scss" scoped>
+h1 {
+    text-transform: capitalize;
+}
 .container {
     margin: 10px auto;
     min-width: 200px;

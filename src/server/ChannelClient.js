@@ -21,7 +21,22 @@ export default class ChannelClient {
     }
 
     remove(socketChannel) {
+        if (!this.sockets) return;
         this.sockets.delete(socketChannel);
+    }
+
+    disconnect(...args) {
+        this.name = null;
+        this.password = null;
+        for (const socketChannel of this.sockets) {
+            try {
+                socketChannel._wrapper.disconnect(...args);
+            } catch (e) {
+                console.error(e)
+            }
+        }
+        this.sockets.clear();
+        this.sockets = null;
     }
 
     emit(...args) {
