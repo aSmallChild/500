@@ -1,5 +1,7 @@
 const GAME_ACTION_EVENT_NAME = 'game-action';
-const PLAYER_ACTION_EVENT_NAME = 'player-action';
+const STAGE_ACTION_EVENT_NAME = 'stage-action';
+export const GAME_ACTION_EVENT_HANDER = 'game-action-handler';
+export const STAGE_ACTION_EVENT_HANDER = 'stage-action-handler';
 
 export const common = {
     props: {
@@ -8,14 +10,16 @@ export const common = {
     },
     emits: [
         GAME_ACTION_EVENT_NAME,
-        PLAYER_ACTION_EVENT_NAME,
+        STAGE_ACTION_EVENT_NAME,
+        GAME_ACTION_EVENT_HANDER,
+        STAGE_ACTION_EVENT_HANDER,
     ],
 };
 
-export const playerActions = emit => (actionName, actionData) => emit(PLAYER_ACTION_EVENT_NAME, {actionName, actionData});
+export const stageActions = emit => (actionName, actionData) => emit(STAGE_ACTION_EVENT_NAME, {actionName, actionData});
 
 export const gameActions = emit => {
-    const gameAction = (actionName, actionData) => emit(PLAYER_ACTION_EVENT_NAME, {actionName, actionData});
+    const gameAction = (actionName, actionData) => emit(GAME_ACTION_EVENT_NAME, {actionName, actionData});
     return {
         gameAction,
         giveAdmin(player) {

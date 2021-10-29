@@ -30,7 +30,7 @@ describe('Round Stage Unit', function() {
         });
     });
 
-    describe('onPlayerAction()', () => {
+    describe('onStageAction()', () => {
         it('playing card removes card from players hand', () => {
             // Arrange
             const winningPosition = 0;
@@ -43,7 +43,7 @@ describe('Round Stage Unit', function() {
             const card = hands[winningPosition].cards[0];
 
             // Act
-            stage.onPlayerAction(winningBidder, GameAction.PLACE_CARD, {
+            stage.onStageAction(winningBidder, GameAction.PLACE_CARD, {
                 card: card
             });
             const containsCard = stage.hands[winningPosition].containsCard(card);
@@ -64,7 +64,7 @@ describe('Round Stage Unit', function() {
             const openingCard = hands[winningPosition].cards[0];
 
             // Act
-            stage.onPlayerAction(winningBidder, GameAction.PLACE_CARD, {
+            stage.onStageAction(winningBidder, GameAction.PLACE_CARD, {
                 card: openingCard
             });
 

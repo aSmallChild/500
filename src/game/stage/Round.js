@@ -12,7 +12,7 @@ export default class Round extends GameStage {
         this.currentPlayer = dataFromPreviousStage.highestBidder; // highest bidder leads play
     }
 
-    onPlayerAction(player, actionName, actionData) {
+    onStageAction(player, actionName, actionData) {
         if (actionName === GameAction.PLACE_CARD) return this.#placeCard(player, actionData);
     }
 

@@ -5,6 +5,9 @@ import OrdinaryNormalDeck from '../src/game/model/OrdinaryNormalDeck.js';
 export default class DoodleServer {
     constructor(channel) {
         this.config = new DeckConfig(OrdinaryNormalDeck.config);
+        this.config.cardsPerHand = 8 + 6 * Math.random() >> 0;
+        this.config.kittySize = 2 + 4 * Math.random() >> 0;
+        this.config.totalHands = 2 + 4 * Math.random() >> 0;
         this.setChannel(channel);
         this.hands = [];
         this.table = [];

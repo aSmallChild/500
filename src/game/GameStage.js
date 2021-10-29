@@ -41,14 +41,14 @@ export default class GameStage {
 
     start(dataFromPreviousStage) {}
 
-    onPlayerAction(player, actionName, actionData) {}
+    onStageAction(player, actionName, actionData) {}
 
     onPlayerConnect(player, socket) {}
 
     onObserver(observer) {}
 
-    emitStageMessage(name, data, socket) {
+    emitStageMessage(actionName, actionData, socket) {
         socket = socket || this.channel;
-        socket.emit('stage:action', {name, data});
+        socket.emit('stage:action', {actionName, actionData});
     }
 }

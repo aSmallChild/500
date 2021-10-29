@@ -1,5 +1,5 @@
 <template>
-    <div ref="root" :a="cardSVGs"></div>
+    <div ref="root" :a="cardSVGs" :class="{fan, 'animate-cards': animate}"></div>
 </template>
 
 <script>
@@ -8,8 +8,21 @@ import {computed, nextTick, ref} from 'vue';
 export default {
     props: {
         cards: Array,
+        fan: {
+            type: Boolean,
+            default: false
+        },
+        pile: {
+            type: Boolean,
+            default: false
+        },
+        animate: {
+            type: Boolean,
+            default: true
+        }
     },
     setup(props) {
+        //todo write some random transforms for piles
         const root = ref(null);
         const hasSVG = svg => {
             for (const cardSvg of props.cards) {

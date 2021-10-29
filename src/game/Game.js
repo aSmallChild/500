@@ -20,11 +20,13 @@ export default class Game {
 
             this.onPlayerConnect(player, socket);
 
-            socket.on('player:action', ({actionName, actionData}) => {
-                this.onPlayerAction(player, socket, actionName, actionData);
+            socket.on('stage:action', ({actionName, actionData}) => {
+                console.log('STAGE ACTION', actionName, actionData) // todo debug this to see why it is sometimes called twice
+                this.onStageAction(player, socket, actionName, actionData);
             });
 
             socket.on('game:action', ({actionName, actionData}) => {
+                console.log('GAME ACTION', actionName, actionData)
                 this.onGameAction(player, socket, actionName, actionData);
             });
         });
@@ -63,8 +65,8 @@ export default class Game {
         }
     }
 
-    onPlayerAction(player, socket, actionName, actionData) {
-        const response = this.currentStage.onPlayerAction(player, actionName, actionData);
+    onStageAction(player, socket, actionName, actionData) {
+        const response = this.currentStage.onStageAction(player, actionName, actionData);
         if (response) {
             socket.emit(actionName, response);
         }

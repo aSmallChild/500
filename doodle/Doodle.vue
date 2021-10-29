@@ -7,9 +7,9 @@
             <v-btn color="secondary" @click="newChannel">New</v-btn>
             Name: <input v-model="channelName"/>
             <v-btn color="secondary" @click="channelLogin">Join</v-btn>
-            <card-group class="animate-cards fan" v-for="hand in hands" :cards="hand" :key="hand"/>
-            <card-group class="animate-cards" :cards="table"></card-group>
         </div>
+        <card-group fan v-for="hand in hands" :cards="hand" :key="hand"/>
+        <card-group pile :cards="table"></card-group>
     </div>
 </template>
 
@@ -49,10 +49,7 @@ export default {
 
         const setGroupCards = (thisGroup, otherGroup) => {
             otherGroup.forEach((serializedCard, index) => {
-                let cardSvg = cardMap.get(serializedCard);
-                if (!cardSvg) {
-                    cardSvg = createNewCard(serializedCard);
-                }
+                const cardSvg = cardMap.get(serializedCard) || createNewCard(serializedCard);
                 if (thisGroup[index] === cardSvg) {
                     return;
                 }

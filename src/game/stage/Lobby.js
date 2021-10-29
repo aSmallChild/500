@@ -15,9 +15,10 @@ export default class Lobby extends GameStage {
         }
         this.readyPlayers = new Set();
         this.deckConfig = new DeckConfig(OrdinaryNormalDeck.config);
+        this.emitGameConfig();
     }
 
-    onPlayerAction(player, actionName, actionData) {
+    onStageAction(player, actionName, actionData) {
         if (actionName === 'partner') return this.requestPartner(player, actionData);
         if (actionName === 'ready') return this.playerReady(player, actionData);
 
@@ -34,6 +35,10 @@ export default class Lobby extends GameStage {
             this.deckConfig.totalHands = this.players.length;
             this.emitGameConfig();
         }
+    }
+
+    onObserver(observer) {
+        this.emitGameConfig(observer);
     }
 
     requestPartner(player, clientId) {
@@ -138,7 +143,7 @@ export default class Lobby extends GameStage {
         this.emitGameConfig();
     }
 
-    emitGameConfig() {
-        this.emitStageMessage('config', this.deckConfig);
+    emitGameConfig(player) {
+        this.emitStageMessage('config', this.deckConfig, player?.client);
     }
 }

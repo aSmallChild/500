@@ -47,7 +47,7 @@ export default class SocketManager {
             const channel = this.channels.get(channelKey);
             if (!channel) {
                 const socketChannel = socket.of(Channel.createChannelKey(prefix, channelName));
-                socketChannel.emit(eventName, {success: false, message: 'Invalid channel.'});
+                socketChannel.emit(eventName, {success: false, code: 'invalid_channel', message: 'Invalid channel.'});
                 return;
             }
 

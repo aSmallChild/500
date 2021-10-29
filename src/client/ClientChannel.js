@@ -39,6 +39,10 @@ export default class ClientChannel {
         this.channel.on(...args);
     }
 
+    once(...args) {
+        this.channel.once(...args);
+    }
+
     emit(...args) {
         this.channel.emit(...args);
     }

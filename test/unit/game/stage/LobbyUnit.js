@@ -16,24 +16,24 @@ describe('Lobby Stage Unit', function() {
             });
         });
         describe(`startGame()`, function() {
-            it(`should complete stage when all players are ready`, function(done) {
+            it(`should complete stage when all players are ready`, done => {
                 const lobby = getStage(getPlayers(6), Lobby);
                 lobby.onStageComplete(() => {
                     done();
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onPlayerAction(player, 'ready');
+                    lobby.onStageAction(player, 'ready', true);
                 }
             });
-            it(`should complete stage when all players are ready`, function() {
+            it(`should complete stage when all players are ready`, () => {
                 const lobby = getStage(getPlayers(1), Lobby);
                 lobby.onStageComplete(() => {
                     should(true).be.false('Lobby stage ended without enough players');
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onPlayerAction(player, 'ready');
+                    lobby.onStageAction(player, 'ready', true);
                 }
             });
         });

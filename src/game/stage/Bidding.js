@@ -22,7 +22,7 @@ export default class Bidding extends GameStage {
         this.resetBids();
     }
 
-    onPlayerAction(player, actionName, actionData) {
+    onStageAction(player, actionName, actionData) {
         if (actionName === GameAction.PLACE_BID) return this.onBid(player, actionData);
         if (actionName === GameAction.TAKE_HAND) return this.onTakeHand(player);
         if (actionName === GameAction.TAKE_KITTY) return this.onTakeKitty(player, actionData);

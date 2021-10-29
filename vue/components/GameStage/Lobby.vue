@@ -24,7 +24,7 @@
 
 <script>
 import {computed, ref} from 'vue';
-import {common, gameActions, playerActions} from './common.js';
+import {common, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER} from './common.js';
 
 export default {
     ...common,
@@ -37,22 +37,28 @@ export default {
             kittySize: 3,
         });
 
-        const playerAction = playerActions(emit);
+        const stageAction = stageActions(emit);
         const action = {
             requestPartner(partner) {
-                playerAction('partner', partner.id);
+                stageAction('partner', partner.id);
             },
             playerReady(isReady) {
-                playerAction('ready', isReady);
+                stageAction('ready', isReady);
             },
             startGame() {
-                playerAction('start');
+                stageAction('start');
             },
             updateGameConfig() {
-                playerAction('config', gameConfig.value);
+                stageAction('config', gameConfig.value);
             },
         };
         const game = gameActions(emit);
+
+        emit(STAGE_ACTION_EVENT_HANDER, ({actionName, actionData}) => {
+            if (actionName === 'config') {
+                gameConfig.value = actionData;
+            }
+        });
         return {
             gameConfig,
             requestedPartner,

@@ -127,6 +127,7 @@ $cardHeight: 150px;
   height: $cardHeight * 1.4;
   position: relative;
   display: inline-block;
+  text-align: center;
   @include allTheFans(16, 90deg);
 
   .card {
