@@ -34,6 +34,7 @@ export default class Player {
             id: this.id,
             name: this.name,
             clientId: this.client.id,
+            connections: this.client.connectionCount,
             position: this.position,
             isAdmin: this.isAdmin,
             partner: this.partner?.position

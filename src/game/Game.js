@@ -20,13 +20,13 @@ export default class Game {
 
             socket.removeAllListeners('stage:action');
             socket.on('stage:action', ({actionName, actionData}) => {
-                console.log('STAGE ACTION', actionName, actionData);
+                console.log(`STAGE ${this.currentStage.constructor.name} ${channel.name.toUpperCase()}/${client.id}: `, actionName, actionData);
                 this.onStageAction(player, socket, actionName, actionData);
             });
 
             socket.removeAllListeners('game:action');
             socket.on('game:action', ({actionName, actionData}) => {
-                console.log('GAME ACTION', actionName, actionData);
+                console.log(`GAME ${this.currentStage.constructor.name} ${channel.name.toUpperCase()}/${client.id}: `, actionName, actionData);
                 this.onGameAction(player, socket, actionName, actionData);
             });
 

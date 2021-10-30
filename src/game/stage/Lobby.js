@@ -15,7 +15,7 @@ export default class Lobby extends GameStage {
         }
         this.readyPlayers = new Set();
         this.deckConfig = new DeckConfig(OrdinaryNormalDeck.config);
-        this.emitGameConfig();
+        this.onObserver();
     }
 
     onStageAction(player, actionName, actionData) {
@@ -39,6 +39,8 @@ export default class Lobby extends GameStage {
 
     onObserver(observer) {
         this.emitGameConfig(observer);
+        this.emitPartners(observer);
+        this.emitReadyPlayers(observer);
     }
 
     requestPartner(player, clientId) {
@@ -46,13 +48,14 @@ export default class Lobby extends GameStage {
         if (store[player.id] && store[player.id] !== clientId) {
             delete store[player.id]; // keep requests in order
         }
-        if (!this.getPlayerById(clientId)) return;
-        store[player.id] = clientId;
+        if (this.getPlayerById(clientId)) store[player.id] = clientId;
+        this.emitPartners();
     }
 
     playerReady(player, isReady) {
         if (isReady) this.readyPlayers.add(player.id);
         else this.readyPlayers.delete(player.id);
+        this.emitReadyPlayers();
         if (this.players.length < 2) return;
         if (this.readyPlayers.size === this.players.length) this.startGame();
     }
@@ -143,7 +146,15 @@ export default class Lobby extends GameStage {
         this.emitGameConfig();
     }
 
-    emitGameConfig(player) {
-        this.emitStageMessage('config', this.deckConfig, player?.client);
+    emitGameConfig(client) {
+        this.emitStageMessage('config', this.deckConfig, client);
+    }
+
+    emitPartners(client) {
+        this.emitStageMessage('partners', this.dataStore.preferredPartners, client);
+    }
+
+    emitReadyPlayers(client) {
+        this.emitStageMessage('ready_players', Array.from(this.readyPlayers), client);
     }
 }

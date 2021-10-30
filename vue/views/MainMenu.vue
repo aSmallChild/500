@@ -5,7 +5,7 @@
                 <div class="menu-buttons">
                     <h1>{{ pathNotFound ? 404 : 500 }}</h1>
                     <v-btn v-for="[label, route] of Object.entries(menuItems)" :key="label"
-                           color="secondary" @click="$router.push(route)">
+                           color="primary" @click="$router.push(route)">
                         {{ label }}
                     </v-btn>
                 </div>

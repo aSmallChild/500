@@ -2,15 +2,16 @@
     <div class="container">
         <h1>{{ currentStage || 'Game' }} {{ name.toUpperCase() }}</h1>
         <component :is="currentStage" :players="players" :current-player="currentPlayer"
-                   @stage-action="stageAction" @game-action="gameAction"
+                   @stage-action="stageAction"
                    @stage-action-handler="onStageActionHandler"
+                   @game-action="gameAction"
                    @game-action-handler="onGameActionHandler"
         />
     </div>
 </template>
 
 <script>
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import ClientChannel from '../../src/client/ClientChannel.js';
 import Lobby from '../components/GameStage/Lobby.vue';
@@ -32,6 +33,13 @@ export default {
         const clientId = ref(null);
         const currentPlayer = computed(() => players.value.find(player => player.clientId === clientId.value));
         let channel = null, stageActionHandler, gameActionHandler;
+        watch(() => currentStage, (current, previous) => {
+            if (current === previous) {
+                return;
+            }
+            stageActionHandler = null;
+            gameActionHandler = null;
+        });
 
         const channelName = route.params.id;
         const channelKey = `game:${channelName}`;
@@ -54,8 +62,6 @@ export default {
                 clientId.value = channel.clientId;
                 name.value = channel.name;
                 channel.on('game:stage', stage => {
-                    stageActionHandler = null;
-                    gameActionHandler = null;
                     currentStage.value = stage;
                 });
                 channel.on('game:players', newList => {
@@ -63,9 +69,11 @@ export default {
                 });
                 channel.on('game:action', data => {
                     if (gameActionHandler) gameActionHandler(data);
+                    else console.log('NO HANDLER FOR GAME ACTION');
                 });
                 channel.on('stage:action', data => {
                     if (stageActionHandler) stageActionHandler(data);
+                    else console.log('NO HANDLER FOR STAGE ACTION');
                 });
 
                 channel.join();

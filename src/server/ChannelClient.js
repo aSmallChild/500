@@ -9,6 +9,10 @@ export default class ChannelClient {
         return this.name.toLowerCase();
     }
 
+    get connectionCount() {
+        return this.sockets ? this.sockets.size : 0;
+    }
+
     checkPassword(submittedPassword) {
         if (!this.password) {
             return true;
