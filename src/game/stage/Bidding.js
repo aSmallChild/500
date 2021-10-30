@@ -1,23 +1,18 @@
 import GameStage from '../GameStage.js';
-import OrdinaryNormalDeck from '../model/OrdinaryNormalDeck.js';
 import Deck from '../model/Deck.js';
 import DeckConfig from '../model/DeckConfig.js';
 import Bid from '../model/Bid.js';
-import { GameAction } from '../GameAction.js';
+import {GameAction} from '../GameAction.js';
 
 export default class Bidding extends GameStage {
-    start() {
+    start(dataFromPreviousStage) {
         // this.config = new DeckConfig(dataFromPreviousStage.config);
         // this.hands = dataFromPreviousStage.hands.map(hand => Deck.fromString(hand, this.config));
         // this.kitty = Deck.fromString(dataFromPreviousStage.kitty, this.config);
         this.firstBidder = typeof this.dataStore.firstBidder === 'undefined' ? 0 : this.dataStore.firstBidder;
         this.dataStore.firstBidder = (this.firstBidder + 1) % this.players.length;
-        const config = OrdinaryNormalDeck.config; // todo this needs to be set in the lobby
-        config.kittySize = 3;
-        config.cardsPerHand = 10;
-        config.totalHands = this.players.length;
         this.playersThatHaveLookedAtTheirCards = new Set();
-        this.config = new DeckConfig(config);
+        this.config = new DeckConfig(dataFromPreviousStage.deckConfig);
         this.possibleBids = Bid.getAvondaleBids(this.config);
         this.resetBids();
     }
@@ -29,6 +24,7 @@ export default class Bidding extends GameStage {
     }
 
     onPlayerConnect(player, socket) {
+        this.onObserver(socket);
         if (this.playersThatHaveLookedAtTheirCards.has(player)) {
             this.onTakeHand(player, socket);
         }
@@ -139,6 +135,7 @@ export default class Bidding extends GameStage {
             }
         }
         this.complete({
+            deckConfig: this.config,
             kitty: this.kitty,
             hands: this.hands,
             winningBid: this.highestBid,

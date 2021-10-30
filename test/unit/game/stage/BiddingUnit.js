@@ -4,12 +4,20 @@ import should from 'should';
 import Bidding from '../../../../src/game/stage/Bidding.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
 import {GameAction} from '../../../../src/game/GameAction.js';
+import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
 
+const getStartData = stage => {
+    const config = OrdinaryNormalDeck.config;
+    config.kittySize = 3;
+    config.cardsPerHand = 10;
+    config.totalHands = stage.players.length;
+    return {deckConfig: config};
+};
 describe('Bidding Stage Unit', function() {
     describe(`start()`, function() {
         const stage = getStage(getPlayers(23), Bidding);
-        it(`should deal cards to all players`, function() {
-            stage.start();
+        it(`should deal cards to all players`, () => {
+            stage.start(getStartData(stage));
             stage.handsDealt.kitty.size.should.equal(3);
             stage.handsDealt.hands.should.length(23);
             stage.players.should.length(23);
@@ -18,7 +26,7 @@ describe('Bidding Stage Unit', function() {
             }
         });
     });
-    describe(`onBid()`, function() {
+    describe(`onBid()`, () => {
         // "P","6S","6C","6D","6H","6","7S","7C","7D","7H","7","8S","M","8C","8D","8H","8","9S","9C","9D","9H","9","10S","10C","10D","O","10H","10","B"
         const scenarios = [
             {
@@ -93,29 +101,29 @@ describe('Bidding Stage Unit', function() {
             },
         ];
         for (const scenario of scenarios) {
-            it(scenario.name, function() {
+            it(scenario.name, () => {
                 const stage = getStage(getPlayers(scenario.players, true), Bidding);
                 stage.dataStore.firstBidder = scenario.firstBidder;
-                stage.start();
+                stage.start(getStartData(stage));
                 for (const [position, call] of scenario.bids) {
                     const player = stage.players[position];
                     const bid = stage.getBid(call);
                     stage.currentBidder.should.equal(position);
                     let bidAnnounced = false;
-                    const socket = {
-                        emit(event, action) {
-                            should(event).equal('stage:action');
-                            const {name, data} = action;
-                            name.should.not.equal('bid_error', `Received unexpected bid error: ${data}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
-                        }
-                    };
+                    // const socket = {
+                    //     emit(event, action) {
+                    //         should(event).equal('stage:action');
+                    //         const {actionName, actionData} = action;
+                    //         actionName.should.not.equal('bid_error', `Received unexpected bid error: ${actionData}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
+                    //     },
+                    // };
                     stage.channel.emit = (event, action) => {
                         should(event).equal('stage:action');
-                        const {name, data} = action;
-                        if (!bidAnnounced && name === GameAction.PLACE_BID) {
+                        const {actionName, actionData} = action;
+                        if (!bidAnnounced && actionName === GameAction.PLACE_BID) {
                             bidAnnounced = true;
-                            data.player.position.should.equal(player.position);
-                            data.bid.call.should.equal(bid.call);
+                            actionData.player.position.should.equal(player.position);
+                            actionData.bid.call.should.equal(bid.call);
                         }
                     };
                     stage.onStageAction(player, GameAction.PLACE_BID, call);
@@ -126,8 +134,8 @@ describe('Bidding Stage Unit', function() {
                 const expectedWinningBid = stage.getBid(winningCall);
                 winner.emit = (event, action) => {
                     should(event).equal('stage:action');
-                    const {name, data} = action;
-                    name.should.not.equal('kitty_error', `got kitty_error ${data}`);
+                    const {actionName, actionData} = action;
+                    actionName.should.not.equal('kitty_error', `got kitty_error ${actionData}`);
                 };
                 let stageCompleted = false;
                 stage.onStageComplete((dataForNextStage) => {

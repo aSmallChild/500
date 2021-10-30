@@ -1,13 +1,13 @@
 <template>
     <div class="container">
         <h1>{{ currentStage || 'Game' }} {{ name.toUpperCase() }}</h1>
-        <component :is="currentStage" :players="players" :current-player="currentPlayer"
-                   @stage-action="stageAction"
-                   @stage-action-handler="onStageActionHandler"
-                   @game-action="gameAction"
-                   @game-action-handler="onGameActionHandler"
-        />
     </div>
+    <component :is="currentStage" :players="players" :current-player="currentPlayer"
+         @stage-action="stageAction"
+         @stage-action-handler="onStageActionHandler"
+         @game-action="gameAction"
+         @game-action-handler="onGameActionHandler"
+    />
 </template>
 
 <script>
@@ -15,9 +15,11 @@ import {computed, onUnmounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import ClientChannel from '../../src/client/ClientChannel.js';
 import Lobby from '../components/GameStage/Lobby.vue';
+import Bidding from '../components/GameStage/Bidding.vue';
 
 const stages = {
     Lobby,
+    Bidding
 };
 
 export default {

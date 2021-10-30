@@ -86,8 +86,12 @@ export default class Lobby extends GameStage {
         this.players.sort((a, b) => a.position > b.position ? 1 : -1);
     }
 
+    getDataForNextStage() {
+        return {deckConfig: this.deckConfig};
+    }
+
     startGame() {
-        if (this.dataStore.gameInProgress) return this.complete();
+        if (this.dataStore.gameInProgress) return this.complete(this.getDataForNextStage());
 
         this.resetPlayerPositionsAndPartners();
         if (!(this.players.length % 2) && 4 <= this.players.length && this.players.length <= 10) {
@@ -95,7 +99,7 @@ export default class Lobby extends GameStage {
         }
         this.setPlayerPositions();
         this.dataStore.gameInProgress = true;
-        this.complete();
+        this.complete(this.getDataForNextStage());
     }
 
     matchPartners(outgoingRequests) {
