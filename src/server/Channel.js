@@ -66,6 +66,10 @@ export default class Channel {
             if (this.#onObserver) {
                 this.#onObserver(socketChannel);
             }
+            const client = this.clientChannels.get(socketChannel);
+            if (client && this.#onClient) {
+                this.#onClient(client, socketChannel);
+            }
         });
         socketChannel.once('channel:leave', () => this.observerDisconnect(socketChannel));
 
@@ -116,10 +120,6 @@ export default class Channel {
             response.success = true;
             response.clientId = client.id;
             client.add(socketChannel);
-            socket.once('disconnect', () => client.remove(socketChannel));
-            if (this.#onClient) {
-                this.#onClient(client, socketChannel);
-            }
             this.clientChannels.set(socketChannel, client);
         }
         socketChannel.emit('client:login', response);

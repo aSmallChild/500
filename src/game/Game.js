@@ -18,17 +18,19 @@ export default class Game {
             const player = this.getOrMaybeEvenCreatePlayerForClient(client);
             if (!player) return;
 
-            this.onPlayerConnect(player, socket);
-
+            socket.removeAllListeners('stage:action');
             socket.on('stage:action', ({actionName, actionData}) => {
-                console.log('STAGE ACTION', actionName, actionData) // todo debug this to see why it is sometimes called twice
+                console.log('STAGE ACTION', actionName, actionData);
                 this.onStageAction(player, socket, actionName, actionData);
             });
 
+            socket.removeAllListeners('game:action');
             socket.on('game:action', ({actionName, actionData}) => {
-                console.log('GAME ACTION', actionName, actionData)
+                console.log('GAME ACTION', actionName, actionData);
                 this.onGameAction(player, socket, actionName, actionData);
             });
+
+            this.onPlayerConnect(player, socket);
         });
     }
 

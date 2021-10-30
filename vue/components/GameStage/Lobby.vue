@@ -17,8 +17,8 @@
     <h2>Players {{ players.length }}</h2>
     <div v-for="player in players" :key="player.name">
         {{ player.name }}{{ player.isAdmin ? ' (admin)' : '' }}
-        <v-btn v-if="currentPlayer.isAdmin && !player.isAdmin" @click="game.giveAdmin(player)" size="small" color="primary">Admin</v-btn>
-        <v-btn v-if="currentPlayer.isAdmin && !player.isAdmin" @click="game.kickPlayer(player)" size="small" color="secondary">Kick</v-btn>
+        <v-btn v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.giveAdmin(player)" size="small" color="primary">Admin</v-btn>
+        <v-btn v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.kickPlayer(player)" size="small" color="secondary">Kick</v-btn>
     </div>
 </template>
 

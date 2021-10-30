@@ -18,6 +18,7 @@ export default class ChannelClient {
 
     add(socketChannel) {
         this.sockets.add(socketChannel);
+        socketChannel.once('disconnect', () => this.remove(socketChannel));
     }
 
     remove(socketChannel) {
