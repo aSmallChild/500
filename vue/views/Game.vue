@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import {computed, ref, watch} from 'vue';
+import {computed, onUnmounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import ClientChannel from '../../src/client/ClientChannel.js';
 import Lobby from '../components/GameStage/Lobby.vue';
@@ -47,7 +47,10 @@ export default {
         const redirectBack = target => router.push(target || '/join' + (channelName ? '/' + channelName : ''));
         const gameAction = data => channel.emit('game:action', data);
         const stageAction = data => channel.emit('stage:action', data);
-        const onStageActionHandler = handler => stageActionHandler = handler;
+        const onStageActionHandler = handler => {
+            stageActionHandler = handler;
+            channel.emit('stage:mounted');
+        };
         const onGameActionHandler = handler => gameActionHandler = handler;
 
         (async () => {
@@ -83,6 +86,9 @@ export default {
             }
         })();
 
+        onUnmounted(() => {
+            if (channel) channel.leave();
+        })
         return {name, players, clientId, currentPlayer, currentStage, stageAction, gameAction, onStageActionHandler, onGameActionHandler};
     },
 };

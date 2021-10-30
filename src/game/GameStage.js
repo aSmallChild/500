@@ -47,6 +47,8 @@ export default class GameStage {
 
     onObserver(observer) {}
 
+    onObserverDisconnect(observer, client) {}
+
     emitStageMessage(actionName, actionData, socket) {
         socket = socket || this.channel;
         socket.emit('stage:action', {actionName, actionData});

@@ -14,6 +14,7 @@ export default class Game {
     setChannel(channel) {
         this.channel = channel;
         channel.onObserver(observer => this.onObserver(observer));
+        channel.onObserverDisconnect((observer, client) => this.onObserverDisconnect(observer, client));
         channel.onClient((client, socket) => {
             const player = this.getOrMaybeEvenCreatePlayerForClient(client);
             if (!player) return;
@@ -75,15 +76,25 @@ export default class Game {
     }
 
     onPlayerConnect(player, socket) {
+        if (this.players.length === 1) {
+            player.isAdmin = true;
+        }
         this.emitPlayers();
         this.emitStage(socket);
-        this.currentStage.onPlayerConnect(player, socket);
+        socket.removeAllListeners('stage:mounted');
+        socket.on('stage:mounted', () => this.currentStage.onPlayerConnect(player, socket));
     }
 
     onObserver(observer) {
         this.emitPlayers(observer);
         this.emitStage(observer);
-        this.currentStage.onObserver(observer);
+        observer.removeAllListeners('stage:mounted');
+        observer.on('stage:mounted', () => this.currentStage.onObserver(observer));
+    }
+
+    onObserverDisconnect(observer, client) {
+        this.currentStage.onObserverDisconnect(observer, client);
+        this.emitPlayers();
     }
 
     nextStage(dataFromPreviousStage) {
@@ -107,6 +118,7 @@ export default class Game {
         this.currentStage.setPlayers(this.players);
         this.currentStage.setChannel(this.channel);
         this.currentStage.start(dataFromPreviousStage);
+        this.emitStage();
     }
 
     onGameAction(player, socket, actionName, actionData) {

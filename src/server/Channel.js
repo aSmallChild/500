@@ -63,15 +63,16 @@ export default class Channel {
 
         socketChannel.on('channel:join', () => {
             socketChannel.emit('channel:join', {success: true});
+            const client = this.clientChannels.get(socketChannel);
+            if (client && this.#onClient) {
+                return this.#onClient(client, socketChannel);
+            }
             if (this.#onObserver) {
                 this.#onObserver(socketChannel);
             }
-            const client = this.clientChannels.get(socketChannel);
-            if (client && this.#onClient) {
-                this.#onClient(client, socketChannel);
-            }
         });
         socketChannel.once('channel:leave', () => this.observerDisconnect(socketChannel));
+        socketChannel.once('close', () => this.observerDisconnect(socketChannel));
 
         socketChannel.emit('channel:login', {success: true});
     }

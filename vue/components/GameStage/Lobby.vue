@@ -1,5 +1,6 @@
 <template>
     <v-btn v-if="currentPlayer" color="primary" @click="action.playerReady(!isReady)">{{ isReady ? 'Unready' : 'Ready' }}</v-btn>
+    <v-btn v-if="currentPlayer?.isAdmin" color="secondary" @click="action.startGame()" :disabled="players.length < 2">Start</v-btn>
     <label>
         <span>Kitty Size</span>
         <input type="number" v-model="gameConfig.kittySize" :disabled="!currentPlayer?.isAdmin" @change="action.updateGameConfig">

@@ -15,10 +15,10 @@ export default class Lobby extends GameStage {
         }
         this.readyPlayers = new Set();
         this.deckConfig = new DeckConfig(OrdinaryNormalDeck.config);
-        this.onObserver();
     }
 
     onStageAction(player, actionName, actionData) {
+        if (actionName === 'mounted') return this.onObserver(player.client);
         if (actionName === 'partner') return this.requestPartner(player, actionData);
         if (actionName === 'ready') return this.playerReady(player, actionData);
 
@@ -27,20 +27,28 @@ export default class Lobby extends GameStage {
         if (actionName === 'config') return this.updateGameConfig(player, actionData);
     }
 
-    onPlayerConnect(player) {
-        if (this.players.length === 1) {
-            player.isAdmin = true;
-        }
+    onPlayerConnect(player, socket) {
         if (this.deckConfig.totalHands !== this.players.length) {
             this.deckConfig.totalHands = this.players.length;
             this.emitGameConfig();
         }
+        else {
+            this.emitGameConfig(socket);
+        }
+        this.emitPartners(socket);
+        this.emitReadyPlayers(socket);
     }
 
     onObserver(observer) {
         this.emitGameConfig(observer);
         this.emitPartners(observer);
         this.emitReadyPlayers(observer);
+    }
+
+    onObserverDisconnect(observer, client) {
+        if (client) {
+            this.onObserver();
+        }
     }
 
     requestPartner(player, clientId) {
