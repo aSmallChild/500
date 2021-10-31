@@ -60,7 +60,6 @@ export default {
         'bid',
     ],
     setup(props, {emit}) {
-        console.log('props', props);
         const bid = ref({});
         const specialBidList = ref([]);
 

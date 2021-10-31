@@ -8,8 +8,8 @@
             Name: <input v-model="channelName"/>
             <v-btn color="secondary" @click="channelLogin">Join</v-btn>
         </div>
-        <card-group fan v-for="hand in hands" :cards="hand" :key="hand"/>
-        <card-group pile :cards="table"></card-group>
+        <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card="onCardClicked"/>
+        <card-group pile :cards="table" @card-svg="onCardClicked"/>
     </div>
 </template>
 
@@ -37,11 +37,14 @@ export default {
         const cardMap = new Map();
         let channel = null;
 
+        const onCardClicked = card => channel.emit('card', card.toString());
+
         const createNewCard = (serializedCard) => {
+            const existingCard = cardMap.get(serializedCard);
+            if (existingCard) return existingCard;
             const card = Card.fromString(serializedCard, config);
             const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
             const cardSvg = new CardSVG(card, svg);
-            cardSvg.svg.addEventListener('click', () => channel.emit('card', serializedCard));
             Object.freeze(cardSvg);
             cardMap.set(card.toString(), cardSvg);
             return cardSvg;
@@ -49,7 +52,7 @@ export default {
 
         const setGroupCards = (thisGroup, otherGroup) => {
             otherGroup.forEach((serializedCard, index) => {
-                const cardSvg = cardMap.get(serializedCard) || createNewCard(serializedCard);
+                const cardSvg = createNewCard(serializedCard);
                 if (thisGroup[index] === cardSvg) {
                     return;
                 }
@@ -137,6 +140,7 @@ export default {
             channelName,
             newChannel,
             channelLogin,
+            onCardClicked,
         };
     },
 };

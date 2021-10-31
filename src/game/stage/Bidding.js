@@ -6,9 +6,6 @@ import {GameAction} from '../GameAction.js';
 
 export default class Bidding extends GameStage {
     start(dataFromPreviousStage) {
-        // this.config = new DeckConfig(dataFromPreviousStage.config);
-        // this.hands = dataFromPreviousStage.hands.map(hand => Deck.fromString(hand, this.config));
-        // this.kitty = Deck.fromString(dataFromPreviousStage.kitty, this.config);
         this.firstBidder = typeof this.dataStore.firstBidder === 'undefined' ? 0 : this.dataStore.firstBidder;
         this.dataStore.firstBidder = (this.firstBidder + 1) % this.players.length;
         this.playersThatHaveLookedAtTheirCards = new Set();
@@ -33,7 +30,7 @@ export default class Bidding extends GameStage {
     onObserver(observer) {
         this.emitStageMessage('deck_config', this.config, observer);
         this.emitStageMessage('possible_bids', this.possibleBids, observer); // todo needs to be scoring type
-        this.emitStageMessage('bids', this.bids, observer);
+        this.emitStageMessage('bids', this.playerBids, observer);
         this.emitStageMessage('current_bidder', this.currentBidder, observer);
         this.emitStageMessage('highest_bid', this.highestBid, observer);
     }
@@ -43,7 +40,7 @@ export default class Bidding extends GameStage {
         deck.shuffle();
         const kitty = deck.deal(config.kittySize);
         const hands = this.players.map(() => deck.deal(config.cardsPerHand));
-        return {hands, kitty};
+        return [hands, kitty];
     }
 
     resetBids() {
@@ -52,14 +49,14 @@ export default class Bidding extends GameStage {
         this.highestBidder = null;
         this.currentBidder = this.firstBidder;
         this.highestBidderRaisedOwnBid = null;
-        this.handsDealt = this.deal(this.config);
+        [this.hands, this.kitty] = this.deal(this.config);
         this.playersThatHaveLookedAtTheirCards.clear();
         this.onObserver(this.channel);
     }
 
-    getBid(call) {
+    getBid(serializedBid) {
         for (const possibleBid of this.possibleBids) {
-            if (possibleBid.call === call) {
+            if (possibleBid === serializedBid) {
                 return possibleBid;
             }
         }
@@ -117,7 +114,7 @@ export default class Bidding extends GameStage {
 
     onTakeHand(player, socket = null) {
         socket = socket || player;
-        this.emitStageMessage('hand', this.hands[player.position], socket);
+        this.emitStageMessage(GameAction.TAKE_HAND, this.hands[player.position], socket);
         this.playersThatHaveLookedAtTheirCards.add(player);
     }
 

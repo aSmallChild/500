@@ -21,14 +21,24 @@ export default class Game {
 
             socket.removeAllListeners('stage:action');
             socket.on('stage:action', ({actionName, actionData}) => {
-                console.log(`STAGE ${this.currentStage.constructor.name} ${channel.name.toUpperCase()}/${client.id}: `, actionName, actionData);
-                this.onStageAction(player, socket, actionName, actionData);
+                const msgStart = `STAGE ${this.currentStage.constructor.name} ${channel.name.toUpperCase()}/${client.id}: `;
+                try {
+                    console.log(msgStart, actionName, actionData);
+                    this.onStageAction(player, socket, actionName, actionData);
+                } catch (e) {
+                    console.error(msgStart, actionName, actionData, e);
+                }
             });
 
             socket.removeAllListeners('game:action');
             socket.on('game:action', ({actionName, actionData}) => {
-                console.log(`GAME ${this.currentStage.constructor.name} ${channel.name.toUpperCase()}/${client.id}: `, actionName, actionData);
-                this.onGameAction(player, socket, actionName, actionData);
+                const msgStart = `GAME ${this.currentStage.constructor.name} ${channel.name.toUpperCase()}/${client.id}: `;
+                try {
+                    console.log(msgStart, actionName, actionData);
+                    this.onGameAction(player, socket, actionName, actionData);
+                } catch (e) {
+                    console.error(msgStart, actionName, actionData, e);
+                }
             });
 
             this.onPlayerConnect(player, socket);
@@ -79,17 +89,21 @@ export default class Game {
         if (this.players.length === 1) {
             player.isAdmin = true;
         }
-        this.emitPlayers();
         this.emitStage(socket);
         socket.removeAllListeners('stage:mounted');
-        socket.on('stage:mounted', () => this.currentStage.onPlayerConnect(player, socket));
+        socket.on('stage:mounted', () => {
+            this.emitPlayers();
+            this.currentStage.onPlayerConnect(player, socket);
+        });
     }
 
     onObserver(observer) {
-        this.emitPlayers(observer);
         this.emitStage(observer);
         observer.removeAllListeners('stage:mounted');
-        observer.on('stage:mounted', () => this.currentStage.onObserver(observer));
+        observer.on('stage:mounted', () => {
+            this.emitPlayers(observer);
+            this.currentStage.onObserver(observer);
+        });
     }
 
     onObserverDisconnect(observer, client) {

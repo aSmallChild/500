@@ -33,11 +33,6 @@ export default class Bid {
         return this.call + ':' + this.points;
     }
 
-    static compareBids(a, b) {
-        if (a.points === b.points) return 0;
-        return a.points > b.points ? 1 : -1;
-    }
-
     static fromString(str, config) {
         if (str.indexOf(':') < 0) str += ':0';
         let [call, points] = str.split(':');
@@ -49,6 +44,11 @@ export default class Bid {
         trumps = trumps ? config.suits.getSuit(trumps) : null;
         antiTrumps = antiTrumps ? config.suits.getSuit(antiTrumps) : null;
         return new Bid(tricks, trumps || null, antiTrumps || null, null, points, config);
+    }
+
+    static compareBids(a, b) {
+        if (a.points === b.points) return 0;
+        return a.points > b.points ? 1 : -1;
     }
 
     static buildSpecialBids(config) {

@@ -1,5 +1,5 @@
 <template>
-    <div ref="root" :a="cardSVGs" :class="{fan, 'animate-cards': animate}"></div>
+    <div ref="root" :a="cardSVGs" :class="{fan, 'animate-cards': animate}" @click.prevent="onClick"/>
 </template>
 
 <script>
@@ -10,28 +10,26 @@ export default {
         cards: Array,
         fan: {
             type: Boolean,
-            default: false
+            default: false,
         },
         pile: {
             type: Boolean,
-            default: false
+            default: false,
         },
         animate: {
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
     },
-    setup(props) {
+    emits: [
+        'card',
+        'card-svg',
+    ],
+    setup(props, {emit}) {
         //todo write some random transforms for piles
         const root = ref(null);
-        const hasSVG = svg => {
-            for (const cardSvg of props.cards) {
-                if (cardSvg.svg === svg) {
-                    return true;
-                }
-            }
-            return false;
-        };
+        const findCardBySvg = svg => props.cards.find(card => card.svg === svg);
+        const findCardByElement = ele => findCardBySvg(ele) || props.cards.find(card => card.svg.contains(ele));
         const getCardsAlreadyPlaced = () => {
             if (!root.value.children) {
                 return [];
@@ -39,7 +37,7 @@ export default {
             const cardsAlreadyHere = [];
             try {
                 for (const svg of root.value.children) {
-                    if (hasSVG(svg)) {
+                    if (findCardBySvg(svg)) {
                         cardsAlreadyHere.push(svg);
                     }
                 }
@@ -69,9 +67,19 @@ export default {
                 }, 7);
             });
         };
+        const onClick = event => {
+            console.log(event) //todo debug this
+            if (event.target === root.value) return;
+            const cardSvg = findCardByElement(event.target);
+            if (cardSvg) {
+                emit('card', cardSvg.card);
+                emit('card-svg', cardSvg);
+            }
+        };
         return {
             root,
             cardSVGs: computed(placeCards),
+            onClick,
         };
     },
 };
