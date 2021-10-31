@@ -33,6 +33,7 @@ export default class CardSVG {
     }
 
     animateTo(setPosition) {
+        // todo debug this, suspect that animations sometimes don't happen because the translate X/Y are NaN
         const originalPosition = this.svg.getBoundingClientRect();
         if (this.svg.parentElement) {
             this.svg.parentElement.removeChild(this.svg);

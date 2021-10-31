@@ -93,6 +93,10 @@ export default class Deck {
     }
 
     static fromString(str, config) {
+        return new Deck(this.cardsFromString(str, config), config);
+    }
+
+    static cardsFromString(str, config) {
         const cards = [];
         let suit = null, previousValue = null;
         for (let x of str.match(/(\d+|.)/g)) {
@@ -113,7 +117,7 @@ export default class Deck {
                 previousValue = x;
             }
         }
-        return new Deck(cards, config);
+        return cards;
     }
 
     compareCards(a, b) {
