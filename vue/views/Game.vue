@@ -1,13 +1,15 @@
 <template>
-    <div class="container">
-        <h1>{{ currentStage || 'Game' }} {{ name.toUpperCase() }}</h1>
+    <h1 @click="copyGameLink">
+        {{ showLinkCopiedMessage ? 'Copied' : currentStage || 'Game' }} {{ name.toUpperCase() }}
+    </h1>
+    <div>
+        <component :is="currentStage" :players="players" :current-player="currentPlayer"
+                   @stage-action="stageAction"
+                   @stage-action-handler="onStageActionHandler"
+                   @game-action="gameAction"
+                   @game-action-handler="onGameActionHandler"
+        />
     </div>
-    <component :is="currentStage" :players="players" :current-player="currentPlayer"
-         @stage-action="stageAction"
-         @stage-action-handler="onStageActionHandler"
-         @game-action="gameAction"
-         @game-action-handler="onGameActionHandler"
-    />
 </template>
 
 <script>
@@ -19,7 +21,7 @@ import Bidding from '../components/GameStage/Bidding.vue';
 
 const stages = {
     Lobby,
-    Bidding
+    Bidding,
 };
 
 export default {
@@ -33,6 +35,7 @@ export default {
         const name = ref(route.params.id);
         const players = ref([]);
         const clientId = ref(null);
+        const showLinkCopiedMessage = ref(false);
         const currentPlayer = computed(() => players.value.find(player => player.clientId === clientId.value));
         let channel = null, stageActionHandler, gameActionHandler;
         watch(() => currentStage, (current, previous) => {
@@ -54,6 +57,11 @@ export default {
             channel.emit('stage:mounted');
         };
         const onGameActionHandler = handler => gameActionHandler = handler;
+        const copyGameLink = () => {
+            navigator.clipboard.writeText(window.location);
+            showLinkCopiedMessage.value = true;
+            setTimeout(() => showLinkCopiedMessage.value = false, 1337);
+        };
 
         (async () => {
             try {
@@ -90,8 +98,8 @@ export default {
 
         onUnmounted(() => {
             if (channel) channel.leave();
-        })
-        return {name, players, clientId, currentPlayer, currentStage, stageAction, gameAction, onStageActionHandler, onGameActionHandler};
+        });
+        return {name, players, clientId, currentPlayer, currentStage, stageAction, gameAction, onStageActionHandler, onGameActionHandler, copyGameLink, showLinkCopiedMessage};
     },
 };
 </script>
@@ -99,11 +107,8 @@ export default {
 <style lang="scss" scoped>
 h1 {
     text-transform: capitalize;
-}
-
-.container {
-    margin: 10px auto;
-    min-width: 200px;
-    max-width: 300px;
+    margin: 10px;
+    cursor: pointer;
+    text-align: center;
 }
 </style>
