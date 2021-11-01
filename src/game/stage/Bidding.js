@@ -29,10 +29,9 @@ export default class Bidding extends GameStage {
 
     onObserver(observer) {
         this.emitStageMessage('deck_config', this.config, observer);
-        this.emitStageMessage('possible_bids', this.possibleBids, observer); // todo needs to be scoring type
         this.emitStageMessage('bids', this.playerBids, observer);
         this.emitStageMessage('current_bidder', this.currentBidder, observer);
-        this.emitStageMessage('highest_bid', this.highestBid, observer);
+        this.emitHighestBid(observer);
     }
 
     deal(config) {
@@ -56,18 +55,18 @@ export default class Bidding extends GameStage {
 
     getBid(serializedBid) {
         for (const possibleBid of this.possibleBids) {
-            if (possibleBid === serializedBid) {
+            if (possibleBid.toString() === serializedBid) {
                 return possibleBid;
             }
         }
         return null;
     }
 
-    onBid(player, call) {
+    onBid(player, serializedBid) {
         if (this.currentBidder !== player.position) return this.emitStageMessage('bid_error', 'It is not your turn to bid.', player);
 
-        const bid = this.getBid(call);
-        if (!bid) return this.emitStageMessage('bid_error', 'Invalid bid.', player);
+        const bid = this.getBid(serializedBid);
+        if (!bid) return this.emitStageMessage('bid_error', 'Invalid bid.', player); // todo need a new way of validating a bid
 
         if (bid.special === 'P') {
             if (player === this.highestBidder) return this.emitStageMessage('bid_error', 'Cannot pass when you are the highest bidder.', player);
@@ -87,7 +86,12 @@ export default class Bidding extends GameStage {
         this.highestBidderRaisedOwnBid = this.highestBidder === player;
         this.highestBid = bid;
         this.highestBidder = player;
+        this.emitHighestBid();
         this.recordBid(player, bid);
+    }
+
+    emitHighestBid(observer) {
+        this.emitStageMessage('highest_bid', {player: this.highestBidder, bid: this.highestBid}, observer);
     }
 
     recordBid(player, bid) {

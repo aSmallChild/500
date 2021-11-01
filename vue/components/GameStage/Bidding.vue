@@ -1,15 +1,19 @@
 <template>
+    <card-svg-defs :def="svgDefs"/>
     <div>
-        <bid-selector v-if="scoring" :scoring="scoring" :has-leading-bid="hasLeadingBid" :has-seen-hand="!!hand" @bid="action.placeBid"/>
-        <card-group v-if="hand" :cards="hand" fan/>
-        <v-btn v-else @click="action.takeHand()" color="primary">Take Hand</v-btn>
+        <bid-selector v-if="scoring" :scoring="scoring" :has-leading-bid="hasLeadingBid" :has-seen-hand="!!hand" @bid="action.placeBid" :error="biddingError"/>
+        <div style="text-align: center">
+            <card-group v-if="hand" :cards="hand" fan/>
+            <v-btn v-else @click="action.takeHand()" color="primary">Take Hand</v-btn>
+        </div>
         <h2>Players {{ players.length }}</h2>
         <div v-for="player in players" :key="player.name" :style="{'font-weight': player.position === currentBidder ? 'strong' : ''}">
             {{ player.position }}.&nbsp;{{ player.name }}
             {{ player.connections ? '' : ' DISCONNECTED' }}
             {{ JSON.stringify(playerBids[player.position]) }}
-            {{ player.position === currentBidder ? 'CURRENT' : '' }}
+            {{ player.position === currentBidder ? ' CURRENT' : '' }}
         </div>
+        <p v-if="highestBid">Highest bid: {{ highestBid }}</p>
     </div>
 </template>
 
@@ -22,15 +26,18 @@ import BidSelector from '../BidSelector.vue';
 import ScoringAvondale from '../../../src/game/model/ScoringAvondale.js';
 import CardGroup from '../CardGroup.vue';
 import Deck from '../../../src/game/model/Deck.js';
+import CardSvgDefs from '../CardSvgDefs.vue';
+import OrdinaryNormalDeck from '../../../src/game/model/OrdinaryNormalDeck.js';
+import Bid from '../../../src/game/model/Bid.js';
 
 export default {
     ...common,
     components: {
         CardGroup,
         BidSelector,
+        CardSvgDefs,
     },
     setup(props, {emit}) {
-        // todo add svg defs to the page
         const getPlayerById = id => props.players.find(player => player.id === id);
         const getPlayerByPosition = position => props.players.find(player => player.position === position);
         let deckConfig;
@@ -39,6 +46,8 @@ export default {
         const hand = ref(null);
         const playerBids = ref([]);
         const currentBidder = ref(0);
+        const biddingError = ref('');
+        const highestBid = ref('');
 
         const stageAction = stageActions(emit);
         const action = {
@@ -67,18 +76,23 @@ export default {
                     deckConfig = new DeckConfig(actionData);
                     scoring.value = new ScoringAvondale(deckConfig);
                     return;
-                case 'possible_bids':
-                    return console.log('TODO', actionName);
                 case 'bids':
-                    return playerBids.value = actionData;
+                    return playerBids.value = actionData.map(bids => bids.map(bid => Bid.fromString(bid, deckConfig).getName()));
                 case 'current_bidder':
+                    biddingError.value = '';
                     return currentBidder.value = actionData;
-                case 'highest_bid':
-                    return console.log('TODO', actionName);
+                case 'highest_bid':{
+                    const {player, bid} = actionData;
+                    highestBid.value = player.name + ' with ' + Bid.fromString(bid, deckConfig).getName();
+                    return;
+                }
                 case 'bid_error':
-                    return console.log('TODO', actionName);
-                case GameAction.PLACE_BID:
-                    return console.log('TODO', actionName);
+                    return biddingError.value = actionData;
+                case GameAction.PLACE_BID: {
+                    const {player, bid} = actionData;
+                    playerBids.value[player.position].push(bid);
+                    return;
+                }
                 case GameAction.TAKE_HAND:
                     return onHand(actionData);
                 case 'kitty_error':
@@ -95,6 +109,9 @@ export default {
             scoring,
             hand,
             hasLeadingBid,
+            svgDefs: OrdinaryNormalDeck.svgDefs,
+            biddingError,
+            highestBid
         };
     },
 };

@@ -27,6 +27,7 @@
             <v-col cols="12" style="text-align: center">
                 <v-btn color="primary" @click="placeBid">Place Bid</v-btn>
                 <v-btn color="secondary" @click="setSpecialBid(scoring.config.getSpecialBid('P')); placeBid()">Pass</v-btn>
+                <div>{{ error }}</div>
             </v-col>
         </v-row>
     </v-container>
@@ -55,6 +56,9 @@ export default {
         highestBid: {
             type: Bid,
         },
+        error: {
+            type: String
+        }
     },
     emits: [
         'bid',
