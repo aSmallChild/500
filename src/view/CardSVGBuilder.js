@@ -2,10 +2,12 @@ export default class CardSVGBuilder {
     static getSVG(card, layout) {
         const svg = this.getElement('svg');
         svg.setAttributeNS(null, 'viewBox', `0 0 ${layout.width} ${layout.height}`);
-        this.addClass(svg, card);
         this.addPips(svg, card, layout);
         this.addSymbols(svg, card, layout);
-        return svg;
+        const div = document.createElement('div');
+        div.appendChild(svg);
+        this.addClass(div, card);
+        return div;
     }
 
     static addClass(svg, card) {

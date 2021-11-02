@@ -8,8 +8,8 @@
             Name: <input v-model="channelName"/>
             <v-btn color="secondary" @click="channelLogin">Join</v-btn>
         </div>
-        <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card="onCardClicked"/>
-        <card-group pile :cards="table" @card-svg="onCardClicked"/>
+        <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card="onCardClicked" draggable-cards @card-id-drop="cardDropped($event, hand)"/>
+        <card-group pile :cards="table" @card="onCardClicked" draggable-cards @card-id-drop="cardDropped($event, table)"/>
     </div>
 </template>
 
@@ -59,7 +59,7 @@ export default {
                 thisGroup[index] = cardSvg;
             });
             if (thisGroup.length > otherGroup.length) {
-                thisGroup.splice(otherGroup.length - 1);
+                thisGroup.splice(otherGroup.length);
             }
         };
         const setCards = groups => {
@@ -72,6 +72,10 @@ export default {
                 setGroupCards(hands.value[index], hand);
             });
         };
+
+        const cardDropped = (cardId, group)  => {
+            group.push(createNewCard(cardId)); // todo run this through the server
+        }
 
         const leaveChannel = () => {
             if (!channel) {
@@ -141,6 +145,7 @@ export default {
             newChannel,
             channelLogin,
             onCardClicked,
+            cardDropped
         };
     },
 };

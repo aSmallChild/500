@@ -10,4 +10,10 @@
         </v-main>
     </v-app>
 </template>
-<style lang="scss">@use "css/base";</style>
+<style lang="scss">
+@use "css/base";
+
+html {
+    overflow-y: auto; // something in vuetify is setting this to scroll which forces the scrollbar to show
+}
+</style>
