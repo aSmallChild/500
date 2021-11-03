@@ -22,6 +22,10 @@ export default class Card {
         return this.config.getCardName(this.value) + (this.suit ? ` of ${this.suit.name}s` : '')
     }
 
+    toJSON() {
+        return this.toString();
+    }
+
     toString() {
         return (this.suit?.symbol || '') + this.value;
     }

@@ -8,8 +8,8 @@
             Name: <input v-model="channelName"/>
             <v-btn color="secondary" @click="channelLogin">Join</v-btn>
         </div>
-        <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card="onCardClicked" draggable-cards @card-id-drop="cardDropped($event, hand)"/>
-        <card-group pile :cards="table" @card="onCardClicked" draggable-cards @card-id-drop="cardDropped($event, table)"/>
+        <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card="onCardClicked" draggable-cards @card-drop="cardDropped($event, hand)"/>
+        <card-group pile :cards="table" @card="onCardClicked" draggable-cards @card-drop="cardDropped($event, table)"/>
     </div>
 </template>
 
@@ -37,7 +37,10 @@ export default {
         const cardMap = new Map();
         let channel = null;
 
-        const onCardClicked = card => channel.emit('card', card.toString());
+        const onCardClicked = card => channel.emit('card', card);
+        const cardDropped = ({cardId, onCard}, group) => {
+            channel.emit('target', {cardId, onCardId: onCard?.card, target: hands.value.indexOf(group)});
+        }
 
         const createNewCard = (serializedCard) => {
             const existingCard = cardMap.get(serializedCard);
@@ -72,10 +75,6 @@ export default {
                 setGroupCards(hands.value[index], hand);
             });
         };
-
-        const cardDropped = (cardId, group)  => {
-            group.push(createNewCard(cardId)); // todo run this through the server
-        }
 
         const leaveChannel = () => {
             if (!channel) {
@@ -145,7 +144,7 @@ export default {
             newChannel,
             channelLogin,
             onCardClicked,
-            cardDropped
+            cardDropped,
         };
     },
 };

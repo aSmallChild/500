@@ -28,6 +28,13 @@ export default class DoodleServer {
                 this.placeCardSomewhereElse(card, group);
                 this.updateChannelCardPositions();
             });
+            observer.on('target', ({cardId: serializedCard, onCardId: nextToCard, target: targetIndex}) => {
+                const [card,] = this.takeCardFromGroup(serializedCard);
+                const target = -1 < targetIndex && targetIndex < this.hands.length ? this.hands[targetIndex] : this.table;
+                const insertAtIndex = target.findIndex(card => card.toString() === nextToCard);
+                target.splice(insertAtIndex + 1, 0, card);
+                this.updateChannelCardPositions();
+            });
         });
     }
 
@@ -42,10 +49,10 @@ export default class DoodleServer {
             if (index >= 0) {
                 const card = group[index];
                 group.splice(index, 1);
-                return [card, group];
+                return [card, group, index];
             }
         }
-        return [null, null];
+        return [null, null, null];
     }
 
     placeCardSomewhereElse(card, oldGroup) {
