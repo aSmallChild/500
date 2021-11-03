@@ -78,6 +78,7 @@ export default {
             const cardId = event.dataTransfer.getData('cardId');
             if (!cardId) return;
             const onCard = findCardByElement(event.target);
+            if (onCard.card.toString() === cardId) return;
             emit('card-drop', {cardId, onCard});
         };
         const onClick = event => {
