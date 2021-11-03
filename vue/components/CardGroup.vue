@@ -72,6 +72,7 @@ export default {
             event.dataTransfer.dropEffect = 'move';
             event.dataTransfer.effectAllowed = 'move';
             event.dataTransfer.setData('cardId', cardSvg.card);
+            event.dataTransfer.setData('text/plain', cardSvg.card.getName());
         };
         const onDrop = event => {
             const cardId = event.dataTransfer.getData('cardId');
