@@ -1,7 +1,7 @@
 <template>
     <div ref="root" :a="cardSVGs" :class="{fan, 'animate-cards': animate}"
          @click="onClick"
-         @drop="onDrop"
+         @drop.prevent="onDrop"
          @dragstart="onDragStart"
          @dragover.prevent
          @dragenter.prevent
@@ -78,7 +78,7 @@ export default {
             const cardId = event.dataTransfer.getData('cardId');
             if (!cardId) return;
             const onCard = findCardByElement(event.target);
-            if (onCard.card.toString() === cardId) return;
+            if (onCard && onCard.card.toString() === cardId) return;
             emit('card-drop', {cardId, onCard});
         };
         const onClick = event => {

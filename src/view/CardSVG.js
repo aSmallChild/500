@@ -2,13 +2,12 @@ export default class CardSVG {
     constructor(card, svg) {
         this.card = card;
         this.svg = svg;
-        this.svg.cardSvg = this;
     }
 
     static moveTo(x, y) {
-        x = typeof x === 'number' ? x + 'px' : x;
-        y = typeof y === 'number' ? y + 'px' : y;
-        return `translateX(${x}) translateY(${y})`;
+        // x = typeof x === 'number' ? `${x}px` : x;
+        // y = typeof y === 'number' ? `${y}px` : y;
+        return `translateX(${x}px) translateY(${y}px)`;
     }
 
     static rotate(angle) {
@@ -32,18 +31,29 @@ export default class CardSVG {
         this.svg.style.transform = transforms.join(' ');
     }
 
+    getCurrentRotationAndTranslation(transform) {
+        if (!transform || transform === 'none') return [0, 0, 0];
+        const [scaleX, skewY, , , tx, ty] = transform.replace('matrix(', '').replace(')', '').split(', ');
+        return [Math.round(Math.atan2(skewY, scaleX) * (180 / Math.PI)), parseFloat(tx) || 0, parseFloat(ty) || 0];
+    }
+
     animateTo(setPosition) {
         // todo debug this, suspect that animations sometimes don't happen because the translate X/Y are NaN
+        const [originalRotation, tx, ty] = this.getCurrentRotationAndTranslation(window.getComputedStyle(this.svg).transform);
+        this.svg.style.visibility = 'hidden';
+        this.svg.style.transform = 'none'; // needs to happen before getting the position cause transforms will displace its bounding rect
         const originalPosition = this.svg.getBoundingClientRect();
+
         if (this.svg.parentElement) {
+            // not having a parent element is what causes the cards to fly in from the top left because their originalPosition will be 0,0
             this.svg.parentElement.removeChild(this.svg);
         }
-        this.svg.style.visibility = 'hidden';
+
         setPosition();
         const newPosition = this.svg.getBoundingClientRect();
         this.instantTransform([
-            this.constructor.moveTo(originalPosition.right - newPosition.right, originalPosition.top - newPosition.top),
-            this.constructor.rotate(-360 * 2),
+            this.constructor.moveTo(tx + originalPosition.right - newPosition.right, ty + originalPosition.top - newPosition.top),
+            originalRotation ? this.constructor.rotate(originalRotation) : '',
         ]);
         this.svg.style.visibility = '';
         return this.animateTransform([]);
