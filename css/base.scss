@@ -23,10 +23,10 @@
   --v-theme-primary-overlay-multiplier: 1;
   --v-theme-primary-darken-1: 1, 135, 134;
   --v-theme-primary-darken-1-overlay-multiplier: 1;
-  --v-theme-secondary:  98, 0, 238;
-  --v-theme-secondary-overlay-multiplier:  2;
-  --v-theme-secondary-darken-1:  55, 0, 179;
-  --v-theme-secondary-darken-1-overlay-multiplier:  2;
+  --v-theme-secondary: 98, 0, 238;
+  --v-theme-secondary-overlay-multiplier: 2;
+  --v-theme-secondary-darken-1: 55, 0, 179;
+  --v-theme-secondary-darken-1-overlay-multiplier: 2;
   --v-theme-error: 176, 0, 32;
   --v-theme-error-overlay-multiplier: 2;
   --v-theme-info: 33, 150, 243;
@@ -59,45 +59,75 @@
   color: var(--text-color)
 }
 
-$cardHeight: 35 * 5px;
-$cardWidth: 25 * 5px;
-
-.card {
-  //border: solid 1px var(--suit-black);
-  border-radius: 4px;
-  background: var(--card-background);
-  height: $cardHeight;
-  width: $cardWidth;
-  margin: 0.3%;
-  padding: 0.1%;
-  box-shadow: #000b 3px 3px 6px;
-  fill: var(--suit-black);
-  stroke: var(--suit-black);
-  display: inline-block;
-}
-
-.black {
+.black .card-face {
   fill: var(--suit-black);
   stroke: var(--suit-black);
 }
 
-.red {
+.red .card-face {
   fill: var(--suit-red);
   stroke: var(--suit-red);
 }
 
-.blue {
+.blue .card-face {
   fill: var(--suit-blue);
   stroke: var(--suit-blue);
 }
 
-.green {
+.green .card-face {
   fill: var(--suit-green);
   stroke: var(--suit-green);
 }
 
-.animate-cards .card {
-  transition: ease-out transform 222ms;
+$cardHeight: 35 * 5px;
+$cardWidth: 25 * 5px;
+
+.card {
+  margin: 4px;
+  display: inline-block;
+  position: relative;
+  filter: drop-shadow(6px 3px 6px #000b);
+  height: $cardHeight;
+  width: $cardWidth;
+
+  transform-style: preserve-3d;
+  perspective: 500px;
+  &.face-down .card-face {
+    backface-visibility: hidden;
+    transform: rotateY(180deg);
+  }
+
+  &.face-down .card-back {
+    transform: rotateY(360deg);
+  }
+}
+
+.card-face, .card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.card-face {
+  background: var(--card-background);
+  fill: var(--suit-black);
+  stroke: var(--suit-black);
+}
+
+.card-back {
+  backface-visibility: hidden;
+  border: solid 4px var(--card-background);
+  background: rgba(var(--v-theme-secondary));
+  transform: rotateY(180deg);
+}
+
+.animate-cards {
+  & .card, & .card-face, & .card-back {
+    transition: ease-out transform 222ms;
+  }
 }
 
 @mixin fan($count, $angle) {

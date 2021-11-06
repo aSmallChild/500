@@ -4,6 +4,10 @@ export default class CardSVG {
         this.svg = svg;
     }
 
+    flip(faceUp) {
+        this.svg.classList.toggle('face-down', faceUp);
+    }
+
     static moveTo(x, y) {
         // x = typeof x === 'number' ? `${x}px` : x;
         // y = typeof y === 'number' ? `${y}px` : y;
