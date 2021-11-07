@@ -1,10 +1,10 @@
-import Bid from '../../../../src/game/model/Bid.js';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
 // noinspection ES6UnusedImports
+/* eslint-disable no-unused-vars,no-undef */import Bid from '../../../../src/game/model/Bid.js';
 import should from 'should';
+import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
 import DeckConfig from '../../../../src/game/model/DeckConfig.js';
 
-const config = new DeckConfig(OrdinaryNormalDeck.config)
+const config = new DeckConfig(OrdinaryNormalDeck.config);
 const testBids = [
     ['M:250', new Bid(null, null, null, 'M', 250, config)],
     ['6S:40', new Bid(6, config.suits.getSuit('S'), null, null, 40, config)],
@@ -12,26 +12,26 @@ const testBids = [
     ['6:100', new Bid(6, null, null, null, 100, config)],
     ['6!S:40', new Bid(6, null, config.suits.getSuit('S'), null, 40, config)],
 ];
-describe('Bid Unit', function() {
-    describe('toString()', function() {
+describe('Bid Unit', () => {
+    describe('toString()', () => {
         for (const [str, bid] of testBids) {
-            it(`serialize '${bid.getName()}' to ${str}`, function() {
+            it(`serialize '${bid.getName()}' to ${str}`, () => {
                 (bid + '').should.equal(str);
             });
         }
     });
-    describe('fromString()', function() {
+    describe('fromString()', () => {
         for (const [str, bid] of testBids) {
-            it(`deserialize ${str} to '${bid.getName()}'`, function() {
+            it(`deserialize ${str} to '${bid.getName()}'`, () => {
                 const newBid = Bid.fromString(str, config);
-                bidsDeepEqual(bid, newBid);
+                bidsDeepEqual(newBid, bid);
             });
         }
     });
-    describe('avondaleBids()', function() {
+    describe('avondaleBids()', () => {
         const bids = Bid.getAvondaleBids(config);
         let points = 0;
-        it(`should have unique bids`, function() {
+        it(`should have unique bids`, () => {
             const uniqueBids = new Set();
             for (const bid of bids) {
                 bid.points.should.be.type('number');
@@ -43,7 +43,7 @@ describe('Bid Unit', function() {
                 uniqueBids.add(str);
             }
         });
-        it(`should have 29 bids`, function() {
+        it(`should have 29 bids`, () => {
             bids.length.should.equal(29);
         });
     });

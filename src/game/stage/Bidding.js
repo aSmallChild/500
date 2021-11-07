@@ -3,6 +3,7 @@ import Deck from '../model/Deck.js';
 import DeckConfig from '../model/DeckConfig.js';
 import Bid from '../model/Bid.js';
 import {GameAction} from '../GameAction.js';
+import ScoringAvondale from '../model/ScoringAvondale.js';
 
 export default class Bidding extends GameStage {
     start(dataFromPreviousStage) {
@@ -10,7 +11,8 @@ export default class Bidding extends GameStage {
         this.dataStore.firstBidder = (this.firstBidder + 1) % this.players.length;
         this.playersThatHaveLookedAtTheirCards = new Set();
         this.config = new DeckConfig(dataFromPreviousStage.deckConfig);
-        this.possibleBids = Bid.getAvondaleBids(this.config);
+        this.scoring = new ScoringAvondale(this.config);
+        this.specialBids = this.scoring.getSpecialBids();
         this.resetBids();
     }
 
@@ -54,19 +56,50 @@ export default class Bidding extends GameStage {
     }
 
     getBid(serializedBid) {
-        for (const possibleBid of this.possibleBids) {
-            if (possibleBid.toString() === serializedBid) {
-                return possibleBid;
+        return Bid.fromString(serializedBid, this.config);
+    }
+
+    validateBid(player, bid) {
+        if (bid.special && !this.scoring.isValidSpecialBid(bid)) {
+            this.emitStageMessage('bid_error', 'Invalid special bid.', player);
+            return false;
+        }
+
+        if (bid.trumps) {
+            if (!this.scoring.canHaveTrumps(bid)) {
+                this.emitStageMessage('bid_error', 'Trumps not allowed with this bid.', player);
+                return false;
             }
         }
-        return null;
+
+        if (bid.antiTrumps && !this.scoring.canHaveAntiTrumps(bid, bid.antiTrumps)) {
+            this.emitStageMessage('bid_error', 'Anti-trump suit cannot be the same as trumps.', player);
+            return false;
+        }
+
+        if (bid.tricks && !this.scoring.isValidTricks(bid.tricks)) {
+            this.emitStageMessage('bid_error', `Bid must be between ${this.scoring.minTricks} and ${this.scoring.maxTricks} tricks.`, player);
+            return false;
+        }
+
+        return true;
+    }
+
+    getPointsForBid(bid) {
+        if (bid.special) {
+            return this.scoring.getSpecialBid(bid.special).points;
+        }
+
+        return this.scoring.calculateStandardBidPoints(bid.tricks, bid.trumps, bid.antiTrumps);
     }
 
     onBid(player, serializedBid) {
         if (this.currentBidder !== player.position) return this.emitStageMessage('bid_error', 'It is not your turn to bid.', player);
 
         const bid = this.getBid(serializedBid);
-        if (!bid) return this.emitStageMessage('bid_error', 'Invalid bid.', player); // todo need a new way of validating a bid
+        if (!this.validateBid(player, bid)) return;
+
+        bid.points = this.getPointsForBid(bid);
 
         if (bid.special === 'P') {
             if (player === this.highestBidder) return this.emitStageMessage('bid_error', 'Cannot pass when you are the highest bidder.', player);

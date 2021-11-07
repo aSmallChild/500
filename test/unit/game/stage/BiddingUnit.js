@@ -13,15 +13,15 @@ const getStartData = stage => {
     config.totalHands = stage.players.length;
     return {deckConfig: config};
 };
-describe('Bidding Stage Unit', function() {
-    describe(`start()`, function() {
+describe('Bidding Stage Unit', () => {
+    describe(`start()`, () => {
         const stage = getStage(getPlayers(23), Bidding);
         it(`should deal cards to all players`, () => {
             stage.start(getStartData(stage));
-            stage.handsDealt.kitty.size.should.equal(3);
-            stage.handsDealt.hands.should.length(23);
+            stage.kitty.size.should.equal(3);
+            stage.hands.should.length(23);
             stage.players.should.length(23);
-            for (const hand of stage.handsDealt.hands) {
+            for (const hand of stage.hands) {
                 hand.size.should.equal(10);
             }
         });
@@ -110,13 +110,13 @@ describe('Bidding Stage Unit', function() {
                     const bid = stage.getBid(call);
                     stage.currentBidder.should.equal(position);
                     let bidAnnounced = false;
-                    // const socket = {
-                    //     emit(event, action) {
-                    //         should(event).equal('stage:action');
-                    //         const {actionName, actionData} = action;
-                    //         actionName.should.not.equal('bid_error', `Received unexpected bid error: ${actionData}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
-                    //     },
-                    // };
+                    player.client = {
+                        emit(event, action) {
+                            should(event).equal('stage:action');
+                            const {actionName, actionData} = action;
+                            actionName.should.not.equal('bid_error', `Received unexpected bid error: ${actionData}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
+                        },
+                    };
                     stage.channel.emit = (event, action) => {
                         should(event).equal('stage:action');
                         const {actionName, actionData} = action;

@@ -5,10 +5,11 @@ export default class ScoringAvondale {
         this.config = config;
         this.pointsIncrement = 20;
         this.startingBidPoints = 40;
+        this.specialBids = Bid.buildSpecialBids(this.config);
     }
 
     getSpecialBids() {
-        return Bid.buildSpecialBids(this.config.specialBids, this.config);
+        return this.specialBids;
     }
 
     get minTricks() {
@@ -24,40 +25,25 @@ export default class ScoringAvondale {
     }
 
     canHaveTrumps(bid) {
-        return !!bid.special;
+        return !bid.special;
     }
 
     canHaveAntiTrumps(bid, suit = null) {
-        if (bid.special) {
-            return false;
-        }
-
-        if (suit) {
-            return bid.trumps !== suit;
-        }
-
-        return true;
+        if (bid.special) return false;
+        return bid.trumps != suit;
     }
 
-    isValid(bid) {
-        if (bid.trumps && !this.canHaveTrumps(bid)) {
-            return false;
-        }
+    isValidSpecialBid(bid) {
+        if (!bid.special) return false;
+        return this.getSpecialBid(bid.special) !== null;
+    }
 
-        if (bid.antiTrumps && !this.canHaveTrumps(bid, bid.antiTrumps)) {
-            return false;
-        }
+    getSpecialBid(symbol) {
+        return this.specialBids.find(b => b.special == symbol);
+    }
 
-        if (bid.tricks && (bid.tricks < this.minTricks || this.maxTricks < bid.tricks)) {
-            return false;
-        }
-
-        if (bid.special && (bid.trumps || bid.antiTrumps)) {
-            return false;
-        }
-
-        // todo need serverside validation for bids, that matches how the bid selector renders things
-        return true;
+    isValidTricks(tricks) {
+        return this.minTricks <= tricks && tricks <= this.maxTricks;
     }
 
     calculateStandardBidPoints(tricks, trumps, antiTrumps) {

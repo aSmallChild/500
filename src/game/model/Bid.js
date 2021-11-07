@@ -41,8 +41,14 @@ export default class Bid {
         const regex = /^(?<tricks>\d+)(?<trumps>[^!])?!?(?<antiTrumps>[^!])?$/g;
         let {tricks, trumps, antiTrumps} = regex.exec(call).groups;
         tricks = parseInt(tricks);
-        trumps = trumps ? config.suits.getSuit(trumps) : null;
-        antiTrumps = antiTrumps ? config.suits.getSuit(antiTrumps) : null;
+        if (trumps) {
+            trumps = trumps ? config.suits.getSuit(trumps) : null;
+            if (!trumps) throw new Error('Trump suit is invalid.');
+        }
+        if (antiTrumps) {
+            antiTrumps = antiTrumps ? config.suits.getSuit(antiTrumps) : null;
+            if (!antiTrumps) throw new Error('Anti-trump suit is invalid.');
+        }
         return new Bid(tricks, trumps || null, antiTrumps || null, null, points, config);
     }
 
