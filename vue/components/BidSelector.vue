@@ -25,8 +25,8 @@
                 <v-btn color="primary" v-for="bid in specialBidList" :key="bid" @click="setSpecialBid(bid)">{{ bid.name }}</v-btn>
             </v-col>
             <v-col cols="12" style="text-align: center">
-                <v-btn color="primary" @click="placeBid">Place Bid</v-btn>
-                <v-btn color="secondary" @click="setSpecialBid(scoring.config.getSpecialBid('P')); placeBid()">Pass</v-btn>
+                <v-btn color="primary" @click="placeBid" v-if="isCurrentBidder">Place Bid</v-btn>
+                <v-btn color="secondary" @click="setSpecialBid(scoring.config.getSpecialBid('P')); placeBid()" v-if="isCurrentBidder && !hasLeadingBid">Pass</v-btn>
                 <div>{{ error }}</div>
             </v-col>
         </v-row>
@@ -46,7 +46,11 @@ export default {
             required: true,
             type: Boolean,
         },
-        hasLeadingBid: { // todo don't allow passing if they have the leading bid
+        hasLeadingBid: {
+            required: true,
+            type: Boolean,
+        },
+        isCurrentBidder: {
             required: true,
             type: Boolean,
         },

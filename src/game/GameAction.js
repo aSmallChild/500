@@ -4,6 +4,7 @@ export const GameAction = {
     // Bidding Stage
     PLACE_BID: 'GameAction.PLACE_BID',
     TAKE_HAND: 'GameAction.TAKE_HAND',
+    PLAYERS_TAKEN_HANDS: 'GameAction.PLAYERS_TAKEN_HANDS',
     TAKE_KITTY: 'GameAction.TAKE_KITTY',
 
     // Round Stage

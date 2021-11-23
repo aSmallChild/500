@@ -24,8 +24,8 @@ export default class Bidding extends GameStage {
 
     onPlayerConnect(player, socket) {
         this.onObserver(socket);
-        if (this.playersThatHaveLookedAtTheirCards.has(player)) {
-            this.onTakeHand(player, socket);
+        if (this.hasPlayerSeenHand(player)) {
+            this.emitPlayerHand(player, socket);
         }
     }
 
@@ -33,6 +33,7 @@ export default class Bidding extends GameStage {
         this.emitStageMessage('deck_config', this.config, observer);
         this.emitStageMessage('bids', this.playerBids, observer);
         this.emitStageMessage('current_bidder', this.currentBidder, observer);
+        this.emitPlayersThatHaveSeenTheirHands(observer);
         this.emitHighestBid(observer);
     }
 
@@ -106,7 +107,7 @@ export default class Bidding extends GameStage {
             return this.recordBid(player, bid);
         }
 
-        if (bid.special === 'B' && this.playersThatHaveLookedAtTheirCards.has(player)) {
+        if (bid.special === 'B' && this.hasPlayerSeenHand(player)) {
             return this.emitStageMessage('bid_error', `You can only call ${bid.getName()} before looking at your hand.`, player);
         }
 
@@ -124,7 +125,7 @@ export default class Bidding extends GameStage {
     }
 
     emitHighestBid(observer) {
-        this.emitStageMessage('highest_bid', {player: this.highestBidder, bid: this.highestBid}, observer);
+        this.emitStageMessage('highest_bid', {position: this.highestBidder?.position, bid: this.highestBid}, observer);
     }
 
     recordBid(player, bid) {
@@ -150,9 +151,22 @@ export default class Bidding extends GameStage {
     }
 
     onTakeHand(player, socket = null) {
+        this.playersThatHaveLookedAtTheirCards.add(player.position);
+        this.emitPlayerHand(player, socket);
+        this.emitPlayersThatHaveSeenTheirHands();
+    }
+
+    emitPlayerHand(player, socket = null) {
         socket = socket || player;
         this.emitStageMessage(GameAction.TAKE_HAND, this.hands[player.position], socket);
-        this.playersThatHaveLookedAtTheirCards.add(player);
+    }
+
+    hasPlayerSeenHand(player) {
+        return this.playersThatHaveLookedAtTheirCards.has(player.position);
+    }
+
+    emitPlayersThatHaveSeenTheirHands(socket = null) {
+        this.emitStageMessage(GameAction.PLAYERS_TAKEN_HANDS, Array.from(this.playersThatHaveLookedAtTheirCards), socket);
     }
 
     onTakeKitty(player) {

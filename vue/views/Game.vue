@@ -2,6 +2,7 @@
     <h1 @click="copyGameLink">
         {{ showLinkCopiedMessage ? 'Copied' : currentStage || 'Game' }} {{ name.toUpperCase() }}
     </h1>
+    <h2 v-if="currentPlayer">{{ currentPlayer.name }}</h2>
     <div>
         <component :is="currentStage" :players="players" :current-player="currentPlayer"
                    @stage-action="stageAction"
@@ -105,7 +106,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-h1 {
+h1, h2 {
     text-transform: capitalize;
     margin: 10px;
     cursor: pointer;

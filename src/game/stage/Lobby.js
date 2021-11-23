@@ -18,7 +18,6 @@ export default class Lobby extends GameStage {
     }
 
     onStageAction(player, actionName, actionData) {
-        if (actionName === 'mounted') return this.onObserver(player.client);
         if (actionName === 'partner') return this.requestPartner(player, actionData);
         if (actionName === 'ready') return this.playerReady(player, actionData);
 
