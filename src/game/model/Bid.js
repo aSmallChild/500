@@ -1,3 +1,6 @@
+
+const serializedBidRegex = /^(\d+)([^!])?!?([^!])?$/;
+
 export default class Bid {
     constructor(tricks, trumps, antiTrumps, special, points, config) {
         this.tricks = tricks;
@@ -38,8 +41,10 @@ export default class Bid {
         let [call, points] = str.split(':');
         points = parseInt(points);
         if (config.getSpecialBid(call)) return new Bid(null, null, null, call, points, config);
-        const regex = /^(?<tricks>\d+)(?<trumps>[^!])?!?(?<antiTrumps>[^!])?$/g;
-        let {tricks, trumps, antiTrumps} = regex.exec(call).groups;
+        let tricks, trumps, antiTrumps;
+        const match = call.match(serializedBidRegex);
+        if (!match || match.length < 4) throw new Error('Invalid serialized bid: ' + str);
+        [, tricks, trumps, antiTrumps] = match;
         tricks = parseInt(tricks);
         if (trumps) {
             trumps = trumps ? config.suits.getSuit(trumps) : null;

@@ -44,12 +44,6 @@ export default class Lobby extends GameStage {
         this.emitReadyPlayers(observer);
     }
 
-    onObserverDisconnect(observer, client) {
-        if (client) {
-            this.onObserver();
-        }
-    }
-
     requestPartner(player, clientId) {
         const store = this.dataStore.preferredPartners;
         if (store[player.id] && store[player.id] !== clientId) {

@@ -1,22 +1,28 @@
 <template>
     <card-svg-defs :def="svgDefs"/>
     <div>
-        <bid-selector v-if="scoring" :scoring="scoring" :is-current-bidder="isCurrentBidder" :has-leading-bid="hasLeadingBid" :has-seen-hand="!!hand" @bid="action.placeBid" :error="biddingError"/>
+        <bid-selector v-if="scoring" :scoring="scoring"
+                      :leading-bid="leadingBid"
+                      :is-current-bidder="isCurrentBidder"
+                      :has-leading-bid="hasLeadingBid"
+                      :has-seen-hand="!!hand"
+                      @bid="action.placeBid"
+                      :error="biddingError"/>
         <div style="text-align: center">
+            <h2 v-if="leadingBid">{{ getPlayerSymbols(leadingBidder) }} {{ leadingBidder.name }}: {{ leadingBid.getName() }} ({{ leadingBid.points }})</h2>
             <card-group v-if="hand" :cards="hand" fan/>
             <v-btn v-else @click="action.takeHand()" color="primary">Take Hand</v-btn>
+            <v-btn v-if="canTakeKitty" @click="action.takeKitty()" color="primary">Take Kitty</v-btn>
         </div>
         <h2>Players ({{ players.length }})</h2>
-        <div v-for="player in players" :key="player.name" :style="{'font-weight': player.position === currentBidderPosition ? 'strong' : ''}">
-            {{ player.position }}.&nbsp;{{ player.name }}
-            {{ player.connections ? '' : ' DISCONNECTED' }}
-            {{ JSON.stringify(playerBids[player.position]) }}
-            {{ player.position === currentBidderPosition ? ' CURRENT' : '' }}
-            {{ player.position === highestBidderPosition ? ' WINNING' : '' }}
-            {{ hasSeenHand(player) ? ' HAS_SEEN_THEIR_CARDS' : '' }}
+        <div class="bid-player-list">
+            <div v-for="player in players" :key="player.name" style="display: inline-block">
+                <span :class="{'current-bidder': player.position === currentBidderPosition}">
+                    {{ player.position }}.&nbsp;{{ player.name }} {{ getPlayerSymbols(player) }}
+                </span>
+                <div v-for="bid in playerBids[player.position]" :key="bid">- {{ bid.getName() }} ({{ bid.points }})</div>
+            </div>
         </div>
-        <p v-if="highestBid">Highest bid: {{ highestBid }}</p>
-        <v-btn v-if="canTakeKitty" @click="action.takeKitty()" color="primary">Take Kitty</v-btn>
     </div>
 </template>
 
@@ -50,8 +56,9 @@ export default {
         const playerBids = ref([]);
         const playersThatHaveSeenTheirCards = ref(new Set());
         const currentBidderPosition = ref(0);
-        const highestBidderPosition = ref(0);
-        const highestBid = ref(null);
+        const leadingBidderPosition = ref(0);
+        const leadingBidder = computed(() => props.players.find(player => player.position === leadingBidderPosition.value));
+        const leadingBid = ref(null);
         const biddingError = ref('');
 
         const stageAction = stageActions(emit);
@@ -75,8 +82,13 @@ export default {
             }
         };
         const isCurrentBidder = () => props.currentPlayer && currentBidderPosition.value === props.currentPlayer.position;
-        const hasLeadingBid = () => props.currentPlayer && highestBidderPosition.value === props.currentPlayer.position;
+        const hasLeadingBid = () => props.currentPlayer && leadingBidderPosition.value === props.currentPlayer.position;
         const canTakeKitty = () => hasLeadingBid() && isCurrentBidder();
+        const getPlayerSymbols = player => {
+            return (player.connections ? '' : '⛔') +
+                (player.position === leadingBidderPosition.value ? '🥇' : '') +
+                (hasSeenHand(player) ? '' : '😎');
+        };
 
         emit(STAGE_ACTION_EVENT_HANDER, ({actionName, actionData}) => {
             switch (actionName) {
@@ -85,21 +97,21 @@ export default {
                     scoring.value = new ScoringAvondale(deckConfig);
                     return;
                 case 'bids':
-                    return playerBids.value = actionData.map(bids => bids.map(bid => Bid.fromString(bid, deckConfig).getName()));
+                    return playerBids.value = actionData.map(bids => bids.map(bid => Object.freeze(Bid.fromString(bid, deckConfig))));
                 case 'current_bidder':
                     biddingError.value = '';
                     return currentBidderPosition.value = actionData;
                 case 'highest_bid': {
                     const {position, bid} = actionData;
-                    highestBidderPosition.value = position ?? -1;
-                    highestBid.value = Object.freeze(Bid.fromString(bid, deckConfig));
+                    leadingBidderPosition.value = position ?? -1;
+                    leadingBid.value = Object.freeze(Bid.fromString(bid, deckConfig));
                     return;
                 }
                 case 'bid_error':
                     return biddingError.value = actionData;
                 case GameAction.PLACE_BID: {
                     const {player, bid} = actionData;
-                    playerBids.value[player.position].push(bid);
+                    playerBids.value[player.position].push(Object.freeze(Bid.fromString(bid, deckConfig)));
                     return;
                 }
                 case GameAction.TAKE_HAND:
@@ -115,9 +127,12 @@ export default {
             action,
             getPlayerById,
             getPlayerByPosition,
+            getPlayerSymbols,
             playerBids,
             currentBidderPosition,
-            highestBidderPosition,
+            leadingBidderPosition,
+            leadingBidder,
+            leadingBid,
             hasSeenHand,
             scoring,
             hand,
@@ -126,12 +141,28 @@ export default {
             canTakeKitty: computed(canTakeKitty),
             svgDefs: OrdinaryNormalDeck.svgDefs,
             biddingError,
-            highestBid,
         };
     },
 };
 </script>
 
-<style scoped>
+<style lang="scss">
+.current-bidder {
+    font-weight: bold;
+    color: lime;
+    text-transform: uppercase;
+}
 
+.bid-player-list {
+    display: flex;
+    flex-direction: row;
+
+    div {
+        flex: 1;
+
+        div {
+            margin-left: 1em;
+        }
+    }
+}
 </style>

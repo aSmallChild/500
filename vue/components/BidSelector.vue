@@ -1,28 +1,49 @@
 <template>
     <v-container grid-list-md fluid>
-        <v-row>
-            <v-col cols="12">
-                <h2 style="display: inline">{{ bid ? bid.getName() + (bid.points ? ` (${bid.points} points)` : '') : 'Select Bid' }}</h2>
-            </v-col>
-        </v-row>
         <v-row v-if="bid">
             <v-col cols="12" md="2"><b>Tricks</b></v-col>
             <v-col cols="12" md="10">
-                <v-btn color="primary" v-for="i in (scoring.maxTricks - scoring.minTricks) + 1" :key="i" @click="setTricks(i - 1 + scoring.minTricks)">{{ i - 1 + scoring.minTricks }}</v-btn>
+                <v-btn v-for="i in (scoring.maxTricks - scoring.minTricks) + 1" :key="i"
+                       @click="setTricks(i - 1 + scoring.minTricks)"
+                       :color="bid.tricks == i - 1 + scoring.minTricks ? 'secondary': 'primary'"
+                       :disabled="!tricksEnabled(i - 1 + scoring.minTricks, leadingBid)"
+                >{{ i - 1 + scoring.minTricks }}
+                </v-btn>
             </v-col>
             <v-col cols="12" md="2"><b>Trumps</b></v-col>
             <v-col cols="12" md="10">
-                <v-btn color="primary" v-for="suit in scoring.config.suits.lowToHigh" :key="suit" @click="setTrumps(suit)">{{ suit.name }}s</v-btn>
-                <v-btn color="primary" @click="setTrumps(null)">No Trumps</v-btn>
+                <v-btn v-for="suit in scoring.config.suits.lowToHigh" :key="suit"
+                       @click="setTrumps(suit)"
+                       :color="bid.trumps == suit ? 'secondary': 'primary'"
+                       :disabled="!suitEnabled(suit, leadingBid)"
+                >{{ suit.name }}s
+                </v-btn>
+                <v-btn @click="setTrumps(null)"
+                       :color="bid.trumps == null ? 'secondary': 'primary'"
+                       :disabled="!suitEnabled(null, leadingBid)"
+                >No Trumps</v-btn>
             </v-col>
             <v-col cols="12" md="2"><b>AntiTrumps</b></v-col>
             <v-col cols="12" md="10">
-                <v-btn color="primary" v-for="suit in scoring.config.suits.lowToHigh" :key="suit" :disabled="canHaveAntiTrump(bid, suit)" @click="setAntiTrumps(suit)">{{ suit.name }}s</v-btn>
-                <v-btn color="primary" @click="setAntiTrumps(null)" :disabled="!!bid.special">None</v-btn>
+                <v-btn v-for="suit in scoring.config.suits.lowToHigh" :key="suit"
+                       @click="setAntiTrumps(suit)"
+                       :color="bid.antiTrumps == suit ? 'secondary': 'primary'"
+                       :disabled="canHaveAntiTrump(bid, suit)"
+                >{{ suit.name }}s
+                </v-btn>
+                <v-btn @click="setAntiTrumps(null)"
+                       :color="bid.antiTrumps == null ? 'secondary': 'primary'"
+                       :disabled="!!bid.special">None</v-btn>
             </v-col>
             <v-col cols="12" md="2"><b>Special</b></v-col>
             <v-col cols="12" md="10">
-                <v-btn color="primary" v-for="bid in specialBidList" :key="bid" @click="setSpecialBid(bid)">{{ bid.name }}</v-btn>
+                <v-btn v-for="specialBid in allowedSpecialBids" :key="specialBid"
+                       @click="setSpecialBid(specialBid)"
+                       :color="bid.special == specialBid.symbol ? 'secondary': 'primary'"
+                >{{ specialBid.name }}</v-btn>
+            </v-col>
+            <v-col cols="12" style="text-align: center">
+                <h2>{{ bid ? bid.getName() + (bid.points ? ` (${bid.points})` : '') : 'Select Bid' }}</h2>
             </v-col>
             <v-col cols="12" style="text-align: center">
                 <v-btn color="primary" @click="placeBid" v-if="isCurrentBidder">Place Bid</v-btn>
@@ -35,14 +56,11 @@
 
 <script>
 import Bid from '../../src/game/model/Bid.js';
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 
-// todo disable trick numbers if n * no trumps is < highest bid
-// todo disable special bids if bid.points < highest bid
-// todo disable suits if maxTricks * suit < highest bid
 export default {
     props: {
-        hasSeenHand: { // todo don't allow blind misere if they have seen their hand
+        hasSeenHand: {
             required: true,
             type: Boolean,
         },
@@ -57,28 +75,40 @@ export default {
         scoring: {
             required: true,
         },
-        highestBid: {
+        leadingBid: {
             type: Bid,
         },
         error: {
-            type: String
-        }
+            type: String,
+        },
     },
     emits: [
         'bid',
     ],
     setup(props, {emit}) {
         const bid = ref({});
-        const specialBidList = ref([]);
+        const specialBids = [];
+        for (const bid of props.scoring.config.specialBids) {
+            if (bid.symbol !== 'P') {
+                specialBids.push(bid);
+            }
+        }
 
+        const allowedSpecialBids = computed(() => specialBids.filter(
+            bid => {
+                if (!bid.points) return false;
+
+                if (props.leadingBid && bid.points <= props.leadingBid.points) return false;
+
+                return !(props.hasSeenHand && bid.special == 'B');
+            },
+        ));
+
+        const suitEnabled = (suit, leadingBid) => !leadingBid || leadingBid.points < props.scoring.calculateStandardBidPoints(props.scoring.maxTricks, suit, null);
+        const tricksEnabled = (tricks, leadingBid) => !leadingBid || leadingBid.points < props.scoring.calculateStandardBidPoints(tricks, null, null);
         const updateStandardBidPoints = () => {
             bid.value.points = props.scoring.calculateStandardBidPoints(bid.value.tricks, bid.value.trumps, bid.value.antiTrumps);
         };
-        for (const bid of props.scoring.config.specialBids) {
-            if (bid.symbol !== 'P') {
-                specialBidList.value.push(bid);
-            }
-        }
         bid.value = new Bid(props.scoring.minTricks, props.scoring.config.suits.lowToHigh[0], null, null, 0, props.scoring.config);
         updateStandardBidPoints();
 
@@ -119,15 +149,6 @@ export default {
         const canHaveAntiTrump = (bid, antiTrumpSuit) => {
             return !!bid.special || bid.trumps && bid.trumps.symbol === antiTrumpSuit.symbol;
         };
-        // const antiTrumpAllowed = (suit) => {
-        //     if (bid.value.special || !suit) {
-        //         return false;
-        //     }
-        //     if (bid.value.trumps) {
-        //         return bid.value.trumps.symbol !== suit.symbol;
-        //     }
-        //     return true;
-        // };
         return {
             setTricks,
             setSpecialBid,
@@ -135,8 +156,10 @@ export default {
             setAntiTrumps,
             placeBid,
             canHaveAntiTrump,
+            suitEnabled,
+            tricksEnabled,
             bid,
-            specialBidList,
+            allowedSpecialBids,
         };
     },
 };
