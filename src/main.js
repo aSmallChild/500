@@ -12,7 +12,7 @@ const routes = [
     {path: '/new', name: 'game_new', component: JoinGame, props: {newGame: true}},
     {path: '/join/:id?', name: 'game_join', component: JoinGame},
     {path: '/game/:id', name: 'game', component: Game},
-    {path: '/sandbox', name: 'sandbox', component: Doodle},
+    {path: '/sandbox/:id?', name: 'sandbox', component: Doodle},
     {path: '/:pathNotFound(.*)*', name: 'not_found', component: MainMenu},
 ];
 

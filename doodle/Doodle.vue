@@ -22,15 +22,18 @@ import Client from '../src/client/Client.js';
 import Card from '../src/game/model/Card.js';
 import CardSVGBuilder from '../src/view/CardSVGBuilder.js';
 import CardSVG from '../src/view/CardSVG.js';
+import {useRoute} from 'vue-router';
 
 export default {
     components: {
         CardGroup,
     },
     setup() {
+        const route = useRoute();
         let config = null;
         const svgDefs = ref();
-        const channelName = ref('');
+        const urlChannelName = ref(route.params.id);
+        const channelName = ref(urlChannelName.value);
         const table = ref([]);
         const hands = ref([]);
         const client = Client.client;
@@ -131,6 +134,9 @@ export default {
 
         onMounted(async () => {
             svgDefs.value.innerHTML += OrdinaryNormalDeck.svgDefs;
+            if (channelName.value) {
+                channelLogin();
+            }
         });
         onUnmounted(() => {
             leaveChannel();
