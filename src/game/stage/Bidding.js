@@ -178,8 +178,7 @@ export default class Bidding extends GameStage {
             if (otherPlayer === player) continue;
             const bids = this.playerBids[otherPlayer.position];
             if (!bids.length || bids[bids.length - 1].special !== 'P') {
-                this.emitStageMessage('kitty_error', 'Not all other players have passed.', player);
-                return;
+                return this.emitStageMessage('kitty_error', 'Not all other players have passed.', player);
             }
         }
         this.complete({
@@ -187,7 +186,7 @@ export default class Bidding extends GameStage {
             kitty: this.kitty,
             hands: this.hands,
             winningBid: this.highestBid,
-            winningBidder: this.highestBidder.position,
+            winningBidderPosition: this.highestBidder.position,
         });
     }
 }
