@@ -2,7 +2,7 @@ import {createServer as httpsServer} from 'https';
 import {createServer as httpServer} from 'http';
 import {WebSocketServer} from 'ws';
 import SocketManager from './SocketManager.js';
-import serverConfig from '../../config.cjs';
+import serverConfig from './config.js';
 import fs from 'fs';
 
 const port = serverConfig.serverPort;

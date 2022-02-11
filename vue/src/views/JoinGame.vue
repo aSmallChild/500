@@ -26,7 +26,7 @@
 <script>
 import {ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import ClientChannel from '../../src/client/ClientChannel.js';
+import ClientChannel from '../../../lib/client/ClientChannel.js';
 
 export default {
     props: {

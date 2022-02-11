@@ -1,6 +1,6 @@
 /* eslint-disable */
-import SocketManager from '../../../src/server/SocketManager.js';
-import Client from '../../../src/client/Client.js';
+import SocketManager from '../../../lib/server/SocketManager.js';
+import Client from '../../../lib/client/Client.js';
 import SocketBridge from '../../util/SocketBridge.js';
 import {strict as assert} from 'assert';
 

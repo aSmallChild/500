@@ -1,8 +1,8 @@
 // noinspection ES6UnusedImports
-/* eslint-disable no-unused-vars,no-undef */import Bid from '../../../../src/game/model/Bid.js';
+/* eslint-disable no-unused-vars,no-undef */import Bid from '../../../../lib/game/model/Bid.js';
 import should from 'should';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
-import DeckConfig from '../../../../src/game/model/DeckConfig.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 
 const config = new DeckConfig(OrdinaryNormalDeck.config);
 const testBids = [

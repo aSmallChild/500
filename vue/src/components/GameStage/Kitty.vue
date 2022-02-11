@@ -24,16 +24,17 @@
 </template>
 
 <script>
+/* eslint-disable */
 import {computed, ref} from 'vue';
 import {common, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
-import {GameAction} from '../../../src/game/GameAction.js';
-import DeckConfig from '../../../src/game/model/DeckConfig.js';
-import ScoringAvondale from '../../../src/game/model/ScoringAvondale.js';
+import {GameAction} from '../../../../lib/game/GameAction.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
+import ScoringAvondale from '../../../../lib/game/model/ScoringAvondale.js';
 import CardGroup from '../CardGroup.vue';
-import Deck from '../../../src/game/model/Deck.js';
+import Deck from '../../../../lib/game/model/Deck.js';
 import CardSvgDefs from '../CardSvgDefs.vue';
-import OrdinaryNormalDeck from '../../../src/game/model/OrdinaryNormalDeck.js';
-import Bid from '../../../src/game/model/Bid.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import Bid from '../../../../lib/game/model/Bid.js';
 
 export default {
     ...common,
@@ -53,15 +54,15 @@ export default {
 
         const stageAction = stageActions(emit);
         const action = {
-            // placeBid(bid) {
-            //     stageAction(GameAction.PLACE_BID, bid);
-            // },
-            // takeHand() {
-            //     stageAction(GameAction.TAKE_HAND);
-            // },
-            // takeKitty() {
-            //     stageAction(GameAction.TAKE_KITTY);
-            // },
+            placeBid(bid) {
+                stageAction(GameAction.PLACE_BID, bid);
+            },
+            takeHand() {
+                stageAction(GameAction.TAKE_HAND);
+            },
+            takeKitty() {
+                stageAction(GameAction.TAKE_KITTY);
+            },
         };
         const game = gameActions(emit);
         const onHand = serializedDeck => {

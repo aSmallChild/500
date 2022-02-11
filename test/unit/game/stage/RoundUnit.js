@@ -1,11 +1,11 @@
 // noinspection ES6UnusedImports
 import should from 'should';
-import { GameAction } from '../../../../src/game/GameAction.js';
-import Bid from '../../../../src/game/model/Bid.js';
-import Deck from '../../../../src/game/model/Deck.js';
-import DeckConfig from '../../../../src/game/model/DeckConfig.js';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
-import Round from '../../../../src/game/stage/Round.js';
+import { GameAction } from '../../../../lib/game/GameAction.js';
+import Bid from '../../../../lib/game/model/Bid.js';
+import Deck from '../../../../lib/game/model/Deck.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import Round from '../../../../lib/game/stage/Round.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
 
 describe('Round Stage Unit', function() {

@@ -1,10 +1,9 @@
 /* eslint-disable */
-import Bid from '../../../../src/game/model/Bid.js';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 // noinspection ES6UnusedImports
 // import should from 'should';
-import DeckConfig from '../../../../src/game/model/DeckConfig.js';
-import ScoringAvondale from '../../../../src/game/model/ScoringAvondale.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
+import ScoringAvondale from '../../../../lib/game/model/ScoringAvondale.js';
 import {expect} from 'chai';
 
 const config = new DeckConfig(OrdinaryNormalDeck.config);

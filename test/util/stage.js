@@ -1,6 +1,6 @@
-import Player from '../../src/game/model/Player.js';
-import Channel from '../../src/server/Channel.js';
-import ChannelClient from '../../src/server/ChannelClient.js';
+import Player from '../../lib/game/model/Player.js';
+import Channel from '../../lib/server/Channel.js';
+import ChannelClient from '../../lib/server/ChannelClient.js';
 
 export function getPlayers(count, positions = false) {
     const players = [];

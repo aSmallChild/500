@@ -1,7 +1,7 @@
-import Card from '../../../src/game/model/Card.js';
-import CardSVG from '../../../src/view/CardSVG.js';
-import CardSVGBuilder from '../../../src/view/CardSVGBuilder.js';
-import OrdinaryNormalDeck from '../../../src/game/model/OrdinaryNormalDeck.js';
+import Card from '../../../../lib/game/model/Card.js';
+import CardSVG from '../../../../lib/view/CardSVG.js';
+import CardSVGBuilder from '../../../../lib/view/CardSVGBuilder.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 
 const GAME_ACTION_EVENT_NAME = 'game-action';
 const STAGE_ACTION_EVENT_NAME = 'stage-action';

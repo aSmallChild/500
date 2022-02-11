@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 // noinspection ES6UnusedImports
 import should from 'should';
-import Lobby from '../../../../src/game/stage/Lobby.js';
+import Lobby from '../../../../lib/game/stage/Lobby.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
 
 describe('Lobby Stage Unit', function() {

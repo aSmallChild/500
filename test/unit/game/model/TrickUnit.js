@@ -1,10 +1,10 @@
 // noinspection ES6UnusedImports
 import should from 'should';
 
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
-import DeckConfig from '../../../../src/game/model/DeckConfig.js';
-import Trick from '../../../../src/game/model/Trick.js';
-import Card from '../../../../src/game/model/Card.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
+import Trick from '../../../../lib/game/model/Trick.js';
+import Card from '../../../../lib/game/model/Card.js';
 
 const config = new DeckConfig(OrdinaryNormalDeck.config)
 const suits = config.suits;

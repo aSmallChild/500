@@ -1,10 +1,10 @@
 // noinspection ES6UnusedImports
 /* eslint-disable no-unused-vars,no-undef */
 import should from 'should';
-import Bidding from '../../../../src/game/stage/Bidding.js';
+import Bidding from '../../../../lib/game/stage/Bidding.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
-import {GameAction} from '../../../../src/game/GameAction.js';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
+import {GameAction} from '../../../../lib/game/GameAction.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 
 const getStartData = stage => {
     const config = OrdinaryNormalDeck.config;

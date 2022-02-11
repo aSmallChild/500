@@ -2,10 +2,10 @@ import {createApp} from 'vue';
 import vuetify from './plugins/vuetify';
 import App from './App.vue';
 import {createRouter, createWebHistory} from 'vue-router';
-import MainMenu from '../vue/views/MainMenu.vue';
-import Doodle from '../doodle/Doodle.vue';
-import JoinGame from '../vue/views/JoinGame.vue';
-import Game from '../vue/views/Game.vue';
+import MainMenu from './views/MainMenu.vue';
+import Doodle from '../../doodle/Doodle.vue';
+import JoinGame from './views/JoinGame.vue';
+import Game from './views/Game.vue';
 
 const routes = [
     {path: '/', name: 'home', component: MainMenu},

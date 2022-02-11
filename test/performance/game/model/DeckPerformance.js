@@ -1,7 +1,7 @@
-import Deck from '../../../../src/game/model/Deck.js';
-import Timer from '../../../../src/util/Timer.js';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
-import DeckConfig from '../../../../src/game/model/DeckConfig.js';
+import Deck from '../../../../lib/game/model/Deck.js';
+import Timer from '../../../../lib/util/Timer.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 // noinspection ES6UnusedImports
 import should from 'should';
 

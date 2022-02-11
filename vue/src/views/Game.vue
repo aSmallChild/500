@@ -16,7 +16,7 @@
 <script>
 import {computed, onUnmounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import ClientChannel from '../../src/client/ClientChannel.js';
+import ClientChannel from '../../../lib/client/ClientChannel.js';
 import Lobby from '../components/GameStage/Lobby.vue';
 import Bidding from '../components/GameStage/Bidding.vue';
 import Kitty from '../components/GameStage/Kitty.vue';

@@ -1,10 +1,10 @@
 import DoodleServer from '../../doodle/DoodleServer.js';
 import WebsocketWrapper from 'ws-wrapper';
-import Channel from './Channel.js';
-import Lobby from '../game/stage/Lobby.js';
-import Bidding from '../game/stage/Bidding.js';
-import Kitty from '../game/stage/Kitty.js';
-import Game from '../game/Game.js';
+import Channel from '../../lib/server/Channel.js';
+import Lobby from '../../lib/game/stage/Lobby.js';
+import Bidding from '../../lib/game/stage/Bidding.js';
+import Kitty from '../../lib/game/stage/Kitty.js';
+import Game from '../../lib/game/Game.js';
 
 WebsocketWrapper.MAX_SEND_QUEUE_SIZE = 0;
 

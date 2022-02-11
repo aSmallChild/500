@@ -1,0 +1,23 @@
+{
+  "name": "500",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "scripts": {
+    "server": "node server.js",
+    "nodemon": "nodemon --inspect=0.0.0.0:9229 server.js"
+  },
+  "dependencies": {
+    "node": "16.9.1",
+    "ws": "^8.2.2",
+    "ws-wrapper": "^2.0.2"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^8.4.0",
+    "nodemon": "^2.0.12",
+    "should": "^13.2.3"
+  },
+  "license": "ISC",
+  "type": "module"
+}

@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import Bid from '../../src/game/model/Bid.js';
+import Bid from '../../../lib/game/model/Bid.js';
 import {computed, ref} from 'vue';
 
 export default {

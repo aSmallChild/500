@@ -1,9 +1,9 @@
 /* eslint-disable */
 // noinspection ES6UnusedImports
 import should from 'should';
-import GameStage from '../../../../src/game/GameStage.js';
-import Game from '../../../../src/game/Game.js';
-import Channel from '../../../../src/server/Channel.js';
+import GameStage from '../../../../lib/game/GameStage.js';
+import Game from '../../../../lib/game/Game.js';
+import Channel from '../../../../lib/server/Channel.js';
 
 class SampleStage1 extends GameStage {
     static startCallback;
