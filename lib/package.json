@@ -1,3 +1,7 @@
 {
+  "dependencies": {
+    "node": "17.4.0",
+    "ws-wrapper": "^2.0.2"
+  },
   "type": "module"
 }

@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "test": "mocha --recursive unit"
+  },
+  "dependencies": {
+    "node": "17.4.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^8.4.0",
+    "should": "^13.2.3"
+  },
+  "license": "ISC",
+  "type": "module"
+}
