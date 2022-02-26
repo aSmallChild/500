@@ -1,0 +1,23 @@
+name = "500"
+type = "javascript"
+webpack_config = "webpacks.config.js"
+workers_dev = true
+account_id = ""
+route = ""
+zone_id = ""
+compatibility_date = "2022-02-04"
+
+[build]
+command = "npm run build"
+
+[build.upload]
+dir = "dist"
+format = "modules"
+main = "index.bundle.mjs"
+
+[durable_objects]
+bindings = [{name = "LOBBY", class_name = "Lobby"}]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Lobby"]

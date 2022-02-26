@@ -1,8 +1,4 @@
 {
-  "name": "500",
-  "version": "1.0.0",
-  "description": "",
-  "author": "",
   "scripts": {
     "server": "node server.js",
     "nodemon": "nodemon --inspect=0.0.0.0:9229 server.js"
@@ -18,6 +14,5 @@
     "nodemon": "^2.0.12",
     "should": "^13.2.3"
   },
-  "license": "ISC",
   "type": "module"
 }
