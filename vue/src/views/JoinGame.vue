@@ -1,30 +1,27 @@
 <template>
-    <v-container class="menu">
-        <v-row align="center" justify="center">
-            <v-col>
-                <!-- waiting for vuetify to be finished so v-text-field is available -->
-                <div class="menu-buttons">
-                    <label class="wrapper" v-if="!isNewGame">
-                        <span>Game</span>
-                        <input :disabled="isNewGame" v-model="gameCode" pattern="A-Z" maxlength="6" type="text" @keyup.enter="submit">
-                    </label>
-                    <label class="wrapper">
-                        <span>Name</span>
-                        <input v-model="playerName" type="text" @keyup.enter="submit">
-                    </label>
-                    <v-btn color="primary" @click="submit" :disabled="isSubmitting">{{ playerName ? 'Play' : 'Watch' }}</v-btn>
-                    <div class="error" v-if="error">
-                        {{ error }}
-                    </div>
-                    <v-btn v-if="createGameInstead" color="secondary" @click="switchToCreateGame" :disabled="isSubmitting">create new game instead</v-btn>
-                </div>
-            </v-col>
-        </v-row>
-    </v-container>
+    <div class="menu">
+        <!-- waiting for vuetify to be finished so v-text-field is available -->
+        <div class="menu-buttons">
+            <label class="wrapper" v-if="!isNewGame">
+                <span>Game</span>
+                <input :disabled="isNewGame" v-model="gameCode" pattern="A-Z" maxlength="6" type="text" @keyup.enter="submit">
+            </label>
+            <label class="wrapper">
+                <span>Name</span>
+                <input v-model="playerName" type="text" @keyup.enter="submit">
+            </label>
+            <n-button type="primary" @click="submit" :disabled="isSubmitting">{{ playerName ? 'Play' : 'Watch' }}</n-button>
+            <div class="error" v-if="error">
+                {{ error }}
+            </div>
+            <n-button type="secondary" v-if="createGameInstead" @click="switchToCreateGame" :disabled="isSubmitting">create new game instead</n-button>
+        </div>
+    </div>
 </template>
 
 <script>
 import {ref} from 'vue';
+import {NButton} from 'naive-ui';
 import {useRoute, useRouter} from 'vue-router';
 import ClientChannel from '../../../lib/client/ClientChannel.js';
 
@@ -34,6 +31,9 @@ export default {
             type: Boolean,
             default: false,
         },
+    },
+    components: {
+        NButton,
     },
     setup(props) {
         const route = useRoute();
@@ -49,7 +49,7 @@ export default {
             createGameInstead.value = false;
             isNewGame.value = true;
             submit();
-        }
+        };
         const submit = async () => {
             if (isSubmitting.value) {
                 return;

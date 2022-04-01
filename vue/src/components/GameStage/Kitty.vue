@@ -8,8 +8,8 @@
         <div style="text-align: center">
             <h2 v-if="leadingBid">{{ getPlayerSymbols(leadingBidder) }} {{ leadingBidder.name }}: {{ leadingBid.getName() }} ({{ leadingBid.points }})</h2>
             <card-group v-if="hand" :cards="hand" fan/>
-            <v-btn v-else @click="action.takeHand()" color="primary">Take Hand</v-btn>
-            <v-btn v-if="canTakeKitty" @click="action.takeKitty()" color="primary">Take Kitty</v-btn>
+            <n-button v-else @click="action.takeHand()" type="primary">Take Hand</n-button>
+            <n-button v-if="canTakeKitty" @click="action.takeKitty()" type="primary">Take Kitty</n-button>
         </div>
         <h2>Players ({{ players.length }})</h2>
         <div class="bid-player-list">
@@ -35,12 +35,14 @@ import Deck from '../../../../lib/game/model/Deck.js';
 import CardSvgDefs from '../CardSvgDefs.vue';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 import Bid from '../../../../lib/game/model/Bid.js';
+import {NButton} from 'naive-ui';
 
 export default {
     ...common,
     components: {
         CardGroup,
         CardSvgDefs,
+        NButton
     },
     setup(props, {emit}) {
         const getPlayerById = id => props.players.find(player => player.id === id);

@@ -4,9 +4,9 @@
             <defs ref="svgDefs"></defs>
         </svg>
         <div style="text-align: center;">
-            <v-btn color="secondary" @click="newChannel">New</v-btn>
+            <n-button type="secondary" @click="newChannel">New</n-button>
             Name: <input v-model="channelName"/>
-            <v-btn color="secondary" @click="channelLogin">Join</v-btn>
+            <n-button type="secondary" @click="channelLogin">Join</n-button>
         </div>
         <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card-svg="onCardClicked" draggable-cards @card-drop="cardDropped($event, hand)"/>
         <card-group pile :cards="table" @card-svg="onCardClicked" draggable-cards @card-drop="cardDropped($event, table)"/>
@@ -23,10 +23,11 @@ import Card from '../lib/game/model/Card.js';
 import CardSVGBuilder from '../lib/view/CardSVGBuilder.js';
 import CardSVG from '../lib/view/CardSVG.js';
 import {useRoute} from 'vue-router';
+import {NButton} from 'naive-ui';
 
 export default {
     components: {
-        CardGroup,
+        CardGroup, NButton
     },
     setup() {
         const route = useRoute();

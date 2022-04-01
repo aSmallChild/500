@@ -1,33 +1,29 @@
 <template>
-    <v-container class="menu">
-        <v-row align="center" justify="center">
-            <v-col>
-                <div class="menu-buttons">
-                    <h1>{{ pathNotFound ? 404 : 500 }}</h1>
-                    <v-btn v-for="[label, route] of Object.entries(menuItems)" :key="label"
-                           color="primary" @click="$router.push(route)">
-                        {{ label }}
-                    </v-btn>
-                </div>
-            </v-col>
-        </v-row>
-    </v-container>
+    <div class="menu">
+        <div class="menu-buttons">
+            <h1>{{ pathNotFound ? 404 : 500 }}</h1>
+            <n-button type="primary" v-for="[label, route] of menuItems" :key="label" @click="$router.push(route)">{{ label }}</n-button>
+        </div>
+    </div>
 </template>
 
 <script>
 import {useRoute} from 'vue-router';
+import {NButton} from 'naive-ui';
 
 export default {
-    name: 'MainMenu',
+    components: {
+        NButton,
+    },
     setup() {
         const route = useRoute();
         return {
             pathNotFound: route.params.pathNotFound || null,
-            menuItems: {
-                'New': 'new',
-                'Join': 'join',
-                'Sandbox': 'sandbox',
-            },
+            menuItems: [
+                ['New', 'new'],
+                ['Join', 'join'],
+                ['Sandbox', 'sandbox'],
+            ],
         };
     },
 };

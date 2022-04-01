@@ -1,19 +1,22 @@
 <template>
-    <v-app>
-        <v-main>
-            <v-btn v-if="$router.currentRoute.value.fullPath !== '/'"
-                   color="secondary" @click="$router.push('/')"
-                   style="position: absolute; margin: 16px;">
+    <n-config-provider :theme="darkTheme">
+        <n-theme-editor>
+            <n-button v-if="$router.currentRoute.value.fullPath !== '/'"
+                      type="secondary" @click="$router.push('/')"
+                      style="position: absolute; margin: 16px;">
                 Menu
-            </v-btn>
+            </n-button>
             <router-view/>
-        </v-main>
-    </v-app>
+            <n-global-style/>
+        </n-theme-editor>
+    </n-config-provider>
 </template>
+
+<script setup>
+import {NButton, NConfigProvider, NThemeEditor} from 'naive-ui';
+import {darkTheme} from 'naive-ui';
+</script>
+
 <style lang="scss">
 @use "css/base";
-
-html {
-    overflow-y: auto; // something in vuetify is setting this to scroll which forces the scrollbar to show
-}
 </style>

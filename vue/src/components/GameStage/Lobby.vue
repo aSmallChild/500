@@ -1,6 +1,6 @@
 <template>
-    <v-btn v-if="currentPlayer" color="primary" @click="action.playerReady(!isReady)">{{ isReady ? 'Unready' : 'Ready' }}</v-btn>
-    <v-btn v-if="currentPlayer?.isAdmin" color="secondary" @click="action.startGame()" :disabled="players.length < 2">Start</v-btn>
+    <n-button v-if="currentPlayer" type="primary" @click="action.playerReady(!isReady)">{{ isReady ? 'Unready' : 'Ready' }}</n-button>
+    <n-button v-if="currentPlayer?.isAdmin" type="secondary" @click="action.startGame()" :disabled="players.length < 2">Start</n-button>
     <label>
         <span>Kitty Size</span>
         <input type="number" v-model="gameConfig.kittySize" :disabled="!currentPlayer?.isAdmin" @change="action.updateGameConfig">
@@ -23,8 +23,8 @@
         {{ player.isAdmin ? ' (admin)' : '' }}
         {{ getRequestedPartner(player) ? ` -> ${getRequestedPartner(player).name}` : '' }}
         {{ player.connections ? '' : ' DISCONNECTED' }}
-        <v-btn v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.giveAdmin(player)" size="small" color="primary">Admin</v-btn>
-        <v-btn v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.kickPlayer(player)" size="small" color="secondary">Kick</v-btn>
+        <n-button v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.giveAdmin(player)" size="small" type="primary">Admin</n-button>
+        <n-button v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.kickPlayer(player)" size="small" type="secondary">Kick</n-button>
     </div>
 </template>
 
@@ -32,9 +32,13 @@
 import {computed, ref} from 'vue';
 import {common, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER} from './common.js';
 
+import {NButton} from 'naive-ui';
+
 export default {
     ...common,
-    name: 'Lobby',
+    components: {
+        NButton,
+    },
     setup(props, {emit}) {
         const getPlayerById = id => props.players.find(player => player.id === id);
         const requestedPartner = ref(null);
@@ -94,7 +98,7 @@ export default {
             isPlayerReady,
             requestedPartners,
             getPlayerById,
-            getRequestedPartner
+            getRequestedPartner,
         };
     },
 };
