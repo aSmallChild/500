@@ -1,27 +1,18 @@
 <template>
-    <div class="menu">
-        <!-- waiting for vuetify to be finished so v-text-field is available -->
-        <div class="menu-buttons">
-            <label class="wrapper" v-if="!isNewGame">
-                <span>Game</span>
-                <input :disabled="isNewGame" v-model="gameCode" pattern="A-Z" maxlength="6" type="text" @keyup.enter="submit">
-            </label>
-            <label class="wrapper">
-                <span>Name</span>
-                <input v-model="playerName" type="text" @keyup.enter="submit">
-            </label>
-            <n-button type="primary" @click="submit" :disabled="isSubmitting">{{ playerName ? 'Play' : 'Watch' }}</n-button>
-            <div class="error" v-if="error">
-                {{ error }}
-            </div>
-            <n-button type="secondary" v-if="createGameInstead" @click="switchToCreateGame" :disabled="isSubmitting">create new game instead</n-button>
-        </div>
-    </div>
+    <n-space justify="center" align="center" vertical class="full-height">
+        <n-input-group>
+            <n-input v-if="!isNewGame" placeholder="Code" :disabled="isNewGame" v-model:value="gameCode" pattern="A-Z" maxlength="6" type="text" @keyup.enter="submit"/>
+            <n-input placeholder="Name" v-model:value="playerName" type="text" @keyup.enter="submit" required/>
+            <n-button @click="submit" :disabled="isSubmitting || isNewGame && !playerName">{{ isNewGame || playerName ? 'Play' : 'Watch' }}</n-button>
+        </n-input-group>
+        <n-text type="error" v-if="error">{{ error }}</n-text>
+        <n-button v-if="createGameInstead" @click="switchToCreateGame" :disabled="isSubmitting">Create new game instead</n-button>
+    </n-space>
 </template>
 
 <script>
 import {ref} from 'vue';
-import {NButton} from 'naive-ui';
+import {NButton, NSpace, NInput, NInputGroup, NText} from 'naive-ui';
 import {useRoute, useRouter} from 'vue-router';
 import ClientChannel from '../../../lib/client/ClientChannel.js';
 
@@ -33,7 +24,7 @@ export default {
         },
     },
     components: {
-        NButton,
+        NButton, NSpace, NInput, NInputGroup, NText
     },
     setup(props) {
         const route = useRoute();
@@ -91,6 +82,7 @@ export default {
                 gameCode.value = channel.name;
                 redirectToGame();
             } catch (err) {
+                error.value = `Failed to create game.`;
                 console.error(err);
             }
         };
@@ -99,53 +91,3 @@ export default {
     },
 };
 </script>
-
-<style lang="scss" scoped>
-label {
-    display: block;
-}
-
-.wrapper {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    max-width: 400px;
-    font-size: 24px;
-}
-
-span, input {
-    min-width: 100px;
-    padding: 0 0.5rem;
-}
-
-span {
-    text-align: center;
-}
-
-input {
-    background: grey;
-    flex: 1;
-}
-
-.menu {
-    height: 100%;
-    display: flex;
-}
-
-.menu-buttons {
-    & > h1 {
-        text-align: center;
-    }
-
-    & > * {
-        margin: 10px auto;
-        min-width: 200px;
-        max-width: 300px;
-        width: 50%;
-    }
-
-    & > .v-btn {
-        display: block;
-    }
-}
-</style>

@@ -1,0 +1,12 @@
+{
+  "common": {
+    "fontSizeMedium": "16px",
+    "heightMedium": "48px"
+  },
+  "Input": {
+    "paddingMedium": "0 24px"
+  },
+  "Button": {
+    "paddingMedium": "0 24px"
+  }
+}

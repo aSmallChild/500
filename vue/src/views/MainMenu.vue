@@ -1,54 +1,31 @@
 <template>
-    <div class="menu">
-        <div class="menu-buttons">
-            <h1>{{ pathNotFound ? 404 : 500 }}</h1>
-            <n-button type="primary" v-for="[label, route] of menuItems" :key="label" @click="$router.push(route)">{{ label }}</n-button>
-        </div>
-    </div>
+    <n-space justify="center" align="center" vertical class="main-menu full-height">
+        <n-h1 strong>{{ pathNotFound ? 404 : 500 }}</n-h1>
+        <router-link v-for="[label, route] of menuItems" :key="label" :to="route" custom v-slot="{ navigate }">
+            <n-button block strong type="primary" @click="navigate" size="large">{{ label }}</n-button>
+        </router-link>
+    </n-space>
 </template>
 
-<script>
+<script setup>
 import {useRoute} from 'vue-router';
-import {NButton} from 'naive-ui';
+import {NButton, NSpace, NH1} from 'naive-ui';
 
-export default {
-    components: {
-        NButton,
-    },
-    setup() {
-        const route = useRoute();
-        return {
-            pathNotFound: route.params.pathNotFound || null,
-            menuItems: [
-                ['New', 'new'],
-                ['Join', 'join'],
-                ['Sandbox', 'sandbox'],
-            ],
-        };
-    },
-};
+const route = useRoute();
+const pathNotFound = route.params.pathNotFound || null;
+const menuItems = [
+    ['New', 'new'],
+    ['Join', 'join'],
+    ['Sandbox', 'sandbox'],
+];
 </script>
 
-<style lang="scss" scoped>
-.menu {
-    height: 100%;
-    display: flex;
-}
-
-.menu-buttons {
-    & > h1 {
-        text-align: center;
-    }
+<style lang="scss">
+.main-menu {
+    text-align: center;
 
     & > * {
-        margin: 10px auto;
-        min-width: 200px;
-        max-width: 300px;
-        width: 50%;
-    }
-
-    & > .v-btn {
-        display: block;
+        width: 12rem;
     }
 }
 </style>

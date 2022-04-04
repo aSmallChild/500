@@ -13,11 +13,6 @@
   --card-background: #efefdd;
 }
 
-body {
-  background: rgb(0, 0, 0);
-  color: #fff;
-}
-
 .black .card-face {
   fill: var(--suit-black);
   stroke: var(--suit-black);
@@ -126,4 +121,8 @@ $cardWidth: 25 * 5px;
     position: absolute;
     transform-origin: 50% 125%;
   }
+}
+
+.full-height {
+  height: 100vh;
 }
