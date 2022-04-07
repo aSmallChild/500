@@ -144,7 +144,6 @@ export default {
         });
 
         return {
-            createNewCard,
             svgDefs,
             table,
             hands,
