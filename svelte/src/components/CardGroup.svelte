@@ -69,8 +69,9 @@
             if (cardsAlreadyHere[i] === cardSvg.svg) continue;
             callbacks.push(cardSvg.animateTo(() => {
                 if (!i) return root.prepend(cardSvg.svg);
-                if (i === cards.length - 1) return root.append(cardSvg.svg);
+                if (i >= cards.length - 1) return root.append(cardSvg.svg);
                 const previousCard = cards[i - 1].svg;
+                if (!previousCard?.parentNode) return root.append(cardSvg.svg);
                 previousCard.parentNode.insertBefore(cardSvg.svg, previousCard.nextSibling);
             }));
         }

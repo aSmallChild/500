@@ -10,63 +10,65 @@
 
     let svgDefs;
     let config = null;
-    let table = [];
     let hands = [];
     const cardMap = new Map();
 
     const onCardClicked = event => event.detail.flip();
-    const cardDropped = ({cardId, onCard}, group) => {
-        console.log(`card ${cardId} dropped on ${onCard.card.getName()} :: ${group.map(e => e.card.getName()).join(', ')}`);
-        const existingCard = createNewCard(cardId);
-        console.log(`existing card: ${existingCard?.card.getName()}`);
-        setGroupCards(group, [...group, existingCard]);
-        table = table;
-        hands = hands;
+    const cardDropped = ({cardId, onCard}, hand, handIndex) => {
+        const cardSvg = getCardSvg(cardId);
+        let onCardIndex = hand.indexOf(onCard);
+        console.log(`card ${cardSvg?.card.getName()} dropped on ${onCard?.card.getName() ?? `hand ${handIndex}`} :: ${hand.map(e => e.card.getName()).join(', ')}`);
+
+        for (let i = 0; i < hands.length; i++) {
+            const oldCardIndex = hands[i].indexOf(cardSvg);
+            if (oldCardIndex < 0) continue;
+
+            hands[i].splice(oldCardIndex, 1);
+            if (i === handIndex) {
+                if (onCardIndex > oldCardIndex) {
+                    onCardIndex--;
+                }
+                continue;
+            }
+
+            hands[i] = hands[i];
+        }
+
+        if (onCardIndex >= 0) {
+            console.log('placing at index', onCardIndex + 1);
+            hand.splice(onCardIndex + 1, 0, cardSvg);
+        } else {
+            console.log('adding to the end');
+            hand.push(cardSvg);
+        }
+
+        hands[handIndex] = hand;
     };
 
-    const createNewCard = (serializedCard) => {
+    const getCardSvg = (serializedCard) => {
         const existingCard = cardMap.get(serializedCard);
         if (existingCard) return existingCard;
         const card = Card.fromString(serializedCard, config);
         const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
         const cardSvg = new CardSVG(card, svg);
-        Object.freeze(cardSvg);
+        // Object.freeze(cardSvg);
         cardMap.set(card.toString(), cardSvg);
         return cardSvg;
     };
 
-    const setGroupCards = (groupCards, newCards) => {
-        newCards.forEach((serializedCard, index) => {
-            const cardSvg = typeof serializedCard === 'string' ? createNewCard(serializedCard) : serializedCard;
-            if (groupCards[index] === cardSvg) {
-                return;
-            }
-            groupCards[index] = cardSvg;
-        });
-        if (groupCards.length > newCards.length) {
-            groupCards.splice(newCards.length);
-        }
-    };
-    const setCards = ([newTable, ...newHands]) => {
-        setGroupCards(table, newTable);
+    const setCards = (newHands) => {
         newHands.forEach((hand, index) => {
             if (hands.length <= index) {
-                hands[index] = [];
+                hands.push([]);
             }
-            setGroupCards(hands[index], hand);
+            hands[index] = hand;
         });
-        // hands = hands;
-    };
-
-    const reset = () => {
-        table = [];
-        hands = [];
     };
 
     onMount(() => {
         svgDefs.innerHTML = OrdinaryNormalDeck.svgDefs;
         config = new DeckConfig(OrdinaryNormalDeck.config);
-        setCards([['HK', 'HQ', 'S10'], ['H2', 'H5', 'CA']]);
+        setCards([[], ['HK', 'HQ', 'S10'], ['H2', 'H5', 'CA'], ['D2']].map(hand => hand.map(serializedCard => getCardSvg(serializedCard))));
     });
 </script>
 
@@ -75,7 +77,6 @@
 </svg>
 <div>Length {hands.length}</div>
 {#each hands as hand, i (i)}
-    <CardGroup type="fan" cards={hand} on:card-svg={onCardClicked} draggableCards on:card-dropped={e => cardDropped(e.detail, hand)}/>
+    <CardGroup type="fan" cards={hand} on:card-svg={onCardClicked} draggableCards on:card-dropped={e => cardDropped(e.detail, hand, i)}/>
 {/each}
-<CardGroup cards={table} on:card-svg={onCardClicked} draggableCards on:card-dropped={e => cardDropped(e.detail, table)}/>
 
