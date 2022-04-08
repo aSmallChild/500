@@ -14,36 +14,40 @@
     const cardMap = new Map();
 
     const onCardClicked = event => event.detail.flip();
-    const cardDropped = ({cardId, onCard}, hand, handIndex) => {
-        const cardSvg = getCardSvg(cardId);
-        let onCardIndex = hand.indexOf(onCard);
-        console.log(`card ${cardSvg?.card.getName()} dropped on ${onCard?.card.getName() ?? `hand ${handIndex}`} :: ${hand.map(e => e.card.getName()).join(', ')}`);
+    const onCardContextMenu = event => event.detail.flip();
 
+    const findCardHandAndIndex = cardSvg => {
         for (let i = 0; i < hands.length; i++) {
             const oldCardIndex = hands[i].indexOf(cardSvg);
-            if (oldCardIndex < 0) continue;
-
-            hands[i].splice(oldCardIndex, 1);
-            if (i === handIndex) {
-                if (onCardIndex > oldCardIndex) {
-                    onCardIndex--;
-                }
-                continue;
-            }
-
-            hands[i] = hands[i];
+            if (oldCardIndex >= 0) return [i, oldCardIndex];
         }
-
-        if (onCardIndex >= 0) {
-            console.log('placing at index', onCardIndex + 1);
-            hand.splice(onCardIndex + 1, 0, cardSvg);
-        } else {
-            console.log('adding to the end');
-            hand.push(cardSvg);
-        }
-
-        hands[handIndex] = hand;
+        return [];
     };
+
+    const cardDropped = ({cardId, onCard}, hand, handIndex) => {
+        const cardSvg = getCardSvg(cardId);
+        const [oldHandIndex, oldCardIndex] = findCardHandAndIndex(cardSvg);
+        moveCardByIndex(oldHandIndex, oldCardIndex, handIndex, hand.indexOf(onCard));
+    };
+
+    const moveCardByIndex = (oldHandIndex, oldCardIndex, newHandIndex, newCardIndex) => {
+        const cardSvg = hands[oldHandIndex][oldCardIndex];
+        const movingWithinSameHand = oldHandIndex === newHandIndex;
+        if (oldHandIndex >= 0) {
+            hands[oldHandIndex].splice(oldCardIndex, 1);
+
+            if (movingWithinSameHand && newCardIndex > oldCardIndex) {
+                newCardIndex--;
+            }
+        }
+
+        newCardIndex++;
+        hands[newHandIndex].splice(newCardIndex, 0, cardSvg);
+        hands[newHandIndex] = hands[newHandIndex];
+        if (!movingWithinSameHand) {
+            hands[oldHandIndex] = hands[oldHandIndex];
+        }
+    }
 
     const getCardSvg = (serializedCard) => {
         const existingCard = cardMap.get(serializedCard);
@@ -51,24 +55,14 @@
         const card = Card.fromString(serializedCard, config);
         const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
         const cardSvg = new CardSVG(card, svg);
-        // Object.freeze(cardSvg);
         cardMap.set(card.toString(), cardSvg);
         return cardSvg;
-    };
-
-    const setCards = (newHands) => {
-        newHands.forEach((hand, index) => {
-            if (hands.length <= index) {
-                hands.push([]);
-            }
-            hands[index] = hand;
-        });
     };
 
     onMount(() => {
         svgDefs.innerHTML = OrdinaryNormalDeck.svgDefs;
         config = new DeckConfig(OrdinaryNormalDeck.config);
-        setCards([[], ['HK', 'HQ', 'S10'], ['H2', 'H5', 'CA'], ['D2']].map(hand => hand.map(serializedCard => getCardSvg(serializedCard))));
+        hands = [[], ['HK', 'HQ', 'S10'], ['H2', 'H5', 'CA'], ['D2']].map(hand => hand.map(serializedCard => getCardSvg(serializedCard)));
     });
 </script>
 
@@ -77,6 +71,10 @@
 </svg>
 <div>Length {hands.length}</div>
 {#each hands as hand, i (i)}
-    <CardGroup type="fan" cards={hand} on:card-svg={onCardClicked} draggableCards on:card-dropped={e => cardDropped(e.detail, hand, i)}/>
+    <CardGroup type="fan" cards={hand} draggableCards
+               on:card-click={onCardClicked}
+               on:card-contextmenu={onCardContextMenu}
+               on:card-dropped={e => cardDropped(e.detail, hand, i)}
+    />
 {/each}
 

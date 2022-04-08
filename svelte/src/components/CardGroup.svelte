@@ -1,5 +1,5 @@
 <script>
-    import {createEventDispatcher, tick} from 'svelte';
+    import {createEventDispatcher} from 'svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -53,8 +53,12 @@
     const onClick = event => {
         const cardSvg = findCardByElement(event.target);
         if (!cardSvg) return;
-        dispatch('card', cardSvg.card);
-        dispatch('card-svg', cardSvg);
+        dispatch('card-click', cardSvg);
+    };
+    const onContextMenu = event => {
+        const cardSvg = findCardByElement(event.target);
+        if (!cardSvg) return;
+        dispatch('card-contextmenu', cardSvg);
     };
     const placeCards = async () => {
         const cardsAlreadyHere = getCardsAlreadyPlaced();
@@ -77,19 +81,18 @@
         }
         if (!callbacks.length) return;
 
-        await tick();
-        // setTimeout(() => {
-        for (const callback of callbacks) {
-            callback();
-        }
-        // }, 7);
+        await new Promise(resolve => setTimeout(() => {
+            callbacks.forEach(callback => callback());
+            resolve();
+        }));
     };
 
     $: root && cards.length && placeCards();
 </script>
 
 <div bind:this={root} class:fan={type=='fan'} class:animate-cards={animate}
-     on:click={onClick}
+     on:click|preventDefault={onClick}
+     on:contextmenu|preventDefault={onContextMenu}
      on:drop|preventDefault={onDrop}
      on:dragstart={onDragStart}
      on:dragover|preventDefault
