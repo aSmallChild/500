@@ -59,17 +59,32 @@
         return cardSvg;
     };
 
+    let old = null;
+    const reset = () => {
+        if (old) {
+            hands = old;
+            old = null;
+        }
+        else {
+            if (hands.length) {
+                old = hands;
+            }
+            hands = [[], ['HK', 'HQ', 'S10'], ['H2', 'H5', 'CA'], ['D2']].map(hand => hand.map(serializedCard => getCardSvg(serializedCard)));
+        }
+
+    }
+
     onMount(() => {
         svgDefs.innerHTML = OrdinaryNormalDeck.svgDefs;
         config = new DeckConfig(OrdinaryNormalDeck.config);
-        hands = [[], ['HK', 'HQ', 'S10'], ['H2', 'H5', 'CA'], ['D2']].map(hand => hand.map(serializedCard => getCardSvg(serializedCard)));
+        reset();
     });
 </script>
 
 <svg width="0" height="0">
     <defs bind:this={svgDefs}></defs>
 </svg>
-<div>Length {hands.length}</div>
+<div on:click={reset}>Length {hands.length}</div>
 {#each hands as hand, i (i)}
     <CardGroup type="fan" cards={hand} draggableCards
                on:card-click={onCardClicked}

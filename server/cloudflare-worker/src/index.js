@@ -1,4 +1,4 @@
-import SocketManager from '../../../lib/server/SocketManager.js';
+import createSession from './createSession.js';
 
 export default {
     async fetch(request, env) {
@@ -44,7 +44,13 @@ async function handleRequest(request, env) {
 export class Lobby {
     constructor(state, env) {
         this.state = state;
-        this.socketManager = new SocketManager();
+        this.taken = false;
+        this.sessionCount = 0;
+    }
+
+    handleSession(request, session) {
+        this.sessionCount++;
+        session.onClose = () => this.sessionCount--;
     }
 
     async fetch(request) {
@@ -61,8 +67,21 @@ export class Lobby {
     }
 
     handleWebsocketUpgrade() {
-        const [response, socket] = websocketUpgrade();
-        this.socketManager.socketConnected(socket);
+        const upgradeHeader = request.headers.get('Upgrade');
+        if (upgradeHeader && upgradeHeader !== 'websocket') {
+            return new Response('Expected Upgrade: websocket', {status: 426});
+        }
+        const [response, session] = createSession();
+        this.handleSession(request, session);
         return response;
     }
+}
+
+function jsonResponse(data, status = 200) {
+    return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+            'content-type': 'application/json;charset=UTF-8',
+        },
+    });
 }
