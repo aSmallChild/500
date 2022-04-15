@@ -29,7 +29,7 @@ export class Lobby {
         return jsonResponse({message: 'bad url'}, 404);
     }
 
-    handleCreateLobbyRequest(request) {
+    async handleCreateLobbyRequest(request) {
         // requests
         //     POST /create_lobby
         //         body:
@@ -49,7 +49,7 @@ export class Lobby {
         //              message: string
         if (this.taken) return jsonResponse({message: 'taken'}, 409);
 
-        const [json, response] = jsonRequest(request);
+        const [json, response] = await jsonRequest(request);
         if (response) return response;
 
         const [user, userResponse] = this.handleCreateUserJSON(json);
@@ -69,8 +69,8 @@ export class Lobby {
         });
     }
 
-    handleCreateUserRequest(request) {
-        const [json, response] = jsonRequest(request);
+    async handleCreateUserRequest(request) {
+        const [json, response] = await jsonRequest(request);
         if (response) return response;
 
         const [user, userResponse] = this.handleCreateUserJSON(json);
@@ -80,7 +80,7 @@ export class Lobby {
     }
 
     handleCreateUserJSON(json) {
-        if (!json.user || !json.user.username) return [null, jsonResponse({message: 'username required'}, 400)];
+        if (!json.user || !json.user.username) return [null, jsonResponse({message: 'bad username'}, 400)];
         const user = this.addUser(json.user.username, json.user.password);
         if (!user) return [null, jsonResponse({message: 'bad password'}, 401)];
         return [user, null];

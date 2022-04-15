@@ -1,9 +1,11 @@
-export function jsonRequest(request) {
+// import {Response} from 'node-fetch'; // needed only for testing
+
+export async function jsonRequest(request) {
     if (request.method != 'POST') {
         return [null, jsonResponse({message: 'bad method'}, 405)];
     }
     try {
-        return [JSON.parse(request.body)];
+        return [await request.json()];
     } catch (err) {
         return [null, jsonResponse({message: 'bad json'}, 400)];
     }
