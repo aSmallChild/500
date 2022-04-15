@@ -1,15 +1,16 @@
 export function jsonRequest(request) {
     if (request.method != 'POST') {
-        return [null, new Response('bad method', {status: 405})];
+        return [null, jsonResponse({message: 'bad method'}, 405)];
     }
     try {
         return [JSON.parse(request.body)];
     } catch (err) {
-        return [null, new Response('bad json', 400)];
+        return [null, jsonResponse({message: 'bad json'}, 400)];
     }
 }
 
 export function jsonResponse(data, status = 200) {
+    data.success = status >= 200 && status < 300;
     return new Response(JSON.stringify(data), {
         status,
         headers: {

@@ -23,18 +23,18 @@ async function handleRequest(request, env) {
     if (url.pathname == basePath) return await createLobby(request, env);
 
     const [lobbyId, userId] = url.pathname.replace(basePath, '').split('/');
-    if (!lobbyId || lobbyId.length > 6) return new Response('bad lobbyId', {status: 400});
+    if (!lobbyId || lobbyId.length > 6) return jsonResponse({message: 'bad lobbyId'}, 400);
 
     if (lobbyId && userId) return await createSession(request, lobbyId, userId);
     if (lobbyId) return await createUser(request, lobbyId);
-    return new Response('bad url', {status: 404});
+    return jsonResponse({message: 'bad url'}, 404);
 }
 
 async function createLobby(request, env) {
     const [json, response] = jsonRequest(request);
     if (response) return response;
 
-    if (!lobbyTypes.includes(json.lobby.type)) {
+    if (!lobbyTypes.includes(json?.lobby?.type)) {
         return jsonResponse({error: 'bad lobby type'}, 400);
     }
 
@@ -49,8 +49,8 @@ async function createUser(request, lobbyId) {
 }
 
 async function createSession(request, lobbyId, userId) {
-    if (request.method != 'GET') return new Response('bad method', {status: 405});
-    if (!userId) return new Response('bad userId', {status: 400});
+    if (request.method != 'GET') return jsonResponse({message: 'bad method'}, 405);
+    if (!userId) return jsonRequest({message: 'bad userId'}, 400);
     request.url = `https://.../session_create/${lobbyId}/${userId}`;
     return getLobby(lobbyId, env).fetch(request);
 }
@@ -69,8 +69,6 @@ async function findAvailableLobbyAndSetItUp(request, env) {
     }
     return response;
 }
-
-
 
 function checkLobbyId(code) {
     const a = 'NUIN';
