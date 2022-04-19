@@ -21,7 +21,7 @@ export default class DoodleServer {
 
     setChannel(channel) {
         this.channel = channel;
-        channel.onObserver(observer => {
+        channel.onObserverConnect(observer => {
             this.clientConnected(observer);
             observer.on('card', serializedCard => {
                 const [card, group] = this.takeCardFromGroup(serializedCard);

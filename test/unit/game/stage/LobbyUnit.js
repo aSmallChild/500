@@ -21,7 +21,7 @@ describe('Lobby Stage Unit', () => {
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onStageAction(player, 'ready', true);
+                    lobby.onStageAction(player, player, 'ready', true);
                 }
             });
             it(`should complete stage when all players are ready`, () => {
@@ -31,7 +31,7 @@ describe('Lobby Stage Unit', () => {
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onStageAction(player, 'ready', true);
+                    lobby.onStageAction(player, player, 'ready', true);
                 }
             });
         });

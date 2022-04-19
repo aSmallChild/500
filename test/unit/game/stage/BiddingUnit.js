@@ -16,7 +16,7 @@ describe('Bidding Stage Unit', () => {
         const stage = getStage(getPlayers(23), Bidding);
         it(`should deal cards to all players`, () => {
             stage.start(getStartData(stage));
-            assert.equal(stage.kitty.size, 3)
+            assert.equal(stage.kitty.size, 3);
             assert.equal(stage.hands.length, 23);
             assert.equal(stage.players.length, 23);
             for (const hand of stage.hands) {
@@ -108,12 +108,10 @@ describe('Bidding Stage Unit', () => {
                     const bid = stage.getBid(call);
                     assert.equal(stage.currentBidder, position);
                     let bidAnnounced = false;
-                    player.client = {
-                        emit(event, action) {
-                            assert.equal(event, 'stage:action');
-                            const {actionName, actionData} = action;
-                            assert.notEqual(actionName, 'bid_error', `Received unexpected bid error: ${actionData}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
-                        },
+                    player.user.emit = (event, action) => {
+                        assert.equal(event, 'stage:action');
+                        const {actionName, actionData} = action;
+                        assert.notEqual(actionName, 'bid_error', `Received unexpected bid error: ${actionData}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
                     };
                     stage.setServer({
                         emit(event, action) {
@@ -126,7 +124,7 @@ describe('Bidding Stage Unit', () => {
                             }
                         },
                     });
-                    stage.onStageAction(player, GameAction.PLACE_BID, call);
+                    stage.onStageAction(player, player.user, GameAction.PLACE_BID, call);
                     assert(bidAnnounced, 'bid was not announced');
                 }
                 const [winnerPosition, winningCall] = scenario.winner;
@@ -140,10 +138,10 @@ describe('Bidding Stage Unit', () => {
                 let stageCompleted = false;
                 stage.onStageComplete((dataForNextStage) => {
                     stageCompleted = true;
-                    assert.equal(dataForNextStage.winningBid?.call, expectedWinningBid.call)
-                    assert.equal(dataForNextStage.winningBidderPosition, winner.position)
+                    assert.equal(dataForNextStage.winningBid?.call, expectedWinningBid.call);
+                    assert.equal(dataForNextStage.winningBidderPosition, winner.position);
                 });
-                stage.onStageAction(winner, GameAction.TAKE_KITTY);
+                stage.onStageAction(winner, winner, GameAction.TAKE_KITTY);
                 assert(stageCompleted, 'stage did not complete');
             });
         }

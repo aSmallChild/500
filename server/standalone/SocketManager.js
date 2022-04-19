@@ -1,6 +1,6 @@
 import DoodleServer from '../../doodle/DoodleServer.js';
 import WebsocketWrapper from 'ws-wrapper';
-import Channel from '../../lib/server/Channel.js';
+import Channel from './Channel.js';
 import Lobby from '../../lib/game/stage/Lobby.js';
 import Bidding from '../../lib/game/stage/Bidding.js';
 import Kitty from '../../lib/game/stage/Kitty.js';

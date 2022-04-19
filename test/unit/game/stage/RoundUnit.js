@@ -37,7 +37,7 @@ describe('Round Stage Unit', function() {
             });
             const card = hands[winningPosition].cards[0];
             debugger;
-            stage.onStageAction(winningBidder, GameAction.PLACE_CARD, {
+            stage.onStageAction(winningBidder, winningBidder, GameAction.PLACE_CARD, {
                 card: card
             });
             const containsCard = stage.hands[winningPosition].containsCard(card);
@@ -53,7 +53,7 @@ describe('Round Stage Unit', function() {
                 highestBid:  new Bid(6, null, null, null, 100, config),
             });
             const openingCard = hands[winningPosition].cards[0];
-            stage.onStageAction(winningBidder, GameAction.PLACE_CARD, {
+            stage.onStageAction(winningBidder, winningBidder, GameAction.PLACE_CARD, {
                 card: openingCard
             });
             const winningCard = stage.trick.endTrick();
