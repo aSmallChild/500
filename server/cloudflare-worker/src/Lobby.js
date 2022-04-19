@@ -1,18 +1,17 @@
 import createSession from './createSession.js';
 import {jsonRequest, jsonResponse} from './util.js';
-import User from './User.js';
+import User from '../../../lib/server/User.js';
+import createGame from '../../../lib/game/createGame.js';
 
-export const lobbyTypes = [
-    'doodle',
-    '500',
-];
+export const lobbyTypes = new Map();
+lobbyTypes.set('500', createGame);
 
 export class Lobby {
     constructor(state, env) {
         this.state = state;
         this.env = env;
         this.taken = false;
-        this.sessionCount = 0;
+        this.password;
         this.users = new Map();
         this.usernames = new Map();
     }
@@ -55,11 +54,14 @@ export class Lobby {
         const [user, userResponse] = this.handleCreateUserJSON(json);
         if (userResponse) return userResponse;
 
-        if (!lobbyTypes.includes(json?.lobby?.type)) {
-            return jsonResponse({message: 'bad lobby type'}, 400);
+        if (json?.lobby?.password) {
+            this.password = json.password; // todo test
         }
 
-        // todo link to game handler
+        this.server = this.createServer(json?.lobby?.type);
+        if (!this.server) {
+            return jsonResponse({message: 'bad lobby type'}, 400);
+        }
 
         this.taken = true;
         return jsonResponse({
@@ -84,6 +86,11 @@ export class Lobby {
         const user = this.addUser(json.user.username, json.user.password);
         if (!user) return [null, jsonResponse({message: 'bad password'}, 401)];
         return [user, null];
+    }
+
+    createServer(lobbyType) {
+        const createServer = lobbyTypes.get(lobbyType);
+        return createServer ? createServer() : null;
     }
 
     addUser(username, password) {
@@ -113,8 +120,13 @@ export class Lobby {
     handleCreateSessionRequest(request, userId) {
         if (request.method != 'GET') return jsonResponse({message: 'bad method'}, 405);
 
-        const user = this.getUser(userId);
+        if (!userId) {
+            const [response, session] = createSession();
+            this.server.onObserverSession(session);
+            return response;
+        }
 
+        const user = this.getUser(userId);
         if (!user) return jsonResponse({message: 'bad user'}, 404);
 
         const upgradeHeader = request.headers.get('Upgrade');
@@ -122,9 +134,8 @@ export class Lobby {
             return jsonResponse({message: 'bad upgrade'}, 426);
         }
         const [response, session] = createSession();
-        this.sessionCount++;
-        session.onClose = () => this.sessionCount--;
         user.add(session);
+        this.server.onUserSession(user, session);
         return response;
     }
 }

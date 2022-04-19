@@ -1,8 +1,10 @@
 import {Request, Response} from 'node-fetch';
+import WebSocketPair from '../test/WebSocketPair.mock.js';
 import {Lobby} from './Lobby.js';
 
 global.Request = Request;
 global.Response = Response;
+global.WebSocketPair = WebSocketPair;
 
 describe('Lobby tests', () => {
     describe('POST /lobby_create', () => {
