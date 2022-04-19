@@ -1,9 +1,6 @@
-// noinspection ES6UnusedImports
-/* eslint-disable no-unused-vars,no-undef */
-import should from 'should';
+import assert from 'assert';
 import Bidding from '../../../../lib/game/stage/Bidding.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
-import {GameAction} from '../../../../lib/game/GameAction.js';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 
 const getStartData = stage => {
@@ -18,11 +15,11 @@ describe('Kitty Stage Unit', () => {
         const stage = getStage(getPlayers(23), Bidding);
         it(`should deal cards to all players`, () => {
             stage.start(getStartData(stage));
-            stage.kitty.size.should.equal(3);
-            stage.hands.should.length(23);
-            stage.players.should.length(23);
+            assert.equal(stage.kitty.size, 3);
+            assert.equal(stage.hands.length, 23);
+            assert.equal(stage.players.length, 23);
             for (const hand of stage.hands) {
-                hand.size.should.equal(10);
+                assert.equal(hand.size, 10);
             }
         });
     });

@@ -1,10 +1,7 @@
-/* eslint-disable */
+import assert from 'assert';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
-// noinspection ES6UnusedImports
-// import should from 'should';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import ScoringAvondale from '../../../../lib/game/model/ScoringAvondale.js';
-import {expect} from 'chai';
 
 const config = new DeckConfig(OrdinaryNormalDeck.config);
 const scoring = new ScoringAvondale(config);
@@ -30,26 +27,26 @@ const testBids = [
     {tricks: 10, suit: hearts, points: 500},
     {tricks: 10, suit: null, points: 520},
 ];
-describe('Scoring Avondale Unit', function() {
-    describe('minTricks', function() {
-        it('should be 6', function() {
-            expect(scoring.minTricks).to.equal(6);
+describe('Scoring Avondale Unit', () => {
+    describe('minTricks', () => {
+        it('should be 6', () => {
+            assert.equal(scoring.minTricks, 6);
         });
     });
-    describe('maxTricks', function() {
-        it('should be 10', function() {
-            expect(scoring.maxTricks).to.equal(10);
+    describe('maxTricks', () => {
+        it('should be 10', () => {
+            assert.equal(scoring.maxTricks, 10);
         });
     });
-    describe('maxStandardBidPoints', function() {
-        it('should be 520', function() {
-            expect(scoring.maxStandardBidPoints).to.equal(520);
+    describe('maxStandardBidPoints', () => {
+        it('should be 520', () => {
+            assert.equal(scoring.maxStandardBidPoints, 520);
         });
     });
-    describe('calculateStandardBidPoints()', function() {
+    describe('calculateStandardBidPoints()', () => {
         for (const testBid of testBids) {
-            it(`${testBid.tricks} ${testBid.suit ? testBid.suit.name : 'no trumps'} is ${testBid.points} points`, function() {
-                expect(scoring.calculateStandardBidPoints(testBid.tricks, testBid.suit)).to.equal(testBid.points);
+            it(`${testBid.tricks} ${testBid.suit ? testBid.suit.name : 'no trumps'} is ${testBid.points} points`, () => {
+                assert.equal(scoring.calculateStandardBidPoints(testBid.tricks, testBid.suit), testBid.points);
             });
         }
 

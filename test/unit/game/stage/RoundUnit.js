@@ -1,5 +1,4 @@
-// noinspection ES6UnusedImports
-import should from 'should';
+import assert from 'assert';
 import { GameAction } from '../../../../lib/game/GameAction.js';
 import Bid from '../../../../lib/game/model/Bid.js';
 import Deck from '../../../../lib/game/model/Deck.js';
@@ -17,22 +16,18 @@ describe('Round Stage Unit', function() {
 
     describe(`start()`, () => {
         it(`should setup trick`, () => {
-            // Act
             stage.start({
                 hands: hands,
                 highestBidder: players[0],
                 highestBid:  new Bid(6, null, null, null, 100, config),
             });
-
-            // Assert
-            should(stage.trick).be.ok;
-            should(stage.currentPlayer).be.ok;
+            assert.ok(stage.trick);
+            assert.ok(stage.currentPlayer);
         });
     });
 
     describe('onStageAction()', () => {
         it('playing card removes card from players hand', () => {
-            // Arrange
             const winningPosition = 0;
             const winningBidder = players[winningPosition];
             stage.start({
@@ -41,19 +36,15 @@ describe('Round Stage Unit', function() {
                 highestBid:  new Bid(6, null, null, null, 100, config),
             });
             const card = hands[winningPosition].cards[0];
-
-            // Act
+            debugger;
             stage.onStageAction(winningBidder, GameAction.PLACE_CARD, {
                 card: card
             });
             const containsCard = stage.hands[winningPosition].containsCard(card);
-
-            // Assert
-            containsCard.should.be.true();
+            assert.equal(containsCard, true)
         });
 
         it('opening player plays card becoming winning card', () => {
-            // Arrange
             const winningPosition = 0;
             const winningBidder = players[winningPosition];
             stage.start({
@@ -62,15 +53,11 @@ describe('Round Stage Unit', function() {
                 highestBid:  new Bid(6, null, null, null, 100, config),
             });
             const openingCard = hands[winningPosition].cards[0];
-
-            // Act
             stage.onStageAction(winningBidder, GameAction.PLACE_CARD, {
                 card: openingCard
             });
-
-            // Assert
             const winningCard = stage.trick.endTrick();
-            winningCard.should.equal(openingCard);
+            assert.equal(winningCard, openingCard);
         });
     });
 });
