@@ -1,5 +1,3 @@
-// import {Response} from 'node-fetch'; // needed only for testing
-
 export async function jsonRequest(request) {
     if (request.method != 'POST') {
         return [null, jsonResponse({message: 'bad method'}, 405)];

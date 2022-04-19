@@ -1,7 +1,8 @@
+import {Request, Response} from 'node-fetch';
 import {Lobby} from './Lobby.js';
-import {Request} from 'node-fetch';
 
-// jest.mock('./util.js'); // broken due to jest trying to use require with modules ¯\_(ツ)_/¯
+global.Request = Request;
+global.Response = Response;
 
 describe('Lobby tests', () => {
     describe('POST /lobby_create', () => {
