@@ -16,7 +16,7 @@ const pathNotFound = route.params.pathNotFound || null;
 const menuItems = [
     ['New', 'new'],
     ['Join', 'join'],
-    ['Sandbox', 'sandbox'],
+    // ['Sandbox', 'sandbox'],
 ];
 </script>
 
