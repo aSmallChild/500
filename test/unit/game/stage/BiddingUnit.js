@@ -1,10 +1,8 @@
-// noinspection ES6UnusedImports
-/* eslint-disable no-unused-vars,no-undef */
-import should from 'should';
-import Bidding from '../../../../src/game/stage/Bidding.js';
+import assert from 'assert';
+import Bidding from '../../../../lib/game/stage/Bidding.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
-import {GameAction} from '../../../../src/game/GameAction.js';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
+import {GameAction} from '../../../../lib/game/GameAction.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 
 const getStartData = stage => {
     const config = OrdinaryNormalDeck.config;
@@ -18,11 +16,11 @@ describe('Bidding Stage Unit', () => {
         const stage = getStage(getPlayers(23), Bidding);
         it(`should deal cards to all players`, () => {
             stage.start(getStartData(stage));
-            stage.kitty.size.should.equal(3);
-            stage.hands.should.length(23);
-            stage.players.should.length(23);
+            assert.equal(stage.kitty.size, 3);
+            assert.equal(stage.hands.length, 23);
+            assert.equal(stage.players.length, 23);
             for (const hand of stage.hands) {
-                hand.size.should.equal(10);
+                assert.equal(hand.size, 10);
             }
         });
     });
@@ -108,43 +106,43 @@ describe('Bidding Stage Unit', () => {
                 for (const [position, call] of scenario.bids) {
                     const player = stage.players[position];
                     const bid = stage.getBid(call);
-                    stage.currentBidder.should.equal(position);
+                    assert.equal(stage.currentBidder, position);
                     let bidAnnounced = false;
-                    player.client = {
-                        emit(event, action) {
-                            should(event).equal('stage:action');
-                            const {actionName, actionData} = action;
-                            actionName.should.not.equal('bid_error', `Received unexpected bid error: ${actionData}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
-                        },
-                    };
-                    stage.channel.emit = (event, action) => {
-                        should(event).equal('stage:action');
+                    player.user.emit = (event, action) => {
+                        assert.equal(event, 'stage:action');
                         const {actionName, actionData} = action;
-                        if (!bidAnnounced && actionName === GameAction.PLACE_BID) {
-                            bidAnnounced = true;
-                            actionData.player.position.should.equal(player.position);
-                            actionData.bid.call.should.equal(bid.call);
-                        }
+                        assert.notEqual(actionName, 'bid_error', `Received unexpected bid error: ${actionData}, highest bid: ${stage.highestBid}, with bid: ${bid}`);
                     };
-                    stage.onStageAction(player, GameAction.PLACE_BID, call);
-                    bidAnnounced.should.be.true('bid was not announced');
+                    stage.setServer({
+                        emit(event, action) {
+                            assert.equal(event, 'stage:action');
+                            const {actionName, actionData} = action;
+                            if (!bidAnnounced && actionName === GameAction.PLACE_BID) {
+                                bidAnnounced = true;
+                                assert.equal(actionData.player.position, player.position);
+                                assert.equal(actionData.bid.call, bid.call);
+                            }
+                        },
+                    });
+                    stage.onStageAction(player, player.user, GameAction.PLACE_BID, call);
+                    assert(bidAnnounced, 'bid was not announced');
                 }
                 const [winnerPosition, winningCall] = scenario.winner;
                 const winner = stage.players[winnerPosition];
                 const expectedWinningBid = stage.getBid(winningCall);
                 winner.emit = (event, action) => {
-                    should(event).equal('stage:action');
+                    assert.equal(event, 'stage:action');
                     const {actionName, actionData} = action;
-                    actionName.should.not.equal('kitty_error', `got kitty_error ${actionData}`);
+                    assert.notEqual(actionName, 'kitty_error', `got kitty_error ${actionData}`);
                 };
                 let stageCompleted = false;
                 stage.onStageComplete((dataForNextStage) => {
                     stageCompleted = true;
-                    dataForNextStage.winningBid.call.should.equal(expectedWinningBid.call);
-                    dataForNextStage.winningBidder.should.equal(winner.position);
+                    assert.equal(dataForNextStage.winningBid?.call, expectedWinningBid.call);
+                    assert.equal(dataForNextStage.winningBidderPosition, winner.position);
                 });
-                stage.onStageAction(winner, GameAction.TAKE_KITTY);
-                stageCompleted.should.be.true('stage did not complete');
+                stage.onStageAction(winner, winner, GameAction.TAKE_KITTY);
+                assert(stageCompleted, 'stage did not complete');
             });
         }
     });

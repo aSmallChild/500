@@ -1,12 +1,10 @@
-// noinspection ES6UnusedImports
-import should from 'should';
+import assert from 'assert';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
+import Trick from '../../../../lib/game/model/Trick.js';
+import Card from '../../../../lib/game/model/Card.js';
 
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
-import DeckConfig from '../../../../src/game/model/DeckConfig.js';
-import Trick from '../../../../src/game/model/Trick.js';
-import Card from '../../../../src/game/model/Card.js';
-
-const config = new DeckConfig(OrdinaryNormalDeck.config)
+const config = new DeckConfig(OrdinaryNormalDeck.config);
 const suits = config.suits;
 const heart = suits.getSuit('H');
 const diamond = suits.getSuit('D');
@@ -16,26 +14,17 @@ const spade = suits.getSuit('S');
 describe('Trick Unit', () => {
     describe('playCard', () => {
         it('initial play of card sets trumps', () => {
-            // Arrange
             const trick = new Trick(3);
             const card = new Card(heart, 'A', config);
-
-            // Act
             trick.playCard(card);
-
-            // Assert
-            trick.trumps.should.equal(heart);
+            assert.equal(trick.trumps, heart);
         });
 
         it('exceeds expected max plays', () => {
-            // Arrange
             const trick = new Trick(1);
             const card = new Card(heart, 'A', config);
             trick.playCard(card);
-
-            // Act
-            // Assert
-            should.throws(() => trick.playCard(card), Error);
+            assert.throws(() => trick.playCard(card), Error);
         });
 
         const winningPlays = [
@@ -49,59 +38,39 @@ describe('Trick Unit', () => {
 
         for (const [card, winningCard] of winningPlays) {
             it(`replaces card ${card.value} with winning card ${winningCard.value}`, () => {
-                // Arrange
                 const trick = new Trick(2);
                 trick.playCard(card);
-
-                // Act
                 trick.playCard(winningCard);
-
-                // Assert
-                trick.winningCard.should.equal(winningCard);
+                assert.equal(trick.winningCard, winningCard);
             });
         }
 
         it('joker cannot beat winning joker', () => {
-            // Arrange
             const trick = new Trick(2);
             const initialCard = new Card(heart, '$', config);
             const nextCard = new Card(heart, '$', config);
             trick.playCard(initialCard);
-
-            // Act
             trick.playCard(nextCard);
-
-            // Assert
-            trick.winningCard.should.equal(initialCard);
+            assert.equal(trick.winningCard, initialCard);
         });
 
         it('left bower cannot beat right bower', () => {
-            // Arrange
             const trick = new Trick(2);
             const initialCard = new Card(heart, 'J', config);
             const nextCard = new Card(diamond, 'J', config);
             trick.playCard(initialCard);
-
-            // Act
             trick.playCard(nextCard);
-
-            // Assert
-            trick.winningCard.should.equal(initialCard);
+            assert.equal(trick.winningCard, initialCard);
         });
     });
 
     describe('endTrick', () => {
         it('returns winning card', () => {
-            // Arrange
             const trick = new Trick(2);
             const initialCard = new Card(heart, '2', config);
             trick.playCard(initialCard);
-
-            // Act
             const winningCard = trick.endTrick();
-
-            // Assert
-            winningCard.should.equal(initialCard);
+            assert.equal(winningCard, initialCard);
         });
     });
 });

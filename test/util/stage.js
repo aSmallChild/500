@@ -1,11 +1,10 @@
-import Player from '../../src/game/model/Player.js';
-import Channel from '../../src/server/Channel.js';
-import ChannelClient from '../../src/server/ChannelClient.js';
+import Player from '../../lib/game/model/Player.js';
+import User from '../../lib/server/User.js';
 
 export function getPlayers(count, positions = false) {
     const players = [];
     for (let i = 0; i < count; i++) {
-        const player = new Player((i + 10).toString(36), new ChannelClient('' + i, 'b'));
+        const player = new Player((i + 10).toString(36), new User('' + i, 'b'));
         if (positions) player.position = i;
         players.push(player);
     }
@@ -13,10 +12,9 @@ export function getPlayers(count, positions = false) {
 }
 
 export function getStage(players, constructor) {
-    const channel = new Channel('a', 'b', 'c');
     const stage = new constructor();
     stage.setDataStore({});
     stage.setPlayers(players);
-    stage.setChannel(channel);
+    stage.setServer({emit() {}});
     return stage;
 }

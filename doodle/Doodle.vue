@@ -1,32 +1,33 @@
 <template>
-    <div>
-        <svg width="0" height="0">
-            <defs ref="svgDefs"></defs>
-        </svg>
-        <div style="text-align: center;">
-            <v-btn color="secondary" @click="newChannel">New</v-btn>
-            Name: <input v-model="channelName"/>
-            <v-btn color="secondary" @click="channelLogin">Join</v-btn>
-        </div>
+    <svg width="0" height="0">
+        <defs ref="svgDefs"></defs>
+    </svg>
+    <n-space justify="center" align="center" class="full-height">
+        <n-button @click="newChannel">New</n-button>
+        <n-input-group>
+            <n-input placeholder="Code" v-model:value="channelName"/>
+            <n-button @click="channelLogin">Join</n-button>
+        </n-input-group>
         <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card-svg="onCardClicked" draggable-cards @card-drop="cardDropped($event, hand)"/>
         <card-group pile :cards="table" @card-svg="onCardClicked" draggable-cards @card-drop="cardDropped($event, table)"/>
-    </div>
+    </n-space>
 </template>
 
 <script>
 import {ref, onMounted, onUnmounted} from 'vue';
-import CardGroup from '../vue/components/CardGroup.vue';
-import DeckConfig from '../src/game/model/DeckConfig.js';
-import OrdinaryNormalDeck from '../src/game/model/OrdinaryNormalDeck.js';
-import Client from '../src/client/Client.js';
-import Card from '../src/game/model/Card.js';
-import CardSVGBuilder from '../src/view/CardSVGBuilder.js';
-import CardSVG from '../src/view/CardSVG.js';
+import CardGroup from '../vue/src/components/CardGroup.vue';
+import DeckConfig from '../lib/game/model/DeckConfig.js';
+import OrdinaryNormalDeck from '../lib/game/model/OrdinaryNormalDeck.js';
+// import Client from '../lib/client/Client.js';
+import Card from '../lib/game/model/Card.js';
+import CardSVGBuilder from '../lib/view/CardSVGBuilder.js';
+import CardSVG from '../lib/view/CardSVG.js';
 import {useRoute} from 'vue-router';
+import {NButton, NSpace, NInput, NInputGroup} from 'naive-ui';
 
 export default {
     components: {
-        CardGroup,
+        CardGroup, NButton, NSpace, NInput, NInputGroup,
     },
     setup() {
         const route = useRoute();
@@ -44,7 +45,7 @@ export default {
         const onCardClicked = card => card.flip();
         const cardDropped = ({cardId, onCard}, group) => {
             channel.emit('target', {cardId, onCardId: onCard?.card, target: hands.value.indexOf(group)});
-        }
+        };
 
         const createNewCard = (serializedCard) => {
             const existingCard = cardMap.get(serializedCard);
@@ -143,7 +144,6 @@ export default {
         });
 
         return {
-            createNewCard,
             svgDefs,
             table,
             hands,

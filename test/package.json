@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "test": "mocha --recursive unit"
+  },
+  "dependencies": {
+    "node": "17.4.0"
+  },
+  "devDependencies": {
+    "mocha": "^8.4.0"
+  },
+  "license": "ISC",
+  "type": "module"
+}

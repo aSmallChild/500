@@ -1,9 +1,6 @@
-/* eslint-disable */
-// noinspection ES6UnusedImports
-import should from 'should';
-import GameStage from '../../../../src/game/GameStage.js';
-import Game from '../../../../src/game/Game.js';
-import Channel from '../../../../src/server/Channel.js';
+import assert from 'assert';
+import GameStage from '../../../../lib/game/GameStage.js';
+import Game from '../../../../lib/game/Game.js';
 
 class SampleStage1 extends GameStage {
     static startCallback;
@@ -21,69 +18,68 @@ class SampleStage2 extends GameStage {
     }
 }
 
-describe('Game Unit', function() {
-    describe('Cycle through the game', function() {
+describe('Game Unit', () => {
+    describe('Cycle through the game', () => {
         const game = new Game([
             SampleStage1,
             SampleStage2,
-        ], new Channel('a', 'b', 'c'));
-        describe(`nextStage()`, function() {
+        ]);
+        describe(`nextStage()`, () => {
             let stage1DataStore = null, stage2DataStore = null;
-            it(`should start on stage 1`, function(done) {
+            it(`should start on stage 1`, done => {
                 SampleStage1.startCallback = (instance, dataFromPreviousStage) => {
-                    instance.should.be.instanceof(SampleStage1);
-                    instance.dataStore.should.be.instanceof(Object);
-                    Object.keys(instance.dataStore).should.have.length(0);
-                    instance.dataStore.should.not.have.property('stage_1_test_property');
+                    assert(instance instanceof SampleStage1);
+                    assert(instance.dataStore instanceof Object);
+                    assert.equal(Object.keys(instance.dataStore).length, 0);
                     instance.dataStore.stage_1_test_property = 'data_from_stage_1';
                     stage1DataStore = instance;
-                    should(dataFromPreviousStage).be.undefined();
+                    assert(!dataFromPreviousStage);
                     done();
                 };
                 game.nextStage();
             });
-            it(`should proceed to stage 2`, function(done) {
+            it(`should proceed to stage 2`, done => {
                 SampleStage2.startCallback = (instance, dataFromPreviousStage) => {
-                    instance.should.be.instanceof(SampleStage2);
-                    instance.dataStore.should.be.instanceof(Object);
-                    Object.keys(instance.dataStore).should.have.length(0);
-                    instance.dataStore.should.not.have.property('stage_2_test_property');
+                    assert(instance instanceof SampleStage2);
+                    assert(instance.dataStore instanceof Object);
+                    assert.equal(Object.keys(instance.dataStore), 0);
+                    assert(!instance.dataStore?.stage_2_test_property);
                     instance.dataStore.stage_2_test_property = 'data_from_stage_2';
                     stage2DataStore = instance.dataStore;
-                    dataFromPreviousStage.should.equal('data_for_stage_2');
+                    assert.equal(dataFromPreviousStage, 'data_for_stage_2');
                     done();
                 };
                 game.currentStage.complete('data_for_stage_2');
             });
-            it(`should cycle back to stage 1`, function(done) {
+            it(`should cycle back to stage 1`, done => {
                 SampleStage1.startCallback = (instance, dataFromPreviousStage) => {
-                    instance.should.be.instanceof(SampleStage1);
-                    instance.dataStore.should.be.instanceof(Object);
-                    Object.keys(instance.dataStore).should.have.length(1);
-                    instance.dataStore.stage_1_test_property.should.equal('data_from_stage_1');
-                    instance.dataStore.should.not.equal(stage1DataStore);
-                    dataFromPreviousStage.should.equal('data_for_stage_1_again');
+                    assert(instance instanceof SampleStage1);
+                    assert(instance.dataStore instanceof Object);
+                    assert.equal(Object.keys(instance.dataStore).length, 1);
+                    assert.equal(instance.dataStore.stage_1_test_property, 'data_from_stage_1');
+                    assert.notEqual(instance.dataStore, stage1DataStore);
+                    assert.equal(dataFromPreviousStage, 'data_for_stage_1_again');
                     done();
                 };
                 game.currentStage.complete('data_for_stage_1_again');
             });
-            it(`should proceed to stage 2 again`, function(done) {
+            it(`should proceed to stage 2 again`, done => {
                 SampleStage2.startCallback = (instance, dataFromPreviousStage) => {
-                    instance.should.be.instanceof(SampleStage2);
-                    instance.dataStore.should.be.instanceof(Object);
-                    Object.keys(instance.dataStore).should.have.length(1);
-                    instance.dataStore.stage_2_test_property.should.equal('data_from_stage_2');
-                    instance.dataStore.should.not.equal(stage2DataStore);
-                    dataFromPreviousStage.should.equal('game_over');
+                    assert(instance instanceof SampleStage2);
+                    assert(instance.dataStore instanceof Object);
+                    assert.equal(Object.keys(instance.dataStore).length, 1);
+                    assert.equal(instance.dataStore.stage_2_test_property, 'data_from_stage_2');
+                    assert.notEqual(instance.dataStore, stage2DataStore);
+                    assert.equal(dataFromPreviousStage, 'game_over');
                     done();
                 };
                 const stage = game.currentStage;
                 game.currentStage.complete('game_over');
-                should(game.currentStage).be.null();
-                should(stage.dataStore).be.undefined();
-                should(stage._onStageComplete).be.undefined();
-                should(stage.players).be.undefined();
-                Object.keys(stage).should.have.length(0);
+                assert.equal(game.currentStage, null);
+                assert(!stage?.dataStore);
+                assert(!stage?._onStageComplete);
+                assert(!stage?.players);
+                assert.equal(Object.keys(stage).length, 0);
             });
         });
     });

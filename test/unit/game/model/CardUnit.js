@@ -1,9 +1,7 @@
-/* eslint-disable */
-import Card from '../../../../src/game/model/Card.js';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
-import DeckConfig from '../../../../src/game/model/DeckConfig.js';
-// noinspection ES6UnusedImports
-import should from 'should';
+import Card from '../../../../lib/game/model/Card.js';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
+import assert from 'assert';
 
 const config = new DeckConfig(OrdinaryNormalDeck.config);
 const testCards = [
@@ -16,7 +14,7 @@ describe('Card Unit', function() {
     describe('toString()', function() {
         it('should produce some strings', function() {
             for (const [card, str] of testCards) {
-                str.should.equal(card + '', `${card.getName()} did not match ${card} != ${str}`);
+                assert.equal(str, card + '', `${card.getName()} did not match ${card} != ${str}`);
             }
         });
     });
@@ -24,8 +22,8 @@ describe('Card Unit', function() {
         it('should produce some cards', function() {
             for (const [card, str] of testCards) {
                 const newCard = Card.fromString(str, config);
-                (card.value === newCard.value).should.be.true(`card values do not match ${card.value} === ${newCard.value}`);
-                (card.suit === newCard.suit).should.be.true(`card suits do not match ${card.suit} === ${newCard.suit}`);
+                assert(card.value === newCard.value, `card values do not match ${card.value} === ${newCard.value}`);
+                assert(card.suit === newCard.suit, `card suits do not match ${card.suit} === ${newCard.suit}`);
             }
         });
     });

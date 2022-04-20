@@ -1,0 +1,128 @@
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --suit-red: #c00;
+  --suit-black: #111;
+  --suit-blue: #0040ff;
+  --suit-green: #0c0;
+  --text-color: #efefdd;
+  --card-background: #efefdd;
+}
+
+.black .card-face {
+  fill: var(--suit-black);
+  stroke: var(--suit-black);
+}
+
+.red .card-face {
+  fill: var(--suit-red);
+  stroke: var(--suit-red);
+}
+
+.blue .card-face {
+  fill: var(--suit-blue);
+  stroke: var(--suit-blue);
+}
+
+.green .card-face {
+  fill: var(--suit-green);
+  stroke: var(--suit-green);
+}
+
+$cardHeight: 35 * 5px;
+$cardWidth: 25 * 5px;
+
+.card {
+  margin: 4px;
+  display: inline-block;
+  position: relative;
+  filter: drop-shadow(6px 3px 6px #000b);
+  height: $cardHeight;
+  width: $cardWidth;
+
+  transform-style: preserve-3d;
+  perspective: 500px;
+  &.face-down .card-face {
+    backface-visibility: hidden;
+    transform: rotateY(180deg);
+  }
+
+  &.face-down .card-back {
+    transform: rotateY(360deg);
+  }
+}
+
+.card-face, .card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.card-face {
+  background: var(--card-background);
+  fill: var(--suit-black);
+  stroke: var(--suit-black);
+}
+
+.card-back {
+  backface-visibility: hidden;
+  border: solid 4px var(--card-background);
+  background: rgba(var(--v-theme-secondary));
+  transform: rotateY(180deg);
+}
+
+.animate-cards {
+  & .card, & .card-face, & .card-back {
+    transition: ease-out transform 222ms;
+  }
+}
+
+@mixin fan($count, $angle) {
+  $offset: -$angle / 2;
+  @for $i from 1 through $count {
+    $increment: $angle / ($count + 1);
+    .card:nth-child(#{$i}) {
+      transform: translate(-50%, -50%) rotate($offset + $increment * $i);
+    }
+  }
+}
+
+@mixin allTheFans($counts, $angle) {
+  $offset: -$angle / 2;
+  @for $count from 1 through $counts {
+    .card:first-child:nth-last-child(#{$count}),
+    .card:first-child:nth-last-child(#{$count}) ~ .card {
+      @for $i from 1 through $count {
+        $increment: $angle / ($count + 1);
+        &:nth-child(#{$i}) {
+          transform: translate(-50%, 6%) rotate($offset + $increment * $i);
+        }
+      }
+    }
+  }
+}
+
+.fan {
+  width: $cardHeight * 2.2;
+  height: $cardHeight * 1.4;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  @include allTheFans(16, 90deg);
+
+  .card {
+    position: absolute;
+    transform-origin: 50% 125%;
+  }
+}
+
+.full-height {
+  height: 100vh;
+}

@@ -1,21 +1,19 @@
-/* eslint-disable no-undef */
-// noinspection ES6UnusedImports
-import should from 'should';
-import Lobby from '../../../../src/game/stage/Lobby.js';
+import assert from 'assert';
+import Lobby from '../../../../lib/game/stage/Lobby.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
 
-describe('Lobby Stage Unit', function() {
-    describe('Cycle through the game', function() {
-        describe(`start()`, function() {
+describe('Lobby Stage Unit', () => {
+    describe('Cycle through the game', () => {
+        describe(`start()`, () => {
             const lobby = getStage(getPlayers(6), Lobby);
-            it(`should not end prematurely`, function() {
+            it(`should not end prematurely`, () => {
                 lobby.onStageComplete(() => {
-                    should(true).be.false('Lobby stage ended prematurely');
+                    assert.fail('Lobby stage ended prematurely');
                 });
                 lobby.start();
             });
         });
-        describe(`startGame()`, function() {
+        describe(`startGame()`, () => {
             it(`should complete stage when all players are ready`, done => {
                 const lobby = getStage(getPlayers(6), Lobby);
                 lobby.onStageComplete(() => {
@@ -23,21 +21,21 @@ describe('Lobby Stage Unit', function() {
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onStageAction(player, 'ready', true);
+                    lobby.onStageAction(player, player, 'ready', true);
                 }
             });
             it(`should complete stage when all players are ready`, () => {
                 const lobby = getStage(getPlayers(1), Lobby);
                 lobby.onStageComplete(() => {
-                    should(true).be.false('Lobby stage ended without enough players');
+                    assert.fail('Lobby stage ended without enough players');
                 });
                 lobby.start();
                 for (const player of lobby.players) {
-                    lobby.onStageAction(player, 'ready', true);
+                    lobby.onStageAction(player, player, 'ready', true);
                 }
             });
         });
-        describe(`matchPartners()`, function() {
+        describe(`matchPartners()`, () => {
             const matchPartnerTests = [
                 {
                     name: 'all partners want each other',
@@ -69,7 +67,7 @@ describe('Lobby Stage Unit', function() {
                 },
             ];
             for (const testCase of matchPartnerTests) {
-                it(testCase.name, function() {
+                it(testCase.name, () => {
                     const lobby = getStage(getPlayers(testCase.playerCount), Lobby);
                     const partnerRequestsToIds = partnerRequests => {
                         const idRequests = {};
@@ -82,20 +80,20 @@ describe('Lobby Stage Unit', function() {
                     for (let [a, b] of testCase.expectedMatches) {
                         a = lobby.getPlayerByName(a);
                         b = lobby.getPlayerByName(b);
-                        should(a.partner).not.be.null();
-                        should(b.partner).not.be.null();
-                        a.partner.should.equal(b);
-                        b.partner.should.equal(a);
+                        assert(a.partner);
+                        assert(b.partner);
+                        assert.equal(a.partner, b);
+                        assert.equal(b.partner, a);
                     }
                     lobby.setPlayerPositions();
-                    testCase.playerCount.should.equal(testCase.expectedPositions.length);
-                    testCase.playerCount.should.equal(lobby.players.length);
+                    assert.equal(testCase.playerCount, testCase.expectedPositions.length);
+                    assert.equal(testCase.playerCount, lobby.players.length);
                     for (let i = 0; i < testCase.expectedPositions.length; i++) {
                         const player = lobby.getPlayerByName(testCase.expectedPositions[i]);
                         const playerAtPosition = lobby.players[i];
-                        should(player.position).not.be.null();
-                        player.position.should.equal(i, `Player is not in correct position, expected player ${player.name} to have position ${i} instead of ${player.position}`);
-                        playerAtPosition.position.should.equal(i, `stage.players is not sorted correctly player at position ${i} had their position set to ${playerAtPosition.position}`);
+                        assert(player.position !== null);
+                        assert.equal(player.position, i, `Player is not in correct position, expected player ${player.name} to have position ${i} instead of ${player.position}`);
+                        assert.equal(playerAtPosition.position, i, `stage.players is not sorted correctly player at position ${i} had their position set to ${playerAtPosition.position}`);
                     }
                 });
             }

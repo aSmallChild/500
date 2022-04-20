@@ -1,8 +1,7 @@
-// noinspection ES6UnusedImports
-/* eslint-disable no-unused-vars,no-undef */import Bid from '../../../../src/game/model/Bid.js';
-import should from 'should';
-import OrdinaryNormalDeck from '../../../../src/game/model/OrdinaryNormalDeck.js';
-import DeckConfig from '../../../../src/game/model/DeckConfig.js';
+import Bid from '../../../../lib/game/model/Bid.js';
+import assert from 'assert';
+import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 
 const config = new DeckConfig(OrdinaryNormalDeck.config);
 const testBids = [
@@ -16,7 +15,7 @@ describe('Bid Unit', () => {
     describe('toString()', () => {
         for (const [str, bid] of testBids) {
             it(`serialize '${bid.getName()}' to ${str}`, () => {
-                (bid + '').should.equal(str);
+                assert.equal(bid + '', str);
             });
         }
     });
@@ -34,17 +33,17 @@ describe('Bid Unit', () => {
         it(`should have unique bids`, () => {
             const uniqueBids = new Set();
             for (const bid of bids) {
-                bid.points.should.be.type('number');
-                bid.points.should.be.aboveOrEqual(points);
+                assert.equal(typeof bid.points, 'number');
+                assert(bid.points >= points);
                 points = bid.points;
                 const str = bid + '';
-                should.exist(bid, 'bid is missing');
-                uniqueBids.has(str).should.be.false(`bid set contained a duplicate ${str}`);
+                assert(bid, 'bid is missing')
+                assert(!uniqueBids.has(str), `bid set contained a duplicate ${str}`);
                 uniqueBids.add(str);
             }
         });
         it(`should have 29 bids`, () => {
-            bids.length.should.equal(29);
+            assert.equal(bids.length, 29);
         });
     });
 });
@@ -52,10 +51,10 @@ describe('Bid Unit', () => {
 function bidsDeepEqual(actual, expected) {
     for (const property of ['trumps', 'antiTrumps', 'tricks', 'special', 'points']) {
         if (!actual[property]) {
-            should.strictEqual(null, actual[property], `actual.${property} is not null`);
-            should.strictEqual(null, expected[property], `expected.${property} is not null`);
+            assert.strictEqual(null, actual[property], `actual.${property} is not null`);
+            assert.strictEqual(null, expected[property], `expected.${property} is not null`);
         } else {
-            should.strictEqual(actual[property], expected[property], `bid.${property} '${actual[property]}' != '${expected[property]}' does not match`);
+            assert.strictEqual(actual[property], expected[property], `bid.${property} '${actual[property]}' != '${expected[property]}' does not match`);
         }
     }
 }
