@@ -16,7 +16,7 @@
 <script>
 import {computed, onUnmounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import {addSocketListener, createSession, removeSocketListener, sendMessage} from '../../../lib/client/createSession.js';
+import {addSocketListener, createSession, disconnectSession, removeSocketListener, sendMessage} from '../../../lib/client/createSession.js';
 import Lobby from '../components/GameStage/Lobby.vue';
 import Bidding from '../components/GameStage/Bidding.vue';
 import Kitty from '../components/GameStage/Kitty.vue';
@@ -100,6 +100,7 @@ export default {
         })();
         onUnmounted(() => {
             if (listener) removeSocketListener(listener);
+            disconnectSession();
         });
         return {name, players, userId, currentPlayer, currentStage, stageAction, gameAction, onStageActionHandler, onGameActionHandler, copyGameLink, showLinkCopiedMessage};
     },
