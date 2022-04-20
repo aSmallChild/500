@@ -10,15 +10,16 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "engines": {
+    "npm": ">=8.5.5",
+    "node": ">=17.9.0"
+  },
   "license": "ISC",
   "dependencies": {
-    "node": "^17.7.2",
-    "vue": "^3.2.25",
-    "vue-router": "^4.0.14"
-  },
-  "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.0",
     "naive-ui": "^2.27.0",
-    "vite": "^2.9.0"
+    "vite": "^2.9.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14"
   }
 }

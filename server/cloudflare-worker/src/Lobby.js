@@ -129,6 +129,7 @@ export class Lobby {
 
         const user = this.getUser(userId);
         if (!user) return jsonResponse({message: 'bad user'}, 404);
+        // todo password needs to be checked at the start of the session
 
         const upgradeHeader = request.headers.get('Upgrade');
         if (upgradeHeader && upgradeHeader !== 'websocket') {

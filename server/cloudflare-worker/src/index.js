@@ -6,36 +6,49 @@ export {Lobby} from './Lobby.js';
 
 export default {
     async fetch(request, env) {
-        try {
-            return await handleRequest(request, env);
-        } catch (err) {
-            console.error(`Failed to handle request ${request.method} ${request.url}`, err.message, err.stack);
-            return jsonResponse({message: 'internal error'}, 500);
+        const origin = request.headers.get('Origin');
+        if (origin != 'http://localhost:3000' && origin != 'https://legit.nz') {
+            return new Response(null, {status: 400});
         }
+
+        const original = await handleRequest(request, env);
+        const response = new Response(original.body, original);
+        response.headers.set('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
+        response.headers.set('Access-Control-Allow-Origin', origin);
+        response.headers.set('Access-Control-Allow-Headers', '*');
+        return response;
     },
 };
 
 async function handleRequest(request, env) {
-    const requestToForward = request.clone();
-    // POST /lobby {lobby, user}
-    //  -> DO/lobby_create
+    try {
+        if (request.method === 'OPTIONS') {
+            return new Response(null, {status: 204});
+        }
+        const requestToForward = request.clone();
+        // POST /lobby {lobby, user}
+        //  -> DO/lobby_create
 
-    // POST /lobby/lobbyId {lobby, user}
-    //  -> DO/user_create
+        // POST /lobby/lobbyId {lobby, user}
+        //  -> DO/user_create
 
-    // GET /lobby/lobbyId/userId
-    //  -> DO/session_create/lobbyId/userId
+        // GET /lobby/lobbyId/userId
+        //  -> DO/session_create/lobbyId/userId
 
-    const url = new URL(request.url);
-    const basePath = '/lobby';
-    if (url.pathname == basePath) return await createLobby(request, requestToForward, env);
+        const url = new URL(request.url);
+        const basePath = '/lobby';
+        if (url.pathname == basePath) return await createLobby(request, requestToForward, env);
 
-    const [lobbyId, userId] = url.pathname.replace(basePath + '/', '').split('/');
-    if (!lobbyId || lobbyId.length > 6) return jsonResponse({message: 'bad lobbyId'}, 400);
+        const [lobbyId, userId] = url.pathname.replace(basePath + '/', '').split('/');
+        if (!lobbyId || lobbyId.length > 6) return jsonResponse({message: 'bad lobbyId'}, 400);
 
-    if (lobbyId && userId) return await createSession(request, requestToForward, env, lobbyId, userId);
-    if (lobbyId) return await createUser(request, requestToForward, env, lobbyId);
-    return jsonResponse({message: 'bad url'}, 404);
+        if (lobbyId && userId) return await createSession(request, requestToForward, env, lobbyId, userId);
+        if (lobbyId) return await createUser(request, requestToForward, env, lobbyId);
+        return jsonResponse({message: 'bad url'}, 404);
+    } catch (err) {
+        console.error(`Failed to handle request ${request.method} ${request.url}`, err.message, err.stack);
+        return jsonResponse({message: 'internal error'}, 500);
+    }
 }
 
 async function createLobby(request, requestToForward, env) {

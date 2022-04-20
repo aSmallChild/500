@@ -16,7 +16,7 @@
 <script>
 import {computed, onUnmounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import ClientChannel from '../../../lib/client/ClientChannel.js';
+import {addSocketListener, createSession, removeSocketListener, sendMessage} from '../../../lib/client/createSession.js';
 import Lobby from '../components/GameStage/Lobby.vue';
 import Bidding from '../components/GameStage/Bidding.vue';
 import Kitty from '../components/GameStage/Kitty.vue';
@@ -35,12 +35,12 @@ export default {
         const router = useRouter();
         const route = useRoute();
         const currentStage = ref(null);
-        const name = ref(route.params.id);
+        const name = ref(route.params.id || '');
         const players = ref([]);
-        const clientId = ref(null);
+        const userId = ref(null);
         const showLinkCopiedMessage = ref(false);
-        const currentPlayer = computed(() => players.value.find(player => player.clientId === clientId.value));
-        let channel = null, stageActionHandler, gameActionHandler;
+        const currentPlayer = computed(() => players.value.find(player => player.userId === userId.value));
+        let listener = null, stageActionHandler, gameActionHandler;
         watch(() => currentStage, (current, previous) => {
             if (current === previous) {
                 return;
@@ -49,15 +49,14 @@ export default {
             gameActionHandler = null;
         });
 
-        const channelName = route.params.id;
-        const channelKey = `game:${channelName}`;
+        const gameCode = route.params.id;
 
-        const redirectBack = target => router.push(target || '/join' + (channelName ? '/' + channelName : ''));
-        const gameAction = data => channel.emit('game:action', data);
-        const stageAction = data => channel.emit('stage:action', data);
+        const redirectBack = target => router.push(target || '/join' + (gameCode ? '/' + gameCode : ''));
+        const gameAction = data => sendMessage('game:action', data);
+        const stageAction = data => sendMessage('stage:action', data);
         const onStageActionHandler = handler => {
             stageActionHandler = handler;
-            channel.emit('stage:mounted');
+            sendMessage('stage:mounted');
         };
         const onGameActionHandler = handler => gameActionHandler = handler;
         const copyGameLink = () => {
@@ -68,41 +67,41 @@ export default {
 
         (async () => {
             try {
-                let response;
-                [channel, response] = await ClientChannel.reconnect(channelKey);
-                if (!response.success) {
-                    console.error(response);
-                    redirectBack(response.code === 'invalid_channel' ? '/new' : '');
+                const credentials = JSON.parse(window.localStorage.getItem('last_game_credentials'));
+                if (!createSession(import.meta.env.VITE_API_URL, gameCode, credentials.userId)) {
+                    console.error('FAILED TO CREATE SESSION');
+                    redirectBack('/');
                     return;
                 }
-                clientId.value = channel.clientId;
-                name.value = channel.name;
-                channel.on('game:stage', stage => {
-                    currentStage.value = stage;
-                });
-                channel.on('game:players', newList => {
-                    players.value = newList;
-                });
-                channel.on('game:action', data => {
-                    if (gameActionHandler) gameActionHandler(data);
-                    else console.log('NO HANDLER FOR GAME ACTION');
-                });
-                channel.on('stage:action', data => {
-                    if (stageActionHandler) stageActionHandler(data);
-                    else console.log('NO HANDLER FOR STAGE ACTION');
-                });
+                userId.value = credentials.userId;
+                name.value = gameCode;
 
-                channel.join();
+                listener = (event, data) => {
+                    if (event == 'game:stage') {
+                        currentStage.value = data;
+                    }
+                    if (event == 'game:players') {
+                        players.value = data;
+                    }
+                    if (event == 'game:action') {
+                        if (gameActionHandler) gameActionHandler(data);
+                        else console.log('NO HANDLER FOR GAME ACTION');
+                    }
+                    if (event == 'stage:action') {
+                        if (stageActionHandler) stageActionHandler(data);
+                        else console.log('NO HANDLER FOR STAGE ACTION');
+                    }
+                };
+                addSocketListener(listener);
             } catch (err) {
                 console.error(err);
                 redirectBack();
             }
         })();
-
         onUnmounted(() => {
-            if (channel) channel.leave();
+            if (listener) removeSocketListener(listener);
         });
-        return {name, players, clientId, currentPlayer, currentStage, stageAction, gameAction, onStageActionHandler, onGameActionHandler, copyGameLink, showLinkCopiedMessage};
+        return {name, players, userId, currentPlayer, currentStage, stageAction, gameAction, onStageActionHandler, onGameActionHandler, copyGameLink, showLinkCopiedMessage};
     },
 };
 </script>
