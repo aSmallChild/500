@@ -11,6 +11,8 @@ export class Lobby {
         this.state = state;
         this.env = env;
         this.taken = false;
+        this.lobbyId;
+        this.type;
         this.password;
         this.users = new Map();
         this.usernames = new Map();
@@ -55,7 +57,7 @@ export class Lobby {
         if (userResponse) return userResponse;
 
         if (json?.lobby?.password) {
-            this.password = json.password; // todo test
+            this.password = json.password;
         }
 
         const type = json?.lobby?.type;
@@ -64,6 +66,8 @@ export class Lobby {
             return jsonResponse({message: 'bad lobby type'}, 400);
         }
 
+        this.lobbyId = lobbyId;
+        this.type = type;
         this.taken = true;
         return jsonResponse({
             message: 'Lobby created',
@@ -79,7 +83,7 @@ export class Lobby {
         const [user, userResponse] = this.handleCreateUserJSON(json);
         if (userResponse) return userResponse;
 
-        return jsonResponse({message: 'Logged in', user});
+        return jsonResponse({message: 'Logged in', user, lobby: {lobbyId: this.lobbyId, type: this.type}});
     }
 
     handleCreateUserJSON(json) {
@@ -120,6 +124,10 @@ export class Lobby {
 
     handleCreateSessionRequest(request, userId) {
         if (request.method != 'GET') return jsonResponse({message: 'bad method'}, 405);
+        const upgradeHeader = request.headers.get('Upgrade');
+        if (upgradeHeader && upgradeHeader !== 'websocket') {
+            return jsonResponse({message: 'bad upgrade'}, 426);
+        }
 
         if (!userId) {
             const [response, session] = createSession();
@@ -128,13 +136,8 @@ export class Lobby {
         }
 
         const user = this.getUser(userId);
-        if (!user) return jsonResponse({message: 'bad user'}, 404);
+        if (!user) return jsonResponse({message: 'bad user'}, 404); // todo this cannot be a json response, has to accept the connection and return a 4000 error code
         // todo password needs to be checked at the start of the session
-
-        const upgradeHeader = request.headers.get('Upgrade');
-        if (upgradeHeader && upgradeHeader !== 'websocket') {
-            return jsonResponse({message: 'bad upgrade'}, 426);
-        }
         const [response, session] = createSession();
         user.add(session);
         this.server.onUserSession(user, session);

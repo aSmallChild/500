@@ -18,7 +18,7 @@ import {ref, onMounted, onUnmounted} from 'vue';
 import CardGroup from '../vue/src/components/CardGroup.vue';
 import DeckConfig from '../lib/game/model/DeckConfig.js';
 import OrdinaryNormalDeck from '../lib/game/model/OrdinaryNormalDeck.js';
-import Client from '../lib/client/Client.js';
+// import Client from '../lib/client/Client.js';
 import Card from '../lib/game/model/Card.js';
 import CardSVGBuilder from '../lib/view/CardSVGBuilder.js';
 import CardSVG from '../lib/view/CardSVG.js';
