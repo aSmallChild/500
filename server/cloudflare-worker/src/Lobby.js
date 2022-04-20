@@ -18,17 +18,17 @@ export class Lobby {
 
     async fetch(request) {
         const url = new URL(request.url);
-        const [path, userId] = url.pathname.substring(1).split('/');
-        if (path == 'lobby_create') return this.handleCreateLobbyRequest(request);
+        const [path, id] = url.pathname.substring(1).split('/');
+        if (path == 'lobby_create') return this.handleCreateLobbyRequest(request, id);
         if (!this.taken) return jsonResponse({message: 'bad lobby'}, 404);
 
         if (path == 'user_create') return this.handleCreateUserRequest(request);
-        if (path == 'session_create') return this.handleCreateSessionRequest(request, userId);
+        if (path == 'session_create') return this.handleCreateSessionRequest(request, id);
 
         return jsonResponse({message: 'bad url'}, 404);
     }
 
-    async handleCreateLobbyRequest(request) {
+    async handleCreateLobbyRequest(request, lobbyId) {
         // requests
         //     POST /create_lobby
         //         body:
@@ -58,6 +58,7 @@ export class Lobby {
             this.password = json.password; // todo test
         }
 
+        const type = json?.lobby?.type;
         this.server = this.createServer(json?.lobby?.type);
         if (!this.server) {
             return jsonResponse({message: 'bad lobby type'}, 400);
@@ -66,7 +67,7 @@ export class Lobby {
         this.taken = true;
         return jsonResponse({
             message: 'Lobby created',
-            lobbyId: this.state.id, // todo check that this is actually correct
+            lobby: {lobbyId, type},
             user,
         });
     }

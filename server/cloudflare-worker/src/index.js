@@ -17,10 +17,10 @@ export default {
 
 async function handleRequest(request, env) {
     const requestToForward = request.clone();
-    // POST /lobby {lobbyPassword, type, user}
+    // POST /lobby {lobby, user}
     //  -> DO/lobby_create
 
-    // POST /lobby/lobbyId {lobbyPassword, user}
+    // POST /lobby/lobbyId {lobby, user}
     //  -> DO/user_create
 
     // GET /lobby/lobbyId/userId
@@ -30,15 +30,15 @@ async function handleRequest(request, env) {
     const basePath = '/lobby';
     if (url.pathname == basePath) return await createLobby(request, requestToForward, env);
 
-    const [lobbyId, userId] = url.pathname.replace(basePath, '').split('/');
+    const [lobbyId, userId] = url.pathname.replace(basePath + '/', '').split('/');
     if (!lobbyId || lobbyId.length > 6) return jsonResponse({message: 'bad lobbyId'}, 400);
 
-    if (lobbyId && userId) return await createSession(request, requestToForward, lobbyId, userId);
-    if (lobbyId) return await createUser(request, requestToForward, lobbyId);
+    if (lobbyId && userId) return await createSession(request, requestToForward, env, lobbyId, userId);
+    if (lobbyId) return await createUser(request, requestToForward, env, lobbyId);
     return jsonResponse({message: 'bad url'}, 404);
 }
 
-async function createLobby(request, env, requestToForward) {
+async function createLobby(request, requestToForward, env) {
     const [json, response] = await jsonRequest(request);
     if (response) return response;
 
@@ -49,16 +49,16 @@ async function createLobby(request, env, requestToForward) {
     return await findAvailableLobbyAndSetItUp(requestToForward, env);
 }
 
-async function createUser(request, requestToForward, lobbyId) {
+async function createUser(request, requestToForward, env, lobbyId) {
     const response = await jsonRequest(request)[1];
     if (response) return response;
     return getLobby(lobbyId, env).fetch(new Request('https://.../user_create', requestToForward));
 }
 
-async function createSession(request, requestToForward, lobbyId, userId) {
+async function createSession(request, requestToForward, env, lobbyId, userId) {
     if (request.method != 'GET') return jsonResponse({message: 'bad method'}, 405);
     if (!userId) return jsonResponse({message: 'bad userId'}, 400);
-    return getLobby(lobbyId, env).fetch(new Request(`https://.../session_create/${lobbyId}/${userId}`, requestToForward));
+    return getLobby(lobbyId, env).fetch(new Request(`https://.../session_create/${userId}`, requestToForward));
 }
 
 const getLobby = (key, env) => env.LOBBY.get(env.LOBBY.idFromName(key));
@@ -66,8 +66,9 @@ const getLobby = (key, env) => env.LOBBY.get(env.LOBBY.idFromName(key));
 async function findAvailableLobbyAndSetItUp(request, env) {
     let response;
     for (let i = 0; i < 5; i++) {
-        const lobby = getLobby(createLobbyId(), env);
-        response = await lobby.fetch(new Request('https://.../lobby_create', request));
+        const lobbyId = createLobbyId();
+        const lobby = getLobby(lobbyId, env);
+        response = await lobby.fetch(new Request(`https://.../lobby_create/${lobbyId}`, request));
         if (response.status != 409) {
             return response;
         }
