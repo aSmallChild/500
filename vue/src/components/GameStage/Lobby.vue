@@ -1,6 +1,6 @@
 <template>
     <n-button v-if="currentPlayer" type="primary" @click="action.playerReady(!isReady)">{{ isReady ? 'Unready' : 'Ready' }}</n-button>
-    <n-button v-if="currentPlayer?.isAdmin" type="secondary" @click="action.startGame()" :disabled="players.length < 2">Start</n-button>
+    <n-button v-if="currentPlayer?.isAdmin" secondary @click="action.startGame()" :disabled="players.length < 2">Start</n-button>
     <label>
         <span>Kitty Size</span>
         <input type="number" v-model="gameConfig.kittySize" :disabled="!currentPlayer?.isAdmin" @change="action.updateGameConfig">
@@ -18,37 +18,36 @@
     </label>
     <h2>Players {{ players.length }}</h2>
     <div v-for="player in players" :key="player.name">
-        <input type="checkbox" :checked="isPlayerReady(player, readyPlayerIds)"/>
+        <input type="checkbox" :checked="isPlayerReady(player, readyPlayerIds)" disabled/>
         {{ player.name }}
         {{ player.isAdmin ? ' (admin)' : '' }}
         {{ getRequestedPartner(player) ? ` -> ${getRequestedPartner(player).name}` : '' }}
         {{ player.connections ? '' : ' DISCONNECTED' }}
         <n-button v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.giveAdmin(player)" size="small" type="primary">Admin</n-button>
-        <n-button v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.kickPlayer(player)" size="small" type="secondary">Kick</n-button>
+        <n-button v-if="currentPlayer?.isAdmin && !player.isAdmin" @click="game.kickPlayer(player)" size="small" secondary>Kick</n-button>
     </div>
 </template>
 
 <script>
 import {computed, ref} from 'vue';
-import {common, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER} from './common.js';
+import {usePlayers, useStageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER} from './common.js';
 
 import {NButton} from 'naive-ui';
 
 export default {
-    ...common,
     components: {
         NButton,
     },
     setup(props, {emit}) {
-        const getPlayerById = id => props.players.find(player => player.id === id);
+        const {players, currentPlayer, getPlayerById, otherPlayers} = usePlayers();
+        useStageEvents();
         const requestedPartner = ref(null);
-        const otherPlayers = computed(() => props.players.filter(player => player.id !== props.currentPlayer.id));
         const gameConfig = ref({
             cardsPerHand: 10,
             kittySize: 3,
         });
         const readyPlayerIds = ref([]);
-        const isReady = computed(() => isPlayerReady(props.currentPlayer));
+        const isReady = computed(() => isPlayerReady(currentPlayer.value));
         const requestedPartners = ref({});
         const isPlayerReady = player => player && readyPlayerIds.value.indexOf(player.id) > -1;
         const getRequestedPartner = player => {
@@ -79,8 +78,8 @@ export default {
                 case 'config':
                     return gameConfig.value = actionData;
                 case 'partners':
-                    if (props.currentPlayer?.id in actionData) {
-                        requestedPartner.value = getPlayerById(actionData[props.currentPlayer.id]);
+                    if (currentPlayer.value?.id in actionData) {
+                        requestedPartner.value = getPlayerById(actionData[currentPlayer.value.id]);
                     }
                     return requestedPartners.value = actionData;
                 case 'ready_players':
@@ -88,6 +87,8 @@ export default {
             }
         });
         return {
+            players,
+            currentPlayer,
             gameConfig,
             requestedPartner,
             otherPlayers,

@@ -24,9 +24,8 @@
 </template>
 
 <script>
-/* eslint-disable */
 import {computed, ref} from 'vue';
-import {common, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
+import {usePlayers, useStageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
 import {GameAction} from '../../../../lib/game/GameAction.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import ScoringAvondale from '../../../../lib/game/model/ScoringAvondale.js';
@@ -38,20 +37,19 @@ import Bid from '../../../../lib/game/model/Bid.js';
 import {NButton} from 'naive-ui';
 
 export default {
-    ...common,
     components: {
         CardGroup,
         CardSvgDefs,
         NButton
     },
     setup(props, {emit}) {
-        const getPlayerById = id => props.players.find(player => player.id === id);
-        const getPlayerByPosition = position => props.players[position];
+        const {players, currentPlayer, getPlayerById, getPlayerByPosition} = usePlayers();
+        useStageEvents();
         let deckConfig;
         const scoring = ref(null);
         const hand = ref(null);
         const playerBids = ref([]);
-        const leadingBidder = computed(() => props.players.find(player => player.position === leadingBidderPosition.value));
+        const leadingBidder = computed(() => players.value.find(player => player.position === leadingBidderPosition.value));
         const leadingBid = ref(null);
 
         const stageAction = stageActions(emit);
@@ -88,6 +86,8 @@ export default {
             }
         });
         return {
+            players,
+            currentPlayer,
             game,
             action,
             getPlayerById,

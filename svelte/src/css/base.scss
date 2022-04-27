@@ -1,3 +1,5 @@
+@use "sass:math";
+
 body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -101,12 +103,12 @@ $cardWidth: 25 * 5px;
 }
 
 @mixin allTheFans($counts, $angle) {
-  $offset: -$angle / 2;
+  $offset: math.div(-$angle, 2);
   @for $count from 1 through $counts {
     .card:first-child:nth-last-child(#{$count}),
     .card:first-child:nth-last-child(#{$count}) ~ .card {
       @for $i from 1 through $count {
-        $increment: $angle / ($count + 1);
+        $increment: math.div($angle, ($count + 1));
         &:nth-child(#{$i}) {
           transform: translate(-50%, 6%) rotate($offset + $increment * $i);
         }

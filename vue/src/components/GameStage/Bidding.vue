@@ -28,7 +28,7 @@
 
 <script>
 import {computed, ref} from 'vue';
-import {common, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
+import {usePlayers, useStageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
 import {GameAction} from '../../../../lib/game/GameAction.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import BidSelector from '../BidSelector.vue';
@@ -41,7 +41,6 @@ import Bid from '../../../../lib/game/model/Bid.js';
 import {NButton} from 'naive-ui';
 
 export default {
-    ...common,
     components: {
         CardGroup,
         BidSelector,
@@ -49,8 +48,8 @@ export default {
         NButton
     },
     setup(props, {emit}) {
-        const getPlayerById = id => props.players.find(player => player.id === id);
-        const getPlayerByPosition = position => props.players[position];
+        const {players, currentPlayer} = usePlayers();
+        useStageEvents();
         const hasSeenHand = player => playersThatHaveSeenTheirCards.value.has(player.position);
         let deckConfig;
         const scoring = ref(null);
@@ -59,7 +58,7 @@ export default {
         const playersThatHaveSeenTheirCards = ref(new Set());
         const currentBidderPosition = ref(0);
         const leadingBidderPosition = ref(0);
-        const leadingBidder = computed(() => props.players.find(player => player.position === leadingBidderPosition.value));
+        const leadingBidder = computed(() => players.value.find(player => player.position === leadingBidderPosition.value));
         const leadingBid = ref(null);
         const biddingError = ref('');
 
@@ -83,8 +82,8 @@ export default {
                 console.error(e);
             }
         };
-        const isCurrentBidder = () => props.currentPlayer && currentBidderPosition.value === props.currentPlayer.position;
-        const hasLeadingBid = () => props.currentPlayer && leadingBidderPosition.value === props.currentPlayer.position;
+        const isCurrentBidder = () => currentPlayer.value && currentBidderPosition.value === currentPlayer.value.position;
+        const hasLeadingBid = () => currentPlayer.value && leadingBidderPosition.value === currentPlayer.value.position;
         const canTakeKitty = () => hasLeadingBid() && isCurrentBidder();
         const getPlayerSymbols = player => {
             return (player.connections ? '' : '⛔') +
@@ -125,6 +124,8 @@ export default {
             }
         });
         return {
+            players,
+            currentPlayer,
             game,
             action,
             getPlayerById,

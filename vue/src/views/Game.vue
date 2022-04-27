@@ -4,7 +4,7 @@
     </h1>
     <h2 v-if="currentPlayer">{{ currentPlayer.name }}</h2>
     <div>
-        <component :is="currentStage" :players="players" :current-player="currentPlayer"
+        <component :is="currentStage"
                    @stage-action="stageAction"
                    @stage-action-handler="onStageActionHandler"
                    @game-action="gameAction"
@@ -14,12 +14,13 @@
 </template>
 
 <script>
-import {computed, onUnmounted, ref, watch} from 'vue';
+import {onUnmounted, ref, watch} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {addSocketListener, createSession, disconnectSession, removeSocketListener, sendMessage} from '../../../lib/client/createSession.js';
 import Lobby from '../components/GameStage/Lobby.vue';
 import Bidding from '../components/GameStage/Bidding.vue';
 import Kitty from '../components/GameStage/Kitty.vue';
+import {usePlayers} from '../components/GameStage/common.js';
 
 const stages = {
     Lobby,
@@ -32,14 +33,12 @@ export default {
         ...stages,
     },
     setup() {
+        const {players, currentPlayer, userId} = usePlayers();
         const router = useRouter();
         const route = useRoute();
         const currentStage = ref(null);
         const name = ref(route.params.id || '');
-        const players = ref([]);
-        const userId = ref(null);
         const showLinkCopiedMessage = ref(false);
-        const currentPlayer = computed(() => players.value.find(player => player.userId === userId.value));
         let listener = null, stageActionHandler, gameActionHandler;
         watch(() => currentStage, (current, previous) => {
             if (current === previous) {
@@ -68,6 +67,9 @@ export default {
         (async () => {
             try {
                 const credentials = JSON.parse(window.localStorage.getItem('last_game_credentials'));
+                if (credentials.gameCode != gameCode) {
+                    return;
+                }
                 if (!createSession(import.meta.env.VITE_API_URL, gameCode, credentials.userId)) {
                     console.error('FAILED TO CREATE SESSION');
                     redirectBack('/');
