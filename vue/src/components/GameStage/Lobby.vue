@@ -28,81 +28,58 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import {computed, ref} from 'vue';
-import {usePlayers, useStageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER} from './common.js';
-
+import {usePlayers, stageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER} from './common.js';
 import {NButton} from 'naive-ui';
 
-export default {
-    components: {
-        NButton,
+const {players, currentPlayer, getPlayerById, otherPlayers} = usePlayers();
+const emit = defineEmits(stageEvents);
+const requestedPartner = ref(null);
+const gameConfig = ref({
+    cardsPerHand: 10,
+    kittySize: 3,
+});
+const readyPlayerIds = ref([]);
+const isReady = computed(() => isPlayerReady(currentPlayer.value));
+const requestedPartners = ref({});
+const isPlayerReady = player => player && readyPlayerIds.value.indexOf(player.id) > -1;
+const getRequestedPartner = player => {
+    if (!player || !(player.id in requestedPartners.value) || !requestedPartners.value[player.id])
+        return;
+    return getPlayerById(requestedPartners.value[player.id]);
+};
+
+const stageAction = stageActions(emit);
+const action = {
+    requestPartner(partner) {
+        stageAction('partner', partner?.id);
     },
-    setup(props, {emit}) {
-        const {players, currentPlayer, getPlayerById, otherPlayers} = usePlayers();
-        useStageEvents();
-        const requestedPartner = ref(null);
-        const gameConfig = ref({
-            cardsPerHand: 10,
-            kittySize: 3,
-        });
-        const readyPlayerIds = ref([]);
-        const isReady = computed(() => isPlayerReady(currentPlayer.value));
-        const requestedPartners = ref({});
-        const isPlayerReady = player => player && readyPlayerIds.value.indexOf(player.id) > -1;
-        const getRequestedPartner = player => {
-            if (!player || !(player.id in requestedPartners.value) || !requestedPartners.value[player.id])
-                return;
-            return getPlayerById(requestedPartners.value[player.id]);
-        };
-
-        const stageAction = stageActions(emit);
-        const action = {
-            requestPartner(partner) {
-                stageAction('partner', partner?.id);
-            },
-            playerReady(isReady) {
-                stageAction('ready', isReady);
-            },
-            startGame() {
-                stageAction('start');
-            },
-            updateGameConfig() {
-                stageAction('config', gameConfig.value);
-            },
-        };
-        const game = gameActions(emit);
-
-        emit(STAGE_ACTION_EVENT_HANDER, ({actionName, actionData}) => {
-            switch (actionName) {
-                case 'config':
-                    return gameConfig.value = actionData;
-                case 'partners':
-                    if (currentPlayer.value?.id in actionData) {
-                        requestedPartner.value = getPlayerById(actionData[currentPlayer.value.id]);
-                    }
-                    return requestedPartners.value = actionData;
-                case 'ready_players':
-                    return readyPlayerIds.value = actionData;
-            }
-        });
-        return {
-            players,
-            currentPlayer,
-            gameConfig,
-            requestedPartner,
-            otherPlayers,
-            game,
-            action,
-            readyPlayerIds,
-            isReady,
-            isPlayerReady,
-            requestedPartners,
-            getPlayerById,
-            getRequestedPartner,
-        };
+    playerReady(isReady) {
+        stageAction('ready', isReady);
+    },
+    startGame() {
+        stageAction('start');
+    },
+    updateGameConfig() {
+        stageAction('config', gameConfig.value);
     },
 };
+const game = gameActions(emit);
+
+emit(STAGE_ACTION_EVENT_HANDER, (actionName, actionData) => {
+    switch (actionName) {
+        case 'config':
+            return gameConfig.value = actionData;
+        case 'partners':
+            if (currentPlayer.value?.id in actionData) {
+                requestedPartner.value = getPlayerById(actionData[currentPlayer.value.id]);
+            }
+            return requestedPartners.value = actionData;
+        case 'ready_players':
+            return readyPlayerIds.value = actionData;
+    }
+});
 </script>
 
 <style lang="scss" scoped>

@@ -2,12 +2,18 @@ import Card from '../../../../lib/game/model/Card.js';
 import CardSVG from '../../../../lib/view/CardSVG.js';
 import CardSVGBuilder from '../../../../lib/view/CardSVGBuilder.js';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
-import {ref, defineEmits, computed} from 'vue';
+import {ref, computed} from 'vue';
 
 const GAME_ACTION_EVENT_NAME = 'game-action';
 const STAGE_ACTION_EVENT_NAME = 'stage-action';
 export const GAME_ACTION_EVENT_HANDER = 'game-action-handler';
 export const STAGE_ACTION_EVENT_HANDER = 'stage-action-handler';
+export const stageEvents = [
+    GAME_ACTION_EVENT_NAME,
+    STAGE_ACTION_EVENT_NAME,
+    GAME_ACTION_EVENT_HANDER,
+    STAGE_ACTION_EVENT_HANDER,
+];
 
 const players = ref([]);
 const userId = ref(null);
@@ -18,15 +24,6 @@ const getPlayerByPosition = position => players.value[position];
 
 export function usePlayers() {
     return {players, currentPlayer, userId, getPlayerById, getPlayerByPosition, otherPlayers};
-}
-
-export function useStageEvents() {
-    defineEmits([
-        GAME_ACTION_EVENT_NAME,
-        STAGE_ACTION_EVENT_NAME,
-        GAME_ACTION_EVENT_HANDER,
-        STAGE_ACTION_EVENT_HANDER,
-    ]);
 }
 
 export const stageActions = emit => (actionName, actionData) => emit(STAGE_ACTION_EVENT_NAME, {actionName, actionData});

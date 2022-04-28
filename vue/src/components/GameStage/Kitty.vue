@@ -23,9 +23,9 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import {computed, ref} from 'vue';
-import {usePlayers, useStageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
+import {usePlayers, stageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
 import {GameAction} from '../../../../lib/game/GameAction.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import ScoringAvondale from '../../../../lib/game/model/ScoringAvondale.js';
@@ -36,72 +36,48 @@ import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js
 import Bid from '../../../../lib/game/model/Bid.js';
 import {NButton} from 'naive-ui';
 
-export default {
-    components: {
-        CardGroup,
-        CardSvgDefs,
-        NButton
+const {players, currentPlayer, getPlayerById, getPlayerByPosition} = usePlayers();
+const emit = defineEmits(stageEvents);
+let deckConfig;
+const scoring = ref(null);
+const hand = ref(null);
+const playerBids = ref([]);
+const leadingBidder = computed(() => players.value.find(player => player.position === leadingBidderPosition.value));
+const leadingBid = ref(null);
+
+const stageAction = stageActions(emit);
+const action = {
+    placeBid(bid) {
+        stageAction(GameAction.PLACE_BID, bid);
     },
-    setup(props, {emit}) {
-        const {players, currentPlayer, getPlayerById, getPlayerByPosition} = usePlayers();
-        useStageEvents();
-        let deckConfig;
-        const scoring = ref(null);
-        const hand = ref(null);
-        const playerBids = ref([]);
-        const leadingBidder = computed(() => players.value.find(player => player.position === leadingBidderPosition.value));
-        const leadingBid = ref(null);
-
-        const stageAction = stageActions(emit);
-        const action = {
-            placeBid(bid) {
-                stageAction(GameAction.PLACE_BID, bid);
-            },
-            takeHand() {
-                stageAction(GameAction.TAKE_HAND);
-            },
-            takeKitty() {
-                stageAction(GameAction.TAKE_KITTY);
-            },
-        };
-        const game = gameActions(emit);
-        const onHand = serializedDeck => {
-            try {
-                hand.value = Deck.cardsFromString(serializedDeck, deckConfig).map(card => getCardSvg(card, deckConfig));
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        const getPlayerSymbols = player => {
-            return player.connections ? '' : '⛔';
-        };
-
-        emit(STAGE_ACTION_EVENT_HANDER, ({actionName, actionData}) => {
-            switch (actionName) {
-                case 'deck_config':
-                    deckConfig = new DeckConfig(actionData);
-                    scoring.value = new ScoringAvondale(deckConfig);
-                    return;
-            }
-        });
-        return {
-            players,
-            currentPlayer,
-            game,
-            action,
-            getPlayerById,
-            getPlayerByPosition,
-            getPlayerSymbols,
-            playerBids,
-            leadingBidder,
-            leadingBid,
-            scoring,
-            hand,
-            svgDefs: OrdinaryNormalDeck.svgDefs,
-        };
+    takeHand() {
+        stageAction(GameAction.TAKE_HAND);
+    },
+    takeKitty() {
+        stageAction(GameAction.TAKE_KITTY);
     },
 };
+const game = gameActions(emit);
+const onHand = serializedDeck => {
+    try {
+        hand.value = Deck.cardsFromString(serializedDeck, deckConfig).map(card => getCardSvg(card, deckConfig));
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+const getPlayerSymbols = player => {
+    return player.connections ? '' : '⛔';
+};
+
+emit(STAGE_ACTION_EVENT_HANDER, (actionName, actionData) => {
+    switch (actionName) {
+        case 'deck_config':
+            deckConfig = new DeckConfig(actionData);
+            scoring.value = new ScoringAvondale(deckConfig);
+            return;
+    }
+});
 </script>
 
 <style lang="scss">

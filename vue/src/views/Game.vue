@@ -90,7 +90,8 @@ export default {
                         else console.log('NO HANDLER FOR GAME ACTION');
                     }
                     if (event == 'stage:action') {
-                        if (stageActionHandler) stageActionHandler(data);
+                        const {actionName, actionData} = data;
+                        if (stageActionHandler) stageActionHandler(actionName, actionData);
                         else console.log('NO HANDLER FOR STAGE ACTION');
                     }
                 };
