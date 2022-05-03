@@ -108,7 +108,7 @@ emit(STAGE_ACTION_EVENT_HANDER, (actionName, actionData) => {
         case 'highest_bid': {
             const {position, bid} = actionData;
             leadingBidderPosition.value = position ?? -1;
-            leadingBid.value = Object.freeze(Bid.fromString(bid, deckConfig));
+            leadingBid.value = bid ? Object.freeze(Bid.fromString(bid, deckConfig)) : null;
             return;
         }
         case 'bid_error':
