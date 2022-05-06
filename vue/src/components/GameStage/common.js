@@ -4,8 +4,8 @@ import CardSVGBuilder from '../../../../lib/view/CardSVGBuilder.js';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 import {ref, computed} from 'vue';
 
-const GAME_ACTION_EVENT_NAME = 'game-action';
-const STAGE_ACTION_EVENT_NAME = 'stage-action';
+export const GAME_ACTION_EVENT_NAME = 'game-action';
+export const STAGE_ACTION_EVENT_NAME = 'stage-action';
 export const GAME_ACTION_EVENT_HANDER = 'game-action-handler';
 export const STAGE_ACTION_EVENT_HANDER = 'stage-action-handler';
 export const stageEvents = [
@@ -15,9 +15,10 @@ export const stageEvents = [
     STAGE_ACTION_EVENT_HANDER,
 ];
 
+const observer = {id: null, userId: null, name: 'Spectator', position: null};
 const players = ref([]);
 const userId = ref(null);
-const currentPlayer = computed(() => players.value.find(player => player.userId === userId.value));
+const currentPlayer = computed(() => players.value.find(player => player.userId === userId.value) ?? observer);
 const otherPlayers = computed(() => players.value.filter(player => player.id !== currentPlayer.value.id));
 const getPlayerById = id => players.value.find(player => player.id === id);
 const getPlayerByPosition = position => players.value[position];
@@ -26,7 +27,7 @@ export function usePlayers() {
     return {players, currentPlayer, userId, getPlayerById, getPlayerByPosition, otherPlayers};
 }
 
-export const stageActions = emit => (actionName, actionData) => emit(STAGE_ACTION_EVENT_NAME, {actionName, actionData});
+export const stageActions = emit => (actionName, actionData = null) => emit(STAGE_ACTION_EVENT_NAME, {actionName, actionData});
 
 export const gameActions = emit => {
     const gameAction = (actionName, actionData) => emit(GAME_ACTION_EVENT_NAME, {actionName, actionData});

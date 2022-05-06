@@ -106,7 +106,7 @@ describe('Bidding Stage Unit', () => {
                 for (const [position, call] of scenario.bids) {
                     const player = stage.players[position];
                     const bid = stage.getBid(call);
-                    assert.equal(stage.currentBidder, position);
+                    assert.equal(stage.currentBidderPosition, position);
                     let bidAnnounced = false;
                     player.user.emit = (event, action) => {
                         assert.equal(event, 'stage:action');

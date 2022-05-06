@@ -14,7 +14,7 @@
             <n-button v-else @click="action.takeHand()" type="primary">Take Hand</n-button>
             <n-button v-if="canTakeKitty" @click="action.takeKitty()" type="primary">Take Kitty</n-button>
         </div>
-        <h2>Players ({{ players.length }})</h2>
+        <h2 v-test:player-heading>Players ({{ players.length }})</h2>
         <div class="bid-player-list">
             <div v-for="player in players" :key="player.name" style="display: inline-block">
                 <span :class="{'current-bidder': player.position === currentBidderPosition}">
@@ -75,18 +75,8 @@ const onHand = serializedDeck => {
     }
 };
 const svgDefs = OrdinaryNormalDeck.svgDefs;
-const isCurrentBidder = computed(() => {
-    if (currentPlayer.value) {
-        return currentBidderPosition.value === currentPlayer.value.position;
-    }
-    return false;
-});
-const hasLeadingBid = computed(() => {
-    if (currentPlayer.value) {
-        return leadingBidderPosition.value === currentPlayer.value.position;
-    }
-    return false;
-});
+const isCurrentBidder = computed(() => currentBidderPosition.value === currentPlayer.value.position);
+const hasLeadingBid = computed(() => leadingBidderPosition.value === currentPlayer.value.position);
 const canTakeKitty = computed(() => hasLeadingBid.value && isCurrentBidder.value);
 const getPlayerSymbols = player => {
     return (player.connections ? '' : '⛔') +

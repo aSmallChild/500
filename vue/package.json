@@ -12,19 +12,17 @@
     "test": "vitest"
   },
   "engines": {
-    "npm": ">=8.5.5",
-    "node": ">=17.9.0"
+    "npm": ">=8.8.0",
+    "node": ">=18.1.0"
   },
   "license": "ISC",
   "dependencies": {
-    "@vitejs/plugin-vue": "^2.3.1",
-    "naive-ui": "^2.28.1",
-    "vite": "^2.9.5",
+    "@vitejs/plugin-vue": "^2.3.2",
+    "naive-ui": "^2.28.2",
+    "vite": "^2.9.8",
     "vue": "^3.2.33",
-    "vue-router": "^4.0.14",
-    "node-sass": "^7.0.1",
-    "sass": "^1.50.1",
-    "sass-loader": "^12.6.0"
+    "vue-router": "^4.0.15",
+    "sass": "^1.51.0"
   },
   "devDependencies": {
     "@vue/test-utils": "^2.0.0-rc.21",
