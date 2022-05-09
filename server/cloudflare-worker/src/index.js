@@ -74,7 +74,7 @@ async function createSession(request, requestToForward, env, lobbyId, userId) {
     return getLobby(lobbyId, env).fetch(new Request(`https://.../session_create/${userId}`, requestToForward));
 }
 
-const getLobby = (key, env) => env.LOBBY.get(env.LOBBY.idFromName(key));
+const getLobby = (key, env) => env.LOBBY.get(env.LOBBY.idFromName(key.toUpperCase()));
 
 async function findAvailableLobbyAndSetItUp(request, env) {
     let response;
