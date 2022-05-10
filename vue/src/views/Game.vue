@@ -92,7 +92,7 @@ export default {
                     if (event == 'stage:action') {
                         const {actionName, actionData} = data;
                         if (stageActionHandler) stageActionHandler(actionName, actionData);
-                        else console.log('NO HANDLER FOR STAGE ACTION');
+                        else console.log('NO HANDLER FOR STAGE ACTION:', actionName);
                     }
                 };
                 addSocketListener(listener);

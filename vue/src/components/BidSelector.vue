@@ -49,9 +49,9 @@
             <h2>{{ bid ? bid.getName() + (bid.points ? ` (${bid.points})` : '') : 'Select Bid' }}</h2>
         </div>
         <div style="text-align: center" v-if="isCurrentBidder">
-            <n-button type="primary" @click="placeBid" v-test:place-bid-button>Place Bid</n-button>
+            <n-button type="primary" @click="placeBid" data-test="place-bid-button">Place Bid</n-button>
             <n-button type="primary" secondary @click="setSpecialBid(scoring.config.getSpecialBid('P')); placeBid()" v-if="!hasLeadingBid">Pass</n-button>
-            <div v-test:bid-error>{{ error }}</div>
+            <div data-test="bid-error">{{ error }}</div>
         </div>
     </div>
 </template>

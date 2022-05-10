@@ -42,15 +42,7 @@ describe('Bidding', async () => {
         p.players.value = players;
         p.userId.value = 'ccc';
 
-        wrapper = mount(BiddingComponent, {
-            global: {
-                directives: {
-                    test: (el, binding) => {
-                        el.setAttribute('data-test', binding.arg);
-                    },
-                },
-            },
-        });
+        wrapper = mount(BiddingComponent);
         const stageActionHandlers = wrapper.emitted()[STAGE_ACTION_EVENT_HANDER];
         expect(stageActionHandlers).to.have.length(1);
         [[stageActionHandler]] = stageActionHandlers;

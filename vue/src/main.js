@@ -20,4 +20,4 @@ const router = createRouter({
     routes,
 });
 
-createApp(App).directive('test', () => {}).use(router).mount('div');
+createApp(App).use(router).mount('div');
