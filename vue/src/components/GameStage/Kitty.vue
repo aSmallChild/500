@@ -9,10 +9,10 @@
             <h2 v-if="bid">{{ getPlayerSymbols(bidder) }} {{ bidder.name }} leads with {{ bid.getName() }} ({{ bid.points }})</h2>
             <template v-if="kitty">
                 <div>kitty</div>
-                <card-group v-if="kitty" :cards="kitty" fan/>
+                <card-group v-if="kitty" :cards="kitty" fan @card="action.moveCard($event, 'kitty')"/>
             </template>
             <div>hand</div>
-            <card-group v-if="hand" :cards="hand" fan/>
+            <card-group v-if="hand" :cards="hand" fan @card="action.moveCard($event, 'hand')"/>
             <br>
             <div>{{ error }}</div>
             <n-button v-if="isLeadingBidder" @click="action.done()" :type="error ? 'error' : 'primary'">Done</n-button>
@@ -49,6 +49,9 @@ const bid = ref(null);
 
 const stageAction = stageActions(emit);
 const action = {
+    moveCard(card, from) {
+        stageAction('move_card', {card, from});
+    },
     done() {
         stageAction('done');
     },
