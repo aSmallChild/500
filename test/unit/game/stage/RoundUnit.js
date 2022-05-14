@@ -9,7 +9,7 @@ import {getPlayers, getStage} from '../../../util/stage.js';
 
 describe('Round Stage Unit', function() {
     const config = new DeckConfig(OrdinaryNormalDeck.config);
-    const players = getPlayers(5, true);
+    const players = getPlayers(5);
     const stage = getStage(players, Round);
     const deck = Deck.buildDeck(config);
     const hands = players.map(() => deck.deal(config.cardsPerHand));

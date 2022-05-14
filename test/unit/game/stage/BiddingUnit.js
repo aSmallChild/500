@@ -100,7 +100,7 @@ describe('Bidding Stage Unit', () => {
         ];
         for (const scenario of scenarios) {
             it(scenario.name, () => {
-                const stage = getStage(getPlayers(scenario.players, true), Bidding);
+                const stage = getStage(getPlayers(scenario.players), Bidding);
                 stage.dataStore.firstBidder = scenario.firstBidder;
                 stage.start(getStartData(stage));
                 for (const [position, call] of scenario.bids) {

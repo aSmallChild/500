@@ -42,5 +42,23 @@ describe('Kitty Stage Unit', () => {
             assert.equal(card.value, 10);
         });
     });
+    describe(`moveCard()`, () => {
+        it(`should move a card from the kitty to the top of the hand`, () => {
+            stage.start(getStartData(stage));
+            const player = stage.winningBidder;
+            const card = stage.kitty.cards[1];
+            stage.moveCardToOrFromKitty(player, player, {card: card.toString(), from: 'kitty'});
+            const hand = stage.hands[player.position].cards;
+            assert.equal(hand[hand.length - 1], card);
+        });
+        it(`should move a card from the hand to the top of the kitty`, () => {
+            stage.start(getStartData(stage));
+            const player = stage.winningBidder;
+            const card = stage.hands[player.position].cards[1];
+            stage.moveCardToOrFromKitty(player, player, {card: card.toString(), from: 'hand'});
+            const hand = stage.kitty.cards;
+            assert.equal(hand[hand.length - 1], card);
+        });
+    });
 
 });
