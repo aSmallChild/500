@@ -1,7 +1,8 @@
 <template>
     <n-space justify="center" align="center" vertical class="full-height">
         <n-input-group>
-            <n-input v-if="!isNewGame" placeholder="Code" :disabled="isNewGame" v-model:value="gameCode" pattern="A-Z" maxlength="6" type="text" @keyup.enter="submit" class="game-code-input"/>
+            <n-input v-if="!isNewGame" placeholder="Code" :disabled="isNewGame" :input-props="{pattern: '[A-Z]', autocapitalize: 'characters'}" maxlength="6" type="text"
+                     v-model:value="gameCode" @keyup.enter="submit" @input="gameCode = $event.toUpperCase()"/>
             <n-input placeholder="Name" v-model:value="playerName" type="text" @keyup.enter="submit" required/>
             <n-button @click="submit" :disabled="isSubmitting || isNewGame && !playerName">{{ isNewGame || playerName ? 'Play' : 'Watch' }}</n-button>
         </n-input-group>
@@ -104,9 +105,3 @@ export default {
     },
 };
 </script>
-
-<style>
-.game-code-input input {
-    text-transform: uppercase;
-}
-</style>
