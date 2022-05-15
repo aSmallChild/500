@@ -28,6 +28,11 @@ function saveCredentials(response) {
     }));
 }
 
+function loadCredentials() {
+    const json = window.localStorage.getItem('last_game_credentials');
+    return json ? JSON.parse(json) : null;
+}
+
 export default {
     props: {
         newGame: {
@@ -42,7 +47,7 @@ export default {
         const route = useRoute();
         const router = useRouter();
         const gameCode = ref(route.params.id || '');
-        const playerName = ref('');
+        const playerName = ref(loadCredentials()?.username ?? '');
         const error = ref('');
         const isSubmitting = ref(false);
         const createGameInstead = ref(false);
@@ -63,7 +68,7 @@ export default {
             isSubmitting.value = false;
         };
 
-        const redirectToGame = () => router.push(`/game/${gameCode.value}`);
+        const redirectToGame = () => router.push({name: 'game', params: {id: gameCode.value}});
 
         const joinGame = async () => {
             try {

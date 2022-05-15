@@ -40,7 +40,7 @@ export default {
         const name = ref(route.params.id || '');
         const showLinkCopiedMessage = ref(false);
         let listener = null, stageActionHandler, gameActionHandler;
-        watch(() => currentStage, (current, previous) => {
+        watch(currentStage, (current, previous) => {
             if (current === previous) {
                 return;
             }
@@ -50,12 +50,12 @@ export default {
 
         const gameCode = route.params.id;
 
-        const redirectBack = target => router.push(target || '/join' + (gameCode ? '/' + gameCode : ''));
+        const redirectBack = target => router.push(target || {name: 'game_join', params: {id: gameCode}});
         const gameAction = data => sendMessage('game:action', data);
         const stageAction = data => sendMessage('stage:action', data);
         const onStageActionHandler = handler => {
             stageActionHandler = handler;
-            sendMessage('stage:mounted');
+            sendMessage('stage:mounted', currentStage.value);
         };
         const onGameActionHandler = handler => gameActionHandler = handler;
         const copyGameLink = () => {
@@ -68,9 +68,10 @@ export default {
             try {
                 const credentials = JSON.parse(window.localStorage.getItem('last_game_credentials'));
                 if (credentials.gameCode != gameCode) {
+                    router.push({name: 'game_join', params: {id: gameCode}});
                     return;
                 }
-                if (!createSession(import.meta.env.VITE_API_URL, gameCode, credentials.userId)) {
+                if (!await createSession(import.meta.env.VITE_API_URL, gameCode, credentials.userId, true)) {
                     console.error('FAILED TO CREATE SESSION');
                     redirectBack('/');
                     return;
@@ -107,7 +108,7 @@ export default {
         });
         return {name, players, userId, currentPlayer, currentStage, stageAction, gameAction, onStageActionHandler, onGameActionHandler, copyGameLink, showLinkCopiedMessage};
     },
-};
+    };
 </script>
 
 <style lang="scss" scoped>
