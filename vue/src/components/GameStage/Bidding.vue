@@ -34,7 +34,6 @@ import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import BidSelector from '../BidSelector.vue';
 import ScoringAvondale from '../../../../lib/game/model/ScoringAvondale.js';
 import CardGroup from '../CardGroup.vue';
-import Deck from '../../../../lib/game/model/Deck.js';
 import CardSvgDefs from '../CardSvgDefs.vue';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 import Bid from '../../../../lib/game/model/Bid.js';
@@ -67,9 +66,9 @@ const action = {
     },
 };
 const game = gameActions(emit);
-const onHand = serializedDeck => {
+const onHand = serializedCards => {
     try {
-        hand.value = Deck.cardsFromString(serializedDeck, deckConfig).map(card => getCardSvg(card, deckConfig));
+        hand.value = serializedCards.map(serializedCard => getCardSvg(serializedCard, deckConfig));
     } catch (e) {
         console.error(e);
     }

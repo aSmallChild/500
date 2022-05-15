@@ -11,8 +11,8 @@ const getStartData = stage => {
     deckConfig.cardsPerHand = 10;
     deckConfig.totalHands = stage.players.length;
     const deck = Deck.buildDeck(deckConfig);
-    const kitty = deck.deal(deckConfig.kittySize);
-    const hands = stage.players.map(() => deck.deal(deckConfig.cardsPerHand));
+    const kitty = deck.deal(deckConfig.kittySize).cards;
+    const hands = stage.players.map(() => deck.deal(deckConfig.cardsPerHand).cards);
     return JSON.parse(JSON.stringify({
         deckConfig,
         winningBidderPosition: 3,
@@ -46,17 +46,17 @@ describe('Kitty Stage Unit', () => {
         it(`should move a card from the kitty to the top of the hand`, () => {
             stage.start(getStartData(stage));
             const player = stage.winningBidder;
-            const card = stage.kitty.cards[1];
+            const card = stage.kitty[1];
             stage.moveCardToOrFromKitty(player, player, {card: card.toString(), from: 'kitty'});
-            const hand = stage.hands[player.position].cards;
+            const hand = stage.hands[player.position];
             assert.equal(hand[hand.length - 1], card);
         });
         it(`should move a card from the hand to the top of the kitty`, () => {
             stage.start(getStartData(stage));
             const player = stage.winningBidder;
-            const card = stage.hands[player.position].cards[1];
+            const card = stage.hands[player.position][1];
             stage.moveCardToOrFromKitty(player, player, {card: card.toString(), from: 'hand'});
-            const hand = stage.kitty.cards;
+            const hand = stage.kitty;
             assert.equal(hand[hand.length - 1], card);
         });
     });
