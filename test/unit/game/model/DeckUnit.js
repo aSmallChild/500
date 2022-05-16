@@ -1,4 +1,4 @@
-import Deck from '../../../../lib/game/model/Deck.js';
+import {shuffle, buildDeck, containsCard, cardsToString, cardsFromString} from '../../../../lib/game/Deck.js';
 import Card from '../../../../lib/game/model/Card.js';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
@@ -85,13 +85,13 @@ describe('Deck Unit', () => {
                 if (c.hasOwnProperty(x)) config[x] = c[x];
             }
             describe(`${config.totalHands} handed`, () => {
-                const deck = Deck.buildDeck(config);
+                const cards = buildDeck(config);
                 it(`should have ${config._totalCards} cards`, () => {
-                    assert.equal(deck.size, config._totalCards);
+                    assert.equal(cards.length, config._totalCards);
                 });
                 it(`should have unique cards`, () => {
                     const cards = new Set();
-                    for (const card of deck) {
+                    for (const card of cards) {
                         assert(!cards.has(card.toString()), `deck contained a duplicate ${card.getName()}`);
                         cards.add(card.toString());
                     }
@@ -100,29 +100,26 @@ describe('Deck Unit', () => {
         }
     });
 
-    function testShuffle(positionsToMove) {
+    const testShuffle = positionsToMove => {
         const config = new DeckConfig(OrdinaryNormalDeck.config);
         config.totalHands = 5;
-        const deck = Deck.buildDeck(config);
-        const originalOrder = [];
-        for (const card of deck) {
-            originalOrder.push(card.toString());
-        }
-        deck.shuffle();
+        const cards = buildDeck(config);
+        const originalOrder = [...cards];
+        shuffle(cards);
         let cardsThatDidntMoveVeryFar = 0;
-        for (let i = 0; i < deck.size; i++) {
-            const value = deck.cards[i].toString();
+        for (let i = 0; i < cards.length; i++) {
+            const value = cards[i].toString();
             for (let j = -positionsToMove; j <= positionsToMove; j++) {
                 let index = i + j;
-                if (index < 0) index = deck.size + index;
-                index %= deck.size;
+                if (index < 0) index = cards.length + index;
+                index %= cards.length;
                 if (originalOrder[index] === value) {
                     cardsThatDidntMoveVeryFar++;
                     break;
                 }
             }
         }
-        return cardsThatDidntMoveVeryFar / deck.size;
+        return cardsThatDidntMoveVeryFar / cards.length;
     }
 
     describe('shuffle()', () => {
@@ -139,15 +136,15 @@ describe('Deck Unit', () => {
         });
     });
 
-    describe('toString()', () => {
+    describe('cardsToString()', () => {
         it(`should produce a full deck`, () => {
             const config = new DeckConfig(OrdinaryNormalDeck.config);
             config.totalHands = 5;
-            const deck = Deck.buildDeck(config);
-            assert.equal(deck + '', '$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2');
+            const cards = buildDeck(config);
+            assert.equal(cardsToString(cards, config), '$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2');
         });
         it(`should produce correct ranges`, () => {
-            const deck = new Deck([
+            const cards = [
                 new Card(heart, 'A', config),
                 new Card(heart, 'J', config),
                 new Card(heart, 20, config),
@@ -159,43 +156,41 @@ describe('Deck Unit', () => {
                 new Card(spade, 4, config),
                 new Card(spade, 3, config),
                 new Card(spade, 2, config),
-            ], config);
-            deck.shuffle();
-            assert.equal(deck + '', 'HAJ20-18,16C3S5-2');
+            ];
+            shuffle(cards);
+            assert.equal(cardsToString(cards, config), 'HAJ20-18,16C3S5-2');
         });
     });
 
     describe('fromString()', () => {
         it(`should produce a full deck by default`, () => {
-            const deck = Deck.fromString('$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2', config);
-            assert.equal(deck + '', '$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2');
+            const cards = cardsFromString('$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2', config);
+            assert.equal(cardsToString(cards, config), '$HAKQJ10-2DAKQJ10-2CAKQJ10-2SAKQJ10-2');
         });
         it(`should produce correct ranges`, () => {
-            const deck = Deck.fromString('HAJ20-18,16C3S5-2', config);
-            assert.equal(deck + '', 'HAJ20-18,16C3S5-2');
+            const cards = cardsFromString('HAJ20-18,16C3S5-2', config);
+            assert.equal(cardsToString(cards, config), 'HAJ20-18,16C3S5-2');
         });
         it(`should not fail on that weird edge case where it didn't add all the commas`, () => {
-            const deck = Deck.fromString('HQDK10,6,5C10,8,7S10,7', config);
-            assert.equal(deck + '', 'HQDK10,6,5C10,8,7S10,7');
+            const cards = cardsFromString('HQDK10,6,5C10,8,7S10,7', config);
+            assert.equal(cardsToString(cards, config), 'HQDK10,6,5C10,8,7S10,7');
         });
     });
 
     describe('containsCard()', () => {
         it('should pass if deck contains card', () => {
-            const deck = new Deck([
-                new Card(heart, 'A', config),
-            ]);
-            const result = deck.containsCard(new Card(heart, 'A', config));
+            const cards = [new Card(heart, 'A', config)];
+            const result = containsCard(cards, new Card(heart, 'A', config));
             assert(result);
         });
 
         it('should fail if deck does not contain card', () => {
-            const deck = new Deck([
+            const cards = [
                 new Card(spade, 'A', config),
                 new Card(club, 'A', config),
                 new Card(heart, 'K', config),
-            ]);
-            const result = deck.containsCard(new Card(heart, 'A', config));
+            ];
+            const result = containsCard(cards, new Card(heart, 'A', config));
             assert(!result);
         });
     });

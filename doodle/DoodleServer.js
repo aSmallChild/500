@@ -1,5 +1,5 @@
 import DeckConfig from '../lib/game/model/DeckConfig.js';
-import Deck from '../lib/game/model/Deck.js';
+import {buildDeck} from '../lib/game/Deck.js';
 import OrdinaryNormalDeck from '../lib/game/model/OrdinaryNormalDeck.js';
 
 export default class DoodleServer {
@@ -10,12 +10,8 @@ export default class DoodleServer {
         this.config.totalHands = 2 + 4 * Math.random() >> 0;
         this.setChannel(channel);
         this.hands = [];
-        this.table = [];
+        this.table = buildDeck(this.config);
 
-        const cards = Deck.buildDeck(this.config);
-        for (const card of cards) {
-            this.table.push(card);
-        }
         this.dealCards();
     }
 

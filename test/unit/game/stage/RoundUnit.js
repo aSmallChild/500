@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { GameAction } from '../../../../lib/game/GameAction.js';
 import Bid from '../../../../lib/game/model/Bid.js';
-import Deck from '../../../../lib/game/model/Deck.js';
+import {buildDeck, deal} from '../../../../lib/game/Deck.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 import Round from '../../../../lib/game/stage/Round.js';
@@ -11,8 +11,8 @@ describe('Round Stage Unit', function() {
     const config = new DeckConfig(OrdinaryNormalDeck.config);
     const players = getPlayers(5);
     const stage = getStage(players, Round);
-    const deck = Deck.buildDeck(config);
-    const hands = players.map(() => deck.deal(config.cardsPerHand));
+    const cards = buildDeck(config);
+    const hands = players.map(() => deal(cards, config.cardsPerHand));
 
     describe(`start()`, () => {
         it(`should setup trick`, () => {

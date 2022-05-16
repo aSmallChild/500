@@ -2,7 +2,7 @@ import assert from 'assert';
 import Kitty from '../../../../lib/game/stage/Kitty.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
-import Deck from '../../../../lib/game/model/Deck.js';
+import {buildDeck, deal} from '../../../../lib/game/Deck.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 
 const getStartData = stage => {
@@ -10,9 +10,9 @@ const getStartData = stage => {
     deckConfig.kittySize = 3;
     deckConfig.cardsPerHand = 10;
     deckConfig.totalHands = stage.players.length;
-    const deck = Deck.buildDeck(deckConfig);
-    const kitty = deck.deal(deckConfig.kittySize).cards;
-    const hands = stage.players.map(() => deck.deal(deckConfig.cardsPerHand).cards);
+    const cards = buildDeck(deckConfig);
+    const kitty = deal(cards, deckConfig.kittySize);
+    const hands = stage.players.map(() => deal(cards, deckConfig.cardsPerHand));
     return JSON.parse(JSON.stringify({
         deckConfig,
         winningBidderPosition: 3,

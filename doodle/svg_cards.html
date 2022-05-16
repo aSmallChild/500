@@ -77,7 +77,7 @@
 <script type="module">
     import CardSVGBuilder from '../lib/view/CardSVGBuilder.js';
     import DeckConfig from '../lib/game/model/DeckConfig.js';
-    import Deck from '../lib/game/model/Deck.js';
+    import {buildSuitPictureCards, buildSuitNumberCards} from '../lib/game/Deck.js';
     import OrdinaryNormalDeck from '../lib/game/model/OrdinaryNormalDeck.js';
 
     const layout = OrdinaryNormalDeck.layout;
@@ -87,10 +87,9 @@
     document.getElementById('svg_defs').innerHTML += OrdinaryNormalDeck.svgDefs;
     const cards = [];
     for (const suit of config.suits) {
-        Deck.buildSuitPictureCards(suit, config, config.suitPictureCards, cards);
-        Deck.buildSuitNumberCards(suit, config, 1, 20, cards);
+        buildSuitPictureCards(suit, config, config.suitPictureCards, cards);
+        buildSuitNumberCards(suit, config, 1, 20, cards);
     }
-    // const cards = Deck.buildDeck(config);
     for (const card of cards) {
         const svg = CardSVGBuilder.getSVG(card, layout);
         div.appendChild(svg);

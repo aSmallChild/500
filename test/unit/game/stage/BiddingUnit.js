@@ -16,11 +16,11 @@ describe('Bidding Stage Unit', () => {
         const stage = getStage(getPlayers(23), Bidding);
         it(`should deal cards to all players`, () => {
             stage.start(getStartData(stage));
-            assert.equal(stage.kitty.size, 3);
+            assert.equal(stage.kitty.length, 3);
             assert.equal(stage.hands.length, 23);
             assert.equal(stage.players.length, 23);
             for (const hand of stage.hands) {
-                assert.equal(hand.size, 10);
+                assert.equal(hand.length, 10);
             }
         });
     });

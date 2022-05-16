@@ -69,6 +69,7 @@ describe('Lobby Stage Unit', () => {
             for (const testCase of matchPartnerTests) {
                 it(testCase.name, () => {
                     const lobby = getStage(getPlayers(testCase.playerCount), Lobby);
+                    lobby.players.forEach(player => player.position = null);
                     const partnerRequestsToIds = partnerRequests => {
                         const idRequests = {};
                         for (const [k, v] of Object.entries(partnerRequests)) {
