@@ -10,7 +10,7 @@
                       :error="biddingError"/>
         <div style="text-align: center">
             <h2 v-if="leadingBid">{{ getPlayerSymbols(leadingBidder) }} {{ leadingBidder.name }}: {{ leadingBid.getName() }} ({{ leadingBid.points }})</h2>
-            <card-group v-if="hand" :cards="hand" fan/>
+            <card-group v-if="hand" :cards="hand" fan self-clearing />
             <n-button v-else @click="action.takeHand()" type="primary">Take Hand</n-button>
             <n-button v-if="canTakeKitty" @click="action.takeKitty()" type="primary">Take Kitty</n-button>
         </div>
