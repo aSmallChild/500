@@ -10,7 +10,7 @@
                       :error="biddingError"/>
         <div style="text-align: center">
             <h2 v-if="leadingBid">{{ getPlayerSymbols(leadingBidder) }} {{ leadingBidder.name }}: {{ leadingBid.getName() }} ({{ leadingBid.points }})</h2>
-            <card-group v-if="hand" :cards="hand" fan self-clearing />
+            <card-group v-if="hand" :cards="hand" fan self-clearing/>
             <n-button v-else @click="action.takeHand()" type="primary">Take Hand</n-button>
             <n-button v-if="canTakeKitty" @click="action.takeKitty()" type="primary">Take Kitty</n-button>
         </div>
@@ -28,7 +28,7 @@
 
 <script setup>
 import {computed, ref} from 'vue';
-import {usePlayers, stageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
+import {usePlayers, stageEvents, gameActions, stageActions, getCardSvg} from './common.js';
 import {GameAction} from '../../../../lib/game/GameAction.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import BidSelector from '../BidSelector.vue';
@@ -82,37 +82,42 @@ const getPlayerSymbols = player => {
         (hasSeenHand(player) ? '' : '😎');
 };
 
-emit(STAGE_ACTION_EVENT_HANDER, (actionName, actionData) => {
-    switch (actionName) {
-        case 'deck_config':
-            deckConfig = new DeckConfig(actionData);
-            scoring.value = new ScoringAvondale(deckConfig);
-            return;
-        case 'bids':
-            return playerBids.value = actionData.map(bids => bids.map(bid => Object.freeze(Bid.fromString(bid, deckConfig))));
-        case 'current_bidder':
-            biddingError.value = '';
-            return currentBidderPosition.value = actionData;
-        case 'highest_bid': {
-            const {position, bid} = actionData;
-            leadingBidderPosition.value = position ?? -1;
-            leadingBid.value = bid ? Object.freeze(Bid.fromString(bid, deckConfig)) : null;
-            return;
+defineExpose({
+    gameAction(actionName, actionData) {
+
+    },
+    stageAction(actionName, actionData) {
+        switch (actionName) {
+            case 'deck_config':
+                deckConfig = new DeckConfig(actionData);
+                scoring.value = new ScoringAvondale(deckConfig);
+                return;
+            case 'bids':
+                return playerBids.value = actionData.map(bids => bids.map(bid => Object.freeze(Bid.fromString(bid, deckConfig))));
+            case 'current_bidder':
+                biddingError.value = '';
+                return currentBidderPosition.value = actionData;
+            case 'highest_bid': {
+                const {position, bid} = actionData;
+                leadingBidderPosition.value = position ?? -1;
+                leadingBid.value = bid ? Object.freeze(Bid.fromString(bid, deckConfig)) : null;
+                return;
+            }
+            case 'bid_error':
+                return biddingError.value = actionData;
+            case GameAction.PLACE_BID: {
+                const {player, bid} = actionData;
+                playerBids.value[player.position].push(Object.freeze(Bid.fromString(bid, deckConfig)));
+                return;
+            }
+            case GameAction.TAKE_HAND:
+                return onHand(actionData);
+            case GameAction.PLAYERS_TAKEN_HANDS:
+                return actionData.forEach(position => playersThatHaveSeenTheirCards.value.add(position));
+            case 'kitty_error':
+                return console.warn('TODO', actionName); // todo
         }
-        case 'bid_error':
-            return biddingError.value = actionData;
-        case GameAction.PLACE_BID: {
-            const {player, bid} = actionData;
-            playerBids.value[player.position].push(Object.freeze(Bid.fromString(bid, deckConfig)));
-            return;
-        }
-        case GameAction.TAKE_HAND:
-            return onHand(actionData);
-        case GameAction.PLAYERS_TAKEN_HANDS:
-            return actionData.forEach(position => playersThatHaveSeenTheirCards.value.add(position));
-        case 'kitty_error':
-            return console.warn('TODO', actionName); // todo
-    }
+    },
 });
 </script>
 

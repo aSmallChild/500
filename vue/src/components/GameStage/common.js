@@ -6,13 +6,9 @@ import {ref, computed} from 'vue';
 
 export const GAME_ACTION_EVENT_NAME = 'game-action';
 export const STAGE_ACTION_EVENT_NAME = 'stage-action';
-export const GAME_ACTION_EVENT_HANDER = 'game-action-handler';
-export const STAGE_ACTION_EVENT_HANDER = 'stage-action-handler';
 export const stageEvents = [
     GAME_ACTION_EVENT_NAME,
     STAGE_ACTION_EVENT_NAME,
-    GAME_ACTION_EVENT_HANDER,
-    STAGE_ACTION_EVENT_HANDER,
 ];
 
 const observer = {id: null, userId: null, name: 'Spectator', position: null};

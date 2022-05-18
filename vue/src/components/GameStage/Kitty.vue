@@ -26,7 +26,7 @@
 
 <script setup>
 import {computed, ref} from 'vue';
-import {usePlayers, stageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER, getCardSvg} from './common.js';
+import {usePlayers, stageEvents, gameActions, stageActions, getCardSvg} from './common.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import ScoringAvondale from '../../../../lib/game/model/ScoringAvondale.js';
 import CardGroup from '../CardGroup.vue';
@@ -68,23 +68,28 @@ const getPlayerSymbols = player => {
     return player.connections ? '' : '⛔';
 };
 
-emit(STAGE_ACTION_EVENT_HANDER, (actionName, actionData) => {
-    switch (actionName) {
-        case 'deck_config':
-            deckConfig = new DeckConfig(actionData);
-            scoring = new ScoringAvondale(deckConfig);
-            return;
-        case 'hand':
-            return onCards(hand, actionData);
-        case 'kitty':
-            return onCards(kitty, actionData);
-        case 'winning_bid':
-            const {bid: serializedBid, bidderPosition: position} = actionData;
-            bid.value = Bid.fromString(serializedBid, deckConfig);
-            bidderPosition.value = position;
-            return;
-        case 'error':
-            return error.value = actionData;
-    }
+defineExpose({
+    gameAction(actionName, actionData) {
+
+    },
+    stageAction(actionName, actionData) {
+        switch (actionName) {
+            case 'deck_config':
+                deckConfig = new DeckConfig(actionData);
+                scoring = new ScoringAvondale(deckConfig);
+                return;
+            case 'hand':
+                return onCards(hand, actionData);
+            case 'kitty':
+                return onCards(kitty, actionData);
+            case 'winning_bid':
+                const {bid: serializedBid, bidderPosition: position} = actionData;
+                bid.value = Bid.fromString(serializedBid, deckConfig);
+                bidderPosition.value = position;
+                return;
+            case 'error':
+                return error.value = actionData;
+        }
+    },
 });
 </script>

@@ -2,19 +2,14 @@
     <h1 @click="copyGameLink">
         {{ showLinkCopiedMessage ? 'Copied' : currentStage || 'Game' }} {{ name.toUpperCase() }}
     </h1>
-    <h2 v-if="currentPlayer">{{ currentPlayer.name }}</h2>
+    <h2 v-if="currentPlayer">{{ !connected ? '⛔ ' : '' }}{{ currentPlayer.name }}</h2>
     <div>
-        <component :is="currentStage"
-                   @stage-action="stageAction"
-                   @stage-action-handler="onStageActionHandler"
-                   @game-action="gameAction"
-                   @game-action-handler="onGameActionHandler"
-        />
+        <component :is="currentStage" ref="stage" @stage-action="stageAction" @game-action="gameAction"/>
     </div>
 </template>
 
 <script>
-import {onUnmounted, ref, watch} from 'vue';
+import {nextTick, onUnmounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {addSocketListener, createSession, disconnectSession, removeSocketListener, sendMessage} from '../../../lib/client/createSession.js';
 import Lobby from '../components/GameStage/Lobby.vue';
@@ -38,26 +33,16 @@ export default {
         const route = useRoute();
         const currentStage = ref(null);
         const name = ref(route.params.id || '');
+        const connected = ref(false);
+        const stage = ref(null);
         const showLinkCopiedMessage = ref(false);
-        let listener = null, stageActionHandler, gameActionHandler;
-        watch(currentStage, (current, previous) => {
-            if (current === previous) {
-                return;
-            }
-            stageActionHandler = null;
-            gameActionHandler = null;
-        });
+        let listener = null;
 
         const gameCode = route.params.id;
 
         const redirectBack = target => router.push(target || {name: 'game_join', params: {id: gameCode}});
         const gameAction = data => sendMessage('game:action', data);
         const stageAction = data => sendMessage('stage:action', data);
-        const onStageActionHandler = handler => {
-            stageActionHandler = handler;
-            sendMessage('stage:mounted', currentStage.value);
-        };
-        const onGameActionHandler = handler => gameActionHandler = handler;
         const copyGameLink = () => {
             navigator.clipboard.writeText(window.location);
             showLinkCopiedMessage.value = true;
@@ -71,6 +56,34 @@ export default {
                     router.push({name: 'game_join', params: {id: gameCode}});
                     return;
                 }
+
+                listener = (event, data) => {
+                    switch (event) {
+                        case 'open':
+                            return connected.value = true;
+                        case 'close':
+                            return connected.value = false;
+                        case 'game:stage': {
+                            if (currentStage.value == data) return;
+                            currentStage.value = data;
+                            nextTick(() => sendMessage('stage:mounted', currentStage.value));
+                            return;
+                        }
+                        case 'game:players':
+                            return players.value = data;
+                        case 'game:action': {
+                            const {actionName, actionData} = data;
+                            stage.value?.gameAction(actionName, actionData);
+                            return;
+                        }
+                        case 'stage:action': {
+                            const {actionName, actionData} = data;
+                            stage.value?.stageAction(actionName, actionData);
+                            return;
+                        }
+                    }
+                };
+                addSocketListener(listener);
                 if (!await createSession(import.meta.env.VITE_API_URL, gameCode, credentials.userId, true)) {
                     console.error('FAILED TO CREATE SESSION');
                     redirectBack('/');
@@ -79,24 +92,6 @@ export default {
                 userId.value = credentials.userId;
                 name.value = gameCode;
 
-                listener = (event, data) => {
-                    if (event == 'game:stage') {
-                        currentStage.value = data;
-                    }
-                    if (event == 'game:players') {
-                        players.value = data;
-                    }
-                    if (event == 'game:action') {
-                        if (gameActionHandler) gameActionHandler(data);
-                        else console.log('NO HANDLER FOR GAME ACTION');
-                    }
-                    if (event == 'stage:action') {
-                        const {actionName, actionData} = data;
-                        if (stageActionHandler) stageActionHandler(actionName, actionData);
-                        else console.log('NO HANDLER FOR STAGE ACTION:', actionName);
-                    }
-                };
-                addSocketListener(listener);
             } catch (err) {
                 console.error(err);
                 redirectBack();
@@ -106,9 +101,9 @@ export default {
             if (listener) removeSocketListener(listener);
             disconnectSession();
         });
-        return {name, players, userId, currentPlayer, currentStage, stageAction, gameAction, onStageActionHandler, onGameActionHandler, copyGameLink, showLinkCopiedMessage};
+        return {name, players, userId, currentPlayer, currentStage, stageAction, gameAction, copyGameLink, showLinkCopiedMessage, stage, connected};
     },
-    };
+};
 </script>
 
 <style lang="scss" scoped>

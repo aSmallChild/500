@@ -30,7 +30,7 @@
 
 <script setup>
 import {computed, ref} from 'vue';
-import {usePlayers, stageEvents, gameActions, stageActions, STAGE_ACTION_EVENT_HANDER} from './common.js';
+import {usePlayers, stageEvents, gameActions, stageActions} from './common.js';
 import {NButton} from 'naive-ui';
 
 const {players, currentPlayer, getPlayerById, otherPlayers} = usePlayers();
@@ -67,18 +67,23 @@ const action = {
 };
 const game = gameActions(emit);
 
-emit(STAGE_ACTION_EVENT_HANDER, (actionName, actionData) => {
-    switch (actionName) {
-        case 'config':
-            return gameConfig.value = actionData;
-        case 'partners':
-            if (currentPlayer.value?.id in actionData) {
-                requestedPartner.value = getPlayerById(actionData[currentPlayer.value.id]);
-            }
-            return requestedPartners.value = actionData;
-        case 'ready_players':
-            return readyPlayerIds.value = actionData;
-    }
+defineExpose({
+    gameAction(actionName, actionData) {
+
+    },
+    stageAction(actionName, actionData) {
+        switch (actionName) {
+            case 'config':
+                return gameConfig.value = actionData;
+            case 'partners':
+                if (currentPlayer.value?.id in actionData) {
+                    requestedPartner.value = getPlayerById(actionData[currentPlayer.value.id]);
+                }
+                return requestedPartners.value = actionData;
+            case 'ready_players':
+                return readyPlayerIds.value = actionData;
+        }
+    },
 });
 </script>
 
