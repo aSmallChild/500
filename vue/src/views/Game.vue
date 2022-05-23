@@ -15,12 +15,14 @@ import {addSocketListener, createSession, disconnectSession, removeSocketListene
 import Lobby from '../components/GameStage/Lobby.vue';
 import Bidding from '../components/GameStage/Bidding.vue';
 import Kitty from '../components/GameStage/Kitty.vue';
+import Round from '../components/GameStage/Round.vue';
 import {usePlayers} from '../components/GameStage/common.js';
 
 const stages = {
     Lobby,
     Bidding,
     Kitty,
+    Round
 };
 
 export default {
@@ -52,7 +54,7 @@ export default {
         (async () => {
             try {
                 const credentials = JSON.parse(window.localStorage.getItem('last_game_credentials'));
-                if (credentials.gameCode != gameCode) {
+                if (credentials?.gameCode != gameCode) {
                     router.push({name: 'game_join', params: {id: gameCode}});
                     return;
                 }
@@ -84,12 +86,12 @@ export default {
                     }
                 };
                 addSocketListener(listener);
-                if (!await createSession(import.meta.env.VITE_API_URL, gameCode, credentials.userId, true)) {
+                if (!await createSession(import.meta.env.VITE_API_URL, gameCode, credentials?.userId, true)) {
                     console.error('FAILED TO CREATE SESSION');
                     redirectBack('/');
                     return;
                 }
-                userId.value = credentials.userId;
+                userId.value = credentials?.userId;
                 name.value = gameCode;
 
             } catch (err) {
