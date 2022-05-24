@@ -2,10 +2,12 @@
     <card-svg-defs :def="OrdinaryNormalDeck.svgDefs"/>
     <div>
         <div style="text-align: center">
-            <h1 v-if="isMyTurn">Your turn!</h1>
             <h2 v-if="winningBid">{{ getPlayerSymbols(winningBidder) }} {{ winningBidder.name }} is going for {{ winningBid.getName() }} ({{ winningBid.points }})</h2>
+            <h1 v-if="isMyTurn">Your turn!</h1>
+            <div>trick</div>
+            <card-group v-if="trickCards" :cards="trickCards" pile ref="tableCardGroup"/>
             <div>hand</div>
-            <card-group v-if="hand" :cards="hand" fan @card="action.playCard($event, 'hand')"/>
+            <card-group v-if="hand" :cards="hand" fan @card="action.playCard($event, 'hand')" ref="handCardGroup"/>
             <br>
             <div>{{ error }}</div>
         </div>
@@ -24,12 +26,15 @@ import CardGroup from '../CardGroup.vue';
 import CardSvgDefs from '../CardSvgDefs.vue';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 import Bid from '../../../../lib/game/model/Bid.js';
+import {GameEvents} from '../../../../lib/game/GameEvents.js';
 
 const {players, currentPlayer, getPlayerByPosition} = usePlayers();
 const emit = defineEmits(stageEvents);
 let deckConfig;
 const hand = ref(null);
 const error = ref(null);
+const handCardGroup = ref();
+const tableCardGroup = ref();
 
 const winningBid = ref(null);
 const winningBidder = ref(null);
@@ -40,11 +45,12 @@ const playerTurn = ref(null);
 
 const tricks = ref(null);
 const currentTrick = ref(null);
+const trickCards = ref([]);
 
 const stageAction = stageActions(emit);
 const action = {
     playCard(card, from) {
-        stageAction('play_card', {card, from});
+        stageAction(GameEvents.PLAY_CARD, {card, from});
     },
 };
 const game = gameActions(emit);
@@ -66,7 +72,6 @@ const deserializeTrickCards = playedCards => {
         trick.push([getPlayerByPosition(playerPosition), getCardSvg(serializedCard, deckConfig)]);
     }
     return trick;
-
 };
 
 const deserializeTricks = actionData => {
@@ -100,8 +105,15 @@ defineExpose({
                 return tricks.value = deserializeTricks(actionData);
             case 'current_trick': {
                 const {trick, currentPlayerPosition} = actionData;
-                currentTrick.value = deserializeTrickCards(trick);
+                const tableCards = deserializeTrickCards(trick).map(([, card]) => card);
+                console.log('table_cards', tableCards)
+                currentTrick.value = tableCards;
                 playerTurn.value = getPlayerByPosition(currentPlayerPosition);
+
+                if (!currentTrick.value.length) {
+                    handCardGroup.value?.clear();
+                    tableCardGroup.value?.clear();
+                }
                 return;
             }
             case 'error':
