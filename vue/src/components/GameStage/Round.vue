@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import {computed, ref} from 'vue';
+import {computed, ref, nextTick} from 'vue';
 import {usePlayers, stageEvents, gameActions, stageActions, getCardSvg} from './common.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import CardGroup from '../CardGroup.vue';
@@ -44,7 +44,7 @@ const isMyTurn = computed(() => playerTurn.value == currentPlayer.value);
 const playerTurn = ref(null);
 
 const tricks = ref(null);
-const currentTrick = ref(null);
+// const currentTrick = ref(null);
 const trickCards = ref([]);
 
 const stageAction = stageActions(emit);
@@ -103,20 +103,17 @@ defineExpose({
                 return;
             case 'past_tricks':
                 return tricks.value = deserializeTricks(actionData);
+            case 'current_player_position': {
+                playerTurn.value = getPlayerByPosition(actionData);
+                return;
+            }
             case 'current_trick': {
-                const {trick, currentPlayerPosition} = actionData;
-                const tableCards = deserializeTrickCards(trick).map(([, card]) => card);
-                console.log('table_cards', tableCards)
-                currentTrick.value = tableCards;
-                playerTurn.value = getPlayerByPosition(currentPlayerPosition);
-
-                if (!currentTrick.value.length) {
-                    handCardGroup.value?.clear();
-                    tableCardGroup.value?.clear();
-                }
+                trickCards.value = deserializeTrickCards(actionData).map(([, card]) => card);
+                nextTick(() => tableCardGroup.value?.clear());
                 return;
             }
             case 'error':
+                setTimeout(() => error.value = '', 5000);
                 return error.value = actionData;
         }
     },

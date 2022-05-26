@@ -4,12 +4,13 @@
     </h1>
     <h2 v-if="currentPlayer">{{ !connected ? '⛔ ' : '' }}{{ currentPlayer.name }}</h2>
     <div>
-        <component :is="currentStage" ref="stage" @stage-action="stageAction" @game-action="gameAction"/>
+        <component :is="currentStage" ref="stage" @stage-action="stageAction" @game-action="gameAction"
+                   @stage-mounted="onStageMounted"/>
     </div>
 </template>
 
 <script>
-import {nextTick, onUnmounted, ref} from 'vue';
+import {onUnmounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {addSocketListener, createSession, disconnectSession, removeSocketListener, sendMessage} from '../../../lib/client/createSession.js';
 import Lobby from '../components/GameStage/Lobby.vue';
@@ -50,6 +51,7 @@ export default {
             showLinkCopiedMessage.value = true;
             setTimeout(() => showLinkCopiedMessage.value = false, 1337);
         };
+        const onStageMounted = () => sendMessage('stage:mounted', currentStage.value);
 
         (async () => {
             try {
@@ -68,7 +70,6 @@ export default {
                         case 'game:stage': {
                             if (currentStage.value == data) return;
                             currentStage.value = data;
-                            nextTick(() => sendMessage('stage:mounted', currentStage.value));
                             return;
                         }
                         case 'game:players':
@@ -103,7 +104,7 @@ export default {
             if (listener) removeSocketListener(listener);
             disconnectSession();
         });
-        return {name, players, userId, currentPlayer, currentStage, stageAction, gameAction, copyGameLink, showLinkCopiedMessage, stage, connected};
+        return {name, players, userId, currentPlayer, currentStage, stageAction, gameAction, copyGameLink, showLinkCopiedMessage, stage, connected, onStageMounted};
     },
 };
 </script>
