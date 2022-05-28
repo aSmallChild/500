@@ -21,12 +21,10 @@ export class Lobby {
     async fetch(request) {
         const url = new URL(request.url);
         const [path, id] = url.pathname.substring(1).split('/');
+        if (path == 'session_create') return this.handleCreateSessionRequest(request, id);
         if (path == 'lobby_create') return this.handleCreateLobbyRequest(request, id);
         if (!this.taken) return jsonResponse({message: 'bad lobby'}, 404);
-
         if (path == 'user_create') return this.handleCreateUserRequest(request);
-        if (path == 'session_create') return this.handleCreateSessionRequest(request, id);
-
         return jsonResponse({message: 'bad url'}, 404);
     }
 
@@ -123,24 +121,49 @@ export class Lobby {
     }
 
     handleCreateSessionRequest(request, userId) {
-        if (request.method != 'GET') return jsonResponse({message: 'bad method'}, 405);
+        if (request.method != 'GET') {
+            return jsonResponse({message: 'bad method'}, 405);
+        }
+
         const upgradeHeader = request.headers.get('Upgrade');
         if (upgradeHeader && upgradeHeader !== 'websocket') {
             return jsonResponse({message: 'bad upgrade'}, 426);
         }
 
+        const [response, session] = createSession();
+        if (!this.taken) {
+            session.close(4004, 'bad lobby');
+            return response;
+        }
+
         if (!userId) {
-            const [response, session] = createSession();
             this.server.onObserverSession(session);
             return response;
         }
 
         const user = this.getUser(userId);
-        if (!user) return jsonResponse({message: 'bad user'}, 404); // todo this cannot be a json response, has to accept the connection and return a 4000 error code
-        // todo password needs to be checked at the start of the session
-        const [response, session] = createSession();
-        user.add(session);
-        this.server.onUserSession(user, session);
+        if (!user) {
+            session.close(4001, 'bad user');
+            return response;
+        }
+
+        const acceptUserSession = () => {
+            session.send(['session:accepted', null]);
+            user.add(session);
+            this.server.onUserSession(user, session);
+        };
+
+        if (!user.password) {
+            acceptUserSession();
+            return response;
+        }
+
+        session.onMessage((event, password) => {
+            if (event === 'session:password' && password !== user.password) {
+                return session.close(4001, 'bad user');
+            }
+            acceptUserSession();
+        });
         return response;
     }
 }

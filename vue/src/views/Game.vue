@@ -1,12 +1,15 @@
 <template>
-    <h1 @click="copyGameLink">
-        {{ showLinkCopiedMessage ? 'Copied' : currentStage || 'Game' }} {{ name.toUpperCase() }}
-    </h1>
-    <h2 v-if="currentPlayer">{{ !connected ? '⛔ ' : '' }}{{ currentPlayer.name }}</h2>
-    <div>
-        <component :is="currentStage" ref="stage" @stage-action="stageAction" @game-action="gameAction"
-                   @stage-mounted="onStageMounted"/>
-    </div>
+    <h1 v-if="error" v-text="error" class="error"/>
+    <template v-else>
+        <h1 v-if="name" @click="copyGameLink" class="heading-game-code">
+            {{ showLinkCopiedMessage ? 'Copied' : currentStage || 'Game' }} {{ name.toUpperCase() }}
+        </h1>
+        <h2 v-if="currentPlayer" class="heading-player">{{ !connected ? '⛔ ' : '' }}{{ currentPlayer.name }}</h2>
+        <div>
+            <component :is="currentStage" ref="stage" @stage-action="stageAction" @game-action="gameAction"
+                       @stage-mounted="onStageMounted"/>
+        </div>
+    </template>
 </template>
 
 <script>
@@ -23,7 +26,7 @@ const stages = {
     Lobby,
     Bidding,
     Kitty,
-    Round
+    Round,
 };
 
 export default {
@@ -39,11 +42,13 @@ export default {
         const connected = ref(false);
         const stage = ref(null);
         const showLinkCopiedMessage = ref(false);
+        const error = ref('');
         let listener = null;
 
         const gameCode = route.params.id;
 
-        const redirectBack = target => router.push(target || {name: 'game_join', params: {id: gameCode}});
+        const redirectJoinGame = () => router.push({name: 'game_join', params: {id: gameCode}});
+        const redirectMainMenu = () => router.push('/');
         const gameAction = data => sendMessage('game:action', data);
         const stageAction = data => sendMessage('stage:action', data);
         const copyGameLink = () => {
@@ -57,8 +62,7 @@ export default {
             try {
                 const credentials = JSON.parse(window.localStorage.getItem('last_game_credentials'));
                 if (credentials?.gameCode != gameCode) {
-                    router.push({name: 'game_join', params: {id: gameCode}});
-                    return;
+                    return redirectJoinGame();
                 }
 
                 listener = (event, data) => {
@@ -66,7 +70,16 @@ export default {
                         case 'open':
                             return connected.value = true;
                         case 'close':
-                            return connected.value = false;
+                            connected.value = false;
+                            if (data.code === 4004) {
+                                error.value = 'Invalid game code.';
+                                setTimeout(redirectMainMenu, 10000);
+                            }
+                            if (data.code === 4001) {
+                                error.value = 'Login failed.';
+                                setTimeout(redirectJoinGame, 10000);
+                            }
+                            return;
                         case 'game:stage': {
                             if (currentStage.value == data) return;
                             currentStage.value = data;
@@ -87,9 +100,9 @@ export default {
                     }
                 };
                 addSocketListener(listener);
-                if (!await createSession(import.meta.env.VITE_API_URL, gameCode, credentials?.userId, true)) {
+                if (!await createSession(import.meta.env.VITE_API_URL, gameCode, credentials?.userId, credentials?.userPassword, true)) {
                     console.error('FAILED TO CREATE SESSION');
-                    redirectBack('/');
+                    redirectMainMenu();
                     return;
                 }
                 userId.value = credentials?.userId;
@@ -97,23 +110,33 @@ export default {
 
             } catch (err) {
                 console.error(err);
-                redirectBack();
+                redirectJoinGame();
             }
         })();
         onUnmounted(() => {
             if (listener) removeSocketListener(listener);
             disconnectSession();
         });
-        return {name, players, userId, currentPlayer, currentStage, stageAction, gameAction, copyGameLink, showLinkCopiedMessage, stage, connected, onStageMounted};
+        return {name, error, players, userId, currentPlayer, currentStage, stageAction, gameAction, copyGameLink, showLinkCopiedMessage, stage, connected, onStageMounted};
     },
 };
 </script>
 
-<style lang="scss" scoped>
-h1, h2 {
+<style>
+.heading-game-code {
     text-transform: capitalize;
     margin: 10px;
     cursor: pointer;
     text-align: center;
+}
+
+.heading-player {
+    margin: 10px;
+    text-align: center;
+}
+
+.error {
+    text-align: center;
+    color: red;
 }
 </style>

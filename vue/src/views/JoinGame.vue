@@ -18,11 +18,11 @@ import {useRoute, useRouter} from 'vue-router';
 import createLobby from '../../../lib/client/createLobby.js';
 import createUser from '../../../lib/client/createUser.js';
 
-function saveCredentials(response) {
+function saveCredentials(response, userPassword) {
     window.localStorage.setItem('last_game_credentials', JSON.stringify({
         userId: response.user.userId,
         username: response.user.username,
-        // password: response.user.password,
+        userPassword,
         gameCode: response.lobby.lobbyId,
         // gamePassword: response.lobby.password
     }));
@@ -72,15 +72,15 @@ export default {
 
         const joinGame = async () => {
             try {
-                const playerPassword = ''; // todo
+                const userPassword = 'password123'; // todo
                 const gamePassword = ''; // todo
-                const response = await createUser(import.meta.env.VITE_API_URL, gameCode.value, gamePassword, playerName.value, playerPassword);
+                const response = await createUser(import.meta.env.VITE_API_URL, gameCode.value, gamePassword, playerName.value, userPassword);
                 if (!response.success) {
                     error.value = `Failed to join game: ${response.message}`;
                     createGameInstead.value = response.code === 'invalid_channel';
                     return;
                 }
-                saveCredentials(response);
+                saveCredentials(response, userPassword);
                 redirectToGame();
             } catch (err) {
                 console.error(err);
@@ -90,15 +90,15 @@ export default {
 
         const newGame = async () => {
             try {
-                const playerPassword = '';  // todo
+                const userPassword = 'password123!';  // todo
                 const gamePassword = '';  // todo
-                const response = await createLobby(import.meta.env.VITE_API_URL, '500', gamePassword, playerName.value, playerPassword);
+                const response = await createLobby(import.meta.env.VITE_API_URL, '500', gamePassword, playerName.value, userPassword);
                 if (!response.success) {
                     error.value = `Failed to create game: ${response.message}`;
                     return;
                 }
                 gameCode.value = response.lobby.lobbyId;
-                saveCredentials(response);
+                saveCredentials(response, userPassword);
                 redirectToGame();
             } catch (err) {
                 error.value = `Failed to create game.`;
