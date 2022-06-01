@@ -1,23 +1,25 @@
 <template>
     <n-space justify="center" align="center" vertical class="main-menu full-height">
         <n-h1 strong>{{ pathNotFound ? 404 : 500 }}</n-h1>
-        <router-link v-for="[label, route] of menuItems" :key="label" :to="route" custom v-slot="{ navigate }">
-            <n-button block strong type="primary" @click="navigate" size="large">{{ label }}</n-button>
+        <router-link v-for="[order, route, title] of menuItems" :key="order" :to="route" custom v-slot="{ navigate }">
+            <n-button block strong type="primary" @click="navigate" size="large">{{ title }}</n-button>
         </router-link>
     </n-space>
 </template>
 
 <script setup>
-import {useRoute} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
 import {NButton, NSpace, NH1} from 'naive-ui';
 
+const router = useRouter();
 const route = useRoute();
 const pathNotFound = route.params.pathNotFound || null;
-const menuItems = [
-    ['New', 'new'],
-    ['Join', 'join'],
-    // ['Sandbox', 'sandbox'],
-];
+const menuItems = [];
+for (const route of router.getRoutes()) {
+    if (!route.meta?.menuOrder) continue;
+    menuItems.push([route.meta.menuOrder, {name: route.name}, route.meta.title]);
+}
+menuItems.sort(([a], [b]) => a > b);
 </script>
 
 <style lang="scss">
