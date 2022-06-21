@@ -2,77 +2,91 @@
 <html lang="">
 <head>
     <style>
-        :root {
-            --suit-red: #c00;
-            --suit-black: #ccc;
-            --suit-blue: #0040ff;
-            --suit-green: #0c0;
-        }
+      :root {
+        --suit-red: #c00;
+        --suit-black: #ccc;
+        --suit-blue: #0040ff;
+        --suit-green: #0c0;
+      }
 
-        * {
-            color: var(--suit-black)
-        }
+      * {
+        color: var(--suit-black)
+      }
 
-        html {
-            background: #151;
-        }
+      html {
+        background: #151;
+      }
 
-        .card {
-            border: solid 4px var(--suit-black);
-            border-radius: 12px;
-            background: #111;
-            width: 2.5in;
-            height: 3.5in;
-            fill: var(--suit-black);
-            stroke: var(--suit-black);
-        }
+      .card {
+        border: solid 4px var(--suit-black);
+        border-radius: 12px;
+        background: #111;
+        width: 2.5in;
+        height: 3.5in;
+        fill: var(--suit-black);
+        stroke: var(--suit-black);
+        margin: 1rem;
+        display: inline-block;
+      }
 
-        .red {
-            fill: var(--suit-red);
-            stroke: var(--suit-red);
-        }
+      .red {
+        fill: var(--suit-red);
+        stroke: var(--suit-red);
+      }
 
-        .blue {
-            fill: var(--suit-blue);
-            stroke: var(--suit-blue);
-        }
+      .blue {
+        fill: var(--suit-blue);
+        stroke: var(--suit-blue);
+      }
 
-        .green {
-            fill: var(--suit-green);
-            stroke: var(--suit-green);
-        }
+      .green {
+        fill: var(--suit-green);
+        stroke: var(--suit-green);
+      }
     </style>
     <title></title>
 </head>
 <body>
-<div>
-    <svg width="0" height="0">
-        <defs id="svg_defs">
-            <symbol id="k" viewBox="0 0 640 640">
-                <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
-            </symbol>
-            <symbol id="j" viewBox="0 0 640 640">
-                <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
-            </symbol>
-            <symbol id="$" viewBox="0 0 640 640">
-                <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
-            </symbol>
-            <symbol id="q" viewBox="0 0 640 640">
-                <path d="M102.3 626C132.98 626.75 157.45 620.25 175.71 606.5C193.97 592.75 206.76 572.58 214.08 546C227.71 583.67 244.76 602.33 265.25 602C285.73 601.67 307.6 567 330.87 498C355.99 565.5 377.86 600.17 396.49 602C415.12 603.83 433.84 585.17 452.66 546C467.12 574.25 481.02 594.42 494.37 606.5C507.71 618.58 525.88 625.08 548.87 626L548.87 640C494.43 632.52 460.41 627.84 446.8 625.97C367.3 615.04 286.69 614.97 207.17 625.77C193.19 627.66 158.23 632.41 102.3 640L102.3 626Z"></path>
-                <path d="M235 531.83C235 543.42 225.59 552.83 214 552.83C202.41 552.83 193 543.42 193 531.83C193 520.24 202.41 510.83 214 510.83C225.59 510.83 235 520.24 235 531.83Z"></path>
-                <path d="M355.5 481.58C355.5 495.52 344.19 506.83 330.25 506.83C316.31 506.83 305 495.52 305 481.58C305 467.65 316.31 456.33 330.25 456.33C344.19 456.33 355.5 467.65 355.5 481.58Z"></path>
-                <path d="M474 532.33C474 543.65 464.81 552.83 453.5 552.83C442.19 552.83 433 543.65 433 532.33C433 521.02 442.19 511.83 453.5 511.83C464.81 511.83 474 521.02 474 532.33Z"></path>
-            </symbol>
-        </defs>
-    </svg>
-</div>
+<svg width="0" height="0">
+    <defs id="svg_defs">
+        <symbol id="k" viewBox="0 0 640 640">
+            <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
+        </symbol>
+        <symbol id="j" viewBox="0 0 640 640">
+            <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
+        </symbol>
+        <symbol id="$" viewBox="0 0 640 640">
+            <path d="M496.67 640L635 101.67L377.78 397.22L302.22 0L211.11 418.33L4.44 231.67L133.89 640L496.67 640Z"></path>
+        </symbol>
+        <symbol id="q" viewBox="0 0 640 640">
+            <path d="M102.3 626C132.98 626.75 157.45 620.25 175.71 606.5C193.97 592.75 206.76 572.58 214.08 546C227.71 583.67 244.76 602.33 265.25 602C285.73 601.67 307.6 567 330.87 498C355.99 565.5 377.86 600.17 396.49 602C415.12 603.83 433.84 585.17 452.66 546C467.12 574.25 481.02 594.42 494.37 606.5C507.71 618.58 525.88 625.08 548.87 626L548.87 640C494.43 632.52 460.41 627.84 446.8 625.97C367.3 615.04 286.69 614.97 207.17 625.77C193.19 627.66 158.23 632.41 102.3 640L102.3 626Z"></path>
+            <path d="M235 531.83C235 543.42 225.59 552.83 214 552.83C202.41 552.83 193 543.42 193 531.83C193 520.24 202.41 510.83 214 510.83C225.59 510.83 235 520.24 235 531.83Z"></path>
+            <path d="M355.5 481.58C355.5 495.52 344.19 506.83 330.25 506.83C316.31 506.83 305 495.52 305 481.58C305 467.65 316.31 456.33 330.25 456.33C344.19 456.33 355.5 467.65 355.5 481.58Z"></path>
+            <path d="M474 532.33C474 543.65 464.81 552.83 453.5 552.83C442.19 552.83 433 543.65 433 532.33C433 521.02 442.19 511.83 453.5 511.83C464.81 511.83 474 521.02 474 532.33Z"></path>
+        </symbol>
+    </defs>
+</svg>
 <div id="asd">
-    <svg viewBox="0 0 250 350" class="card club">
-        <use href="#k" height="90" width="90" x="80" y="130"/>
-    </svg>
-    <svg viewBox="0 0 250 350" class="card club">
-        <use href="#q" height="90" width="90" x="80" y="130"/>
-    </svg>
+    <div class="card club black">
+        <svg viewBox="0 0 250 350">
+            <use href="#k" height="90" width="90" x="80" y="130"/>
+        </svg>
+    </div>
+    <div class="card heart red">
+        <svg viewBox="0 0 250 350">
+            <use href="#q" height="90" width="90" x="80" y="130"/>
+        </svg>
+    </div>
+    <div class="card heart red">
+        <svg viewBox="0 0 250 350">
+            <use href="#$" height="90" width="90" x="80" y="130"/>
+        </svg>
+    </div>
+    <div class="card heart red">
+        <svg viewBox="0 0 250 350">
+            <use href="#j" height="90" width="90" x="80" y="130"/>
+        </svg>
+    </div>
 </div>
 <script type="module">
     import CardSVGBuilder from '../lib/view/CardSVGBuilder.js';

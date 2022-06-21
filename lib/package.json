@@ -1,3 +1,5 @@
 {
-  "type": "module"
+  "name": "lib",
+  "type": "module",
+  "version": "1.0.0"
 }

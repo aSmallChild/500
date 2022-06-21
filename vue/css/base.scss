@@ -77,7 +77,8 @@ $cardWidth: 25 * 5px;
 .card-back {
   backface-visibility: hidden;
   border: solid 4px var(--card-background);
-  background: rgba(var(--v-theme-secondary));
+  box-sizing: border-box;
+  background: purple;
   transform: rotateY(180deg);
 }
 

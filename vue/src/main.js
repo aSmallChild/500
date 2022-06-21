@@ -10,7 +10,8 @@ const routes = [
     {path: '/new', name: 'game_new', component: JoinGame, props: {newGame: true}, meta: {menuOrder: 10, title: 'New'}},
     {path: '/join/:id?', name: 'game_join', component: JoinGame, meta: {menuOrder: 20, title: 'Join'}},
     {path: '/game/:id', name: 'game', component: Game},
-    {path: '/sandbox/:id?', name: 'sandbox', component: () => import('./views/doodle/tablelayout.vue'), meta: {menuOrder: 30, title: 'Sandbox'}},
+    {path: '/circles', name: 'circles', component: () => import('./views/doodle/tablelayout.vue'), meta: {menuOrder: 30, title: 'Circles'}},
+    {path: '/animation', name: 'animation', component: () => import('./views/doodle/animation.vue'), meta: {menuOrder: 30, title: 'Animations'}},
     {path: '/:pathNotFound(.*)*', name: 'not_found', component: MainMenu},
 ];
 

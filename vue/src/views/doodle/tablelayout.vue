@@ -57,12 +57,6 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'circle',
-};
-</script>
-
 <style lang="scss">
 .round-layout {
     --rl-diameter: 400px;

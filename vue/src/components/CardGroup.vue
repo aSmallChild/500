@@ -76,6 +76,7 @@ export default {
             const onCard = findCardByChildElement(event.target);
             if (onCard && onCard.card.toString() === cardId) return;
             emit('card-drop', {cardId, onCard});
+            placeCards(props.cards);
         };
         const onClick = event => {
             const cardSvg = findCardByChildElement(event.target);
