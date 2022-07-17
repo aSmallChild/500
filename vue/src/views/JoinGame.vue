@@ -1,16 +1,3 @@
-<template>
-    <n-space justify="center" align="center" vertical class="full-height">
-        <n-input-group>
-            <n-input v-if="!isNewGame" placeholder="Code" :disabled="isNewGame" :input-props="{pattern: '[A-Z]', autocapitalize: 'characters'}" maxlength="6" type="text"
-                     v-model:value="gameCode" @keyup.enter="submit" @input="gameCode = $event.toUpperCase()"/>
-            <n-input placeholder="Name" v-model:value="playerName" type="text" @keyup.enter="submit" required/>
-            <n-button @click="submit" :disabled="isSubmitting || isNewGame && !playerName">{{ isNewGame || playerName ? 'Play' : 'Watch' }}</n-button>
-        </n-input-group>
-        <n-text type="error" v-if="error">{{ error }}</n-text>
-        <n-button v-if="createGameInstead" @click="switchToCreateGame" :disabled="isSubmitting">Create new game instead</n-button>
-    </n-space>
-</template>
-
 <script>
 import {ref} from 'vue';
 import {NButton, NSpace, NInput, NInputGroup, NText} from 'naive-ui';
@@ -90,7 +77,7 @@ export default {
 
         const newGame = async () => {
             try {
-                const userPassword = 'password123!';  // todo
+                const userPassword = 'password123';  // todo
                 const gamePassword = '';  // todo
                 const response = await createLobby(import.meta.env.VITE_API_URL, '500', gamePassword, playerName.value, userPassword);
                 if (!response.success) {
@@ -110,3 +97,16 @@ export default {
     },
 };
 </script>
+
+<template>
+    <n-space justify="center" align="center" vertical class="full-height">
+        <n-input-group>
+            <n-input v-if="!isNewGame" placeholder="Code" :disabled="isNewGame" :input-props="{pattern: '[A-Z]', autocapitalize: 'characters'}" maxlength="6" type="text"
+                     v-model:value="gameCode" @keyup.enter="submit" @input="gameCode = $event.toUpperCase()"/>
+            <n-input placeholder="Name" v-model:value="playerName" type="text" @keyup.enter="submit" required/>
+            <n-button @click="submit" :disabled="isSubmitting || isNewGame && !playerName">{{ isNewGame || playerName ? 'Play' : 'Watch' }}</n-button>
+        </n-input-group>
+        <n-text type="error" v-if="error">{{ error }}</n-text>
+        <n-button v-if="createGameInstead" @click="switchToCreateGame" :disabled="isSubmitting">Create new game instead</n-button>
+    </n-space>
+</template>
