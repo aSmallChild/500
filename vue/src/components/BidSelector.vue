@@ -24,19 +24,19 @@
             >No Trumps
             </n-button>
         </div>
-        <div><b>AntiTrumps</b></div>
-        <div>
-            <n-button v-for="suit in scoring.config.suits.lowToHigh" :key="suit"
-                      @click="setAntiTrumps(suit)"
-                      :type="bid.antiTrumps == suit ? 'secondary': 'primary'"
-                      :disabled="canHaveAntiTrump(bid, suit)"
-            >{{ suit.name }}s
-            </n-button>
-            <n-button @click="setAntiTrumps(null)"
-                      :type="bid.antiTrumps == null ? 'secondary': 'primary'"
-                      :disabled="!!bid.special">None
-            </n-button>
-        </div>
+<!--        <div><b>AntiTrumps</b></div>-->
+<!--        <div>-->
+<!--            <n-button v-for="suit in scoring.config.suits.lowToHigh" :key="suit"-->
+<!--                      @click="setAntiTrumps(suit)"-->
+<!--                      :type="bid.antiTrumps == suit ? 'secondary': 'primary'"-->
+<!--                      :disabled="canHaveAntiTrump(bid, suit)"-->
+<!--            >{{ suit.name }}s-->
+<!--            </n-button>-->
+<!--            <n-button @click="setAntiTrumps(null)"-->
+<!--                      :type="bid.antiTrumps == null ? 'secondary': 'primary'"-->
+<!--                      :disabled="!!bid.special">None-->
+<!--            </n-button>-->
+<!--        </div>-->
         <div><b>Special</b></div>
         <div>
             <n-button v-for="specialBid in allowedSpecialBids" :key="specialBid"

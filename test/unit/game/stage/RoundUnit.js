@@ -1,63 +1,69 @@
 import assert from 'assert';
-import { GameAction } from '../../../../lib/game/GameAction.js';
-import Bid from '../../../../lib/game/model/Bid.js';
-import {buildDeck, deal} from '../../../../lib/game/Deck.js';
+import {buildDeck, deal, cardsToString} from '../../../../lib/game/Deck.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 import Round from '../../../../lib/game/stage/Round.js';
 import {getPlayers, getStage} from '../../../util/stage.js';
 
-describe('Round Stage Unit', function() {
-    const config = new DeckConfig(OrdinaryNormalDeck.config);
-    const players = getPlayers(5);
-    const stage = getStage(players, Round);
-    const cards = buildDeck(config);
-    const hands = players.map(() => deal(cards, config.cardsPerHand));
+const deckConfig = new DeckConfig(OrdinaryNormalDeck.config);
+
+function getStartData(stage) {
+    deckConfig.kittySize = 3;
+    deckConfig.cardsPerHand = 10;
+    deckConfig.totalHands = stage.players.length;
+    const cards = buildDeck(deckConfig);
+    const kitty = deal(cards, deckConfig.kittySize);
+    const hands = stage.players.map(() => deal(cards, deckConfig.cardsPerHand));
+    return JSON.parse(JSON.stringify({
+        deckConfig,
+        winningBidderPosition: 3,
+        winningBid: '7S:140',
+        kitty,
+        hands,
+    }));
+}
+
+describe('Round Stage Unit', () => {
+    let stage, players;
+
+    beforeEach(() => {
+        players = getPlayers(4);
+        stage = getStage(players, Round);
+    });
 
     describe(`start()`, () => {
-        it(`should setup trick`, () => {
-            stage.start({
-                hands: hands,
-                highestBidder: players[0],
-                highestBid:  new Bid(6, null, null, null, 100, config),
-            });
-            assert.ok(stage.trick);
-            assert.ok(stage.currentPlayer);
+        it(`should deserialize all the things`, () => {
+            stage.start(getStartData(stage));
+            assert.equal(stage.hands.length, 4);
+            assert.equal(stage.currentPlayer, players[3]);
+            assert.equal(stage.winningBid.trumps.symbol, 'S');
+            assert.equal(stage.winningBid.tricks, 7);
+            assert.equal(stage.hands.map(hand => cardsToString(hand, deckConfig)).join(':'), 'C7-5SAKQJ10-8:D6-4CAKQJ10-8:H5,4DAKQJ10-7:$HAKQJ10-6');
+        });
+    });
+
+    describe('onPlayerConnect()', () => {
+        it('sends player their hand', () => {
+        });
+        it('shows player what has been played so far', () => {
         });
     });
 
     describe('onStageAction()', () => {
-        it('playing card removes card from players hand', () => {
-            const winningPosition = 0;
-            const winningBidder = players[winningPosition];
-            stage.start({
-                hands: hands,
-                highestBidder: winningBidder,
-                highestBid:  new Bid(6, null, null, null, 100, config),
-            });
-            const card = hands[winningPosition].cards[0];
-            debugger;
-            stage.onStageAction(winningBidder, winningBidder, GameAction.PLACE_CARD, {
-                card: card
-            });
-            const containsCard = stage.hands[winningPosition].containsCard(card);
-            assert.equal(containsCard, true)
+        it('can play card', () => {
         });
+        it('can identify winning card', () => {
+        });
+        it('winner leads next round', () => {
+        });
+        it('reveals cards played in error', () => {
+        });
+    });
 
-        it('opening player plays card becoming winning card', () => {
-            const winningPosition = 0;
-            const winningBidder = players[winningPosition];
-            stage.start({
-                hands: hands,
-                highestBidder: winningBidder,
-                highestBid:  new Bid(6, null, null, null, 100, config),
-            });
-            const openingCard = hands[winningPosition].cards[0];
-            stage.onStageAction(winningBidder, winningBidder, GameAction.PLACE_CARD, {
-                card: openingCard
-            });
-            const winningCard = stage.trick.endTrick();
-            assert.equal(winningCard, openingCard);
+    describe('onStageComplete()', () => {
+        it('can complete stage', () => {
+        });
+        it('adds the scores correctly', () => {
         });
     });
 });
