@@ -1,61 +1,3 @@
-<template>
-    <div class="bid-selector" v-if="bid">
-        <div><b>Tricks</b></div>
-        <div>
-            <n-button v-for="i in (scoring.maxTricks - scoring.minTricks) + 1" :key="i"
-                      @click="setTricks(i - 1 + scoring.minTricks)"
-                      :type="bid.tricks == i - 1 + scoring.minTricks ? 'secondary': 'primary'"
-                      :disabled="!tricksEnabled(i - 1 + scoring.minTricks, leadingBid)"
-                      :data-test-="'bid' + i "
-            >{{ i - 1 + scoring.minTricks }}
-            </n-button>
-        </div>
-        <div><b>Trumps</b></div>
-        <div>
-            <n-button v-for="suit in scoring.config.suits.lowToHigh" :key="suit"
-                      @click="setTrumps(suit)"
-                      :type="bid.trumps == suit ? 'secondary': 'primary'"
-                      :disabled="!suitEnabled(suit, leadingBid)"
-            >{{ suit.name }}s
-            </n-button>
-            <n-button @click="setTrumps(null)"
-                      :type="bid.trumps == null ? 'secondary': 'primary'"
-                      :disabled="!suitEnabled(null, leadingBid)"
-            >No Trumps
-            </n-button>
-        </div>
-<!--        <div><b>AntiTrumps</b></div>-->
-<!--        <div>-->
-<!--            <n-button v-for="suit in scoring.config.suits.lowToHigh" :key="suit"-->
-<!--                      @click="setAntiTrumps(suit)"-->
-<!--                      :type="bid.antiTrumps == suit ? 'secondary': 'primary'"-->
-<!--                      :disabled="canHaveAntiTrump(bid, suit)"-->
-<!--            >{{ suit.name }}s-->
-<!--            </n-button>-->
-<!--            <n-button @click="setAntiTrumps(null)"-->
-<!--                      :type="bid.antiTrumps == null ? 'secondary': 'primary'"-->
-<!--                      :disabled="!!bid.special">None-->
-<!--            </n-button>-->
-<!--        </div>-->
-        <div><b>Special</b></div>
-        <div>
-            <n-button v-for="specialBid in allowedSpecialBids" :key="specialBid"
-                      @click="setSpecialBid(specialBid)"
-                      :type="bid.special == specialBid.symbol ? 'secondary': 'primary'"
-            >{{ specialBid.name }}
-            </n-button>
-        </div>
-        <div style="text-align: center">
-            <h2>{{ bid ? bid.getName() + (bid.points ? ` (${bid.points})` : '') : 'Select Bid' }}</h2>
-        </div>
-        <div style="text-align: center" v-if="isCurrentBidder">
-            <n-button type="primary" @click="placeBid" data-test="place-bid-button">Place Bid</n-button>
-            <n-button type="primary" secondary @click="setSpecialBid(scoring.config.getSpecialBid('P')); placeBid()" v-if="!hasLeadingBid">Pass</n-button>
-            <div data-test="bid-error">{{ error }}</div>
-        </div>
-    </div>
-</template>
-
 <script>
 import Bid from '../../../lib/game/model/Bid.js';
 import {NButton} from 'naive-ui';
@@ -170,6 +112,64 @@ export default {
     },
 };
 </script>
+
+<template>
+    <div class="bid-selector" v-if="bid">
+        <div><b>Tricks</b></div>
+        <div>
+            <n-button v-for="i in (scoring.maxTricks - scoring.minTricks) + 1" :key="i"
+                      @click="setTricks(i - 1 + scoring.minTricks)"
+                      :type="bid.tricks == i - 1 + scoring.minTricks ? 'secondary': 'primary'"
+                      :disabled="!tricksEnabled(i - 1 + scoring.minTricks, leadingBid)"
+                      :data-test-="'bid' + i "
+            >{{ i - 1 + scoring.minTricks }}
+            </n-button>
+        </div>
+        <div><b>Trumps</b></div>
+        <div>
+            <n-button v-for="suit in scoring.config.suits.lowToHigh" :key="suit"
+                      @click="setTrumps(suit)"
+                      :type="bid.trumps == suit ? 'secondary': 'primary'"
+                      :disabled="!suitEnabled(suit, leadingBid)"
+            >{{ suit.name }}s
+            </n-button>
+<!--            <n-button @click="setTrumps(null)"-->
+<!--                      :type="bid.trumps == null ? 'secondary': 'primary'"-->
+<!--                      :disabled="!suitEnabled(null, leadingBid)"-->
+<!--            >No Trumps-->
+<!--            </n-button>-->
+        </div>
+<!--        <div><b>AntiTrumps</b></div>-->
+<!--        <div>-->
+<!--            <n-button v-for="suit in scoring.config.suits.lowToHigh" :key="suit"-->
+<!--                      @click="setAntiTrumps(suit)"-->
+<!--                      :type="bid.antiTrumps == suit ? 'secondary': 'primary'"-->
+<!--                      :disabled="canHaveAntiTrump(bid, suit)"-->
+<!--            >{{ suit.name }}s-->
+<!--            </n-button>-->
+<!--            <n-button @click="setAntiTrumps(null)"-->
+<!--                      :type="bid.antiTrumps == null ? 'secondary': 'primary'"-->
+<!--                      :disabled="!!bid.special">None-->
+<!--            </n-button>-->
+<!--        </div>-->
+<!--        <div><b>Special</b></div>-->
+<!--        <div>-->
+<!--            <n-button v-for="specialBid in allowedSpecialBids" :key="specialBid"-->
+<!--                      @click="setSpecialBid(specialBid)"-->
+<!--                      :type="bid.special == specialBid.symbol ? 'secondary': 'primary'"-->
+<!--            >{{ specialBid.name }}-->
+<!--            </n-button>-->
+<!--        </div>-->
+        <div style="text-align: center">
+            <h2>{{ bid ? bid.getName() + (bid.points ? ` (${bid.points})` : '') : 'Select Bid' }}</h2>
+        </div>
+        <div style="text-align: center" v-if="isCurrentBidder">
+            <n-button type="primary" @click="placeBid" data-test="place-bid-button">Place Bid</n-button>
+            <n-button type="primary" secondary @click="setSpecialBid(scoring.config.getSpecialBid('P')); placeBid()" v-if="!hasLeadingBid">Pass</n-button>
+            <div data-test="bid-error">{{ error }}</div>
+        </div>
+    </div>
+</template>
 
 <style>
 .bid-selector button {
