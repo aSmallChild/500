@@ -1,12 +1,13 @@
 <script setup>
-import {computed, ref, nextTick} from 'vue';
-import {usePlayers, stageEvents, gameActions, stageActions, getCardSvg} from './common.js';
+import {computed, nextTick, ref} from 'vue';
+import {gameActions, getCardSvg, stageActions, stageEvents, usePlayers} from './common.js';
 import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
 import CardGroup from '../CardGroup.vue';
 import CardSvgDefs from '../CardSvgDefs.vue';
 import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
 import Bid from '../../../../lib/game/model/Bid.js';
 import {GameEvents} from 'lib/game/GameEvents.js';
+import Scores from '../Scores.vue';
 
 const {players, currentPlayer, getPlayerByPosition} = usePlayers();
 const emit = defineEmits(stageEvents);
@@ -15,6 +16,8 @@ const hand = ref(null);
 const error = ref(null);
 const handCardGroup = ref();
 const tableCardGroup = ref();
+const scores = ref();
+const roundScores = ref();
 
 const winningBid = ref(null);
 const winningBidder = ref(null);
@@ -96,6 +99,12 @@ defineExpose({
       case 'error':
         setTimeout(() => error.value = '', 5000);
         return error.value = actionData;
+      case 'player_scores':
+        scores.value = actionData;
+        return;
+      case 'round_scores':
+        roundScores.value = actionData;
+        return;
     }
   },
 });
@@ -119,6 +128,8 @@ defineExpose({
       {{ player.position }}.&nbsp;{{ player.name }} {{ getPlayerSymbols(player) }}
     </div>
   </div>
+  <hr>
+  <scores v-if="players && scores" :players="players" :scores="scores" :round-scores="roundScores"/>
 </template>
 
 <style>
