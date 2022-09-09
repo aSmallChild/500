@@ -1,19 +1,8 @@
-<template>
-  <card-svg-defs :def="svgDefs"/>
-  <div style="margin: 2.5rem">
-    <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card-svg="onCardClicked" draggable-cards animate
-                @card-drop="cardDropped($event, hand)"/>
-
-    <card-group pile :cards="table" @card-svg="onCardClicked" draggable-cards class="table" animate
-                @card-drop="cardDropped($event, table)"/>
-  </div>
-</template>
-
 <script setup>
 import Card from 'lib/game/model/Card.js';
 import CardGroup from '../../components/CardGroup.vue';
 import CardSvgDefs from '../../components/CardSvgDefs.vue';
-import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
+import OrdinaryNormalDeck from 'lib/game/model/OrdinaryNormalDeck.js';
 import CardSVGBuilder from 'lib/view/CardSVGBuilder.js';
 import CardSVG from 'lib/view/CardSVG.js';
 import DeckConfig from 'lib/game/model/DeckConfig.js';
@@ -95,10 +84,11 @@ const findGroupWithCard = card => {
 
 setCards(
     [
-      ['HA', 'DA', 'SA', 'CA'],
+      ['HA', 'DA', 'SA', 'CA', 'DB', 'SC', 'CD', 'HE', 'DF', 'SG', 'CH'],
       ['HK', 'DK', 'SK', 'CK'],
       ['HQ', 'DQ', 'SQ', 'CQ'],
       ['HJ', 'DJ', 'SJ', 'CJ'],
+      ['HH', 'DD', 'SS', 'CC'],
     ]
 );
 </script>
@@ -111,3 +101,14 @@ setCards(
   padding: 2.5em;
 }
 </style>
+
+<template>
+  <card-svg-defs :def="svgDefs"/>
+  <div style="margin: 2.5rem">
+    <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card-svg="onCardClicked" draggable-cards animate
+                @card-drop="cardDropped($event, hand)"/>
+
+    <card-group pile :cards="table" @card-svg="onCardClicked" draggable-cards class="table" animate
+                @card-drop="cardDropped($event, table)"/>
+  </div>
+</template>

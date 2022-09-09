@@ -1,5 +1,5 @@
 <script>
-import Bid from '../../../lib/game/model/Bid.js';
+import Bid from 'lib/game/model/Bid.js';
 import {NButton} from 'naive-ui';
 import {computed, ref} from 'vue';
 

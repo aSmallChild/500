@@ -12,54 +12,26 @@
   --suit-blue: #0040ff;
   --suit-green: #0c0;
   --text-color: #efefdd;
-  --card-background: #efefdd;
+  --card-background-color: #efefdd;
+  --card-width: calc(25 * 5px);
+  --card-height: calc(35 * 5px);
+  --card-animation-time: 222ms;
 }
-
-.black .card-face {
-  fill: var(--suit-black);
-  stroke: var(--suit-black);
-}
-
-.red .card-face {
-  fill: var(--suit-red);
-  stroke: var(--suit-red);
-}
-
-.blue .card-face {
-  fill: var(--suit-blue);
-  stroke: var(--suit-blue);
-}
-
-.green .card-face {
-  fill: var(--suit-green);
-  stroke: var(--suit-green);
-}
-
-$cardHeight: 35 * 5px;
-$cardWidth: 25 * 5px;
 
 .card {
   margin: 4px;
   display: inline-block;
   position: relative;
   filter: drop-shadow(6px 3px 6px #000b);
-  height: $cardHeight;
-  width: $cardWidth;
+  height: var(--card-height);
+  width: var(--card-width);
 
   transform-style: preserve-3d;
   perspective: 500px;
-
-  &.face-down .card-face {
-    backface-visibility: hidden;
-    transform: rotateY(180deg);
-  }
-
-  &.face-down .card-back {
-    transform: rotateY(360deg);
-  }
 }
 
 .card-face, .card-back {
+  backface-visibility: hidden;
   position: absolute;
   top: 0;
   left: 0;
@@ -69,22 +41,50 @@ $cardWidth: 25 * 5px;
 }
 
 .card-face {
-  background: var(--card-background);
+  background: var(--card-background-color);
   fill: var(--suit-black);
   stroke: var(--suit-black);
+  rotate: y 0deg;
+
+  .face-down & {
+    rotate: y 180deg;
+  }
+
+  .black & {
+    fill: var(--suit-black);
+    stroke: var(--suit-black);
+  }
+
+  .red & {
+    fill: var(--suit-red);
+    stroke: var(--suit-red);
+  }
+
+  .blue & {
+    fill: var(--suit-blue);
+    stroke: var(--suit-blue);
+  }
+
+  .green & {
+    fill: var(--suit-green);
+    stroke: var(--suit-green);
+  }
 }
 
 .card-back {
-  backface-visibility: hidden;
-  border: solid 4px var(--card-background);
+  border: solid 4px var(--card-background-color);
   box-sizing: border-box;
   background: purple;
-  transform: rotateY(180deg);
+  rotate: y -180deg;
+
+  .face-down & {
+    rotate: y 0deg;
+  }
 }
 
 .animate-cards {
   & .card, & .card-face, & .card-back {
-    transition: ease-out transform 222ms;
+    transition: ease-out transform var(--card-animation-time), ease-in rotate var(--card-animation-time);
   }
 }
 
@@ -114,8 +114,8 @@ $cardWidth: 25 * 5px;
 }
 
 .fan {
-  width: $cardHeight * 2.2;
-  height: $cardHeight * 1.4;
+  width: calc(var(--card-height) * 2.2);
+  height: calc(var(--card-height) * 1.4);
   position: relative;
   display: inline-block;
   text-align: center;

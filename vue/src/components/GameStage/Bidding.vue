@@ -2,13 +2,13 @@
 import {computed, ref} from 'vue';
 import {gameActions, getCardSvg, stageActions, stageEvents, usePlayers} from './common.js';
 import {GameAction} from 'lib/game/GameAction.js';
-import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
+import DeckConfig from 'lib/game/model/DeckConfig.js';
 import BidSelector from '../BidSelector.vue';
-import ScoringAvondale from '../../../../lib/game/model/ScoringAvondale.js';
+import ScoringAvondale from 'lib/game/model/ScoringAvondale.js';
 import CardGroup from '../CardGroup.vue';
 import CardSvgDefs from '../CardSvgDefs.vue';
-import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
-import Bid from '../../../../lib/game/model/Bid.js';
+import OrdinaryNormalDeck from 'lib/game/model/OrdinaryNormalDeck.js';
+import Bid from 'lib/game/model/Bid.js';
 import {NButton} from 'naive-ui';
 import Scores from '../Scores.vue';
 

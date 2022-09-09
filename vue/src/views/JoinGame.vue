@@ -2,8 +2,8 @@
 import {ref} from 'vue';
 import {NButton, NSpace, NInput, NInputGroup, NText} from 'naive-ui';
 import {useRoute, useRouter} from 'vue-router';
-import createLobby from '../../../lib/client/createLobby.js';
-import createUser from '../../../lib/client/createUser.js';
+import createLobby from 'lib/client/createLobby.js';
+import createUser from 'lib/client/createUser.js';
 
 function saveCredentials(response, userPassword) {
     window.localStorage.setItem('last_game_credentials', JSON.stringify({

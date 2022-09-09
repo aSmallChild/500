@@ -1,21 +1,7 @@
-<template>
-    <h1 v-if="error" v-text="error" class="error"/>
-    <template v-else>
-        <h1 v-if="name" @click="copyGameLink" class="heading-game-code">
-            {{ showLinkCopiedMessage ? 'Copied' : currentStage || 'Game' }} {{ name.toUpperCase() }}
-        </h1>
-        <h2 v-if="currentPlayer" class="heading-player">{{ !connected ? '⛔ ' : '' }}{{ currentPlayer.name }}</h2>
-        <div>
-            <component :is="currentStage" ref="stage" @stage-action="stageAction" @game-action="gameAction"
-                       @stage-mounted="onStageMounted"/>
-        </div>
-    </template>
-</template>
-
 <script>
 import {onUnmounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import {addSocketListener, createSession, disconnectSession, removeSocketListener, sendMessage} from '../../../lib/client/createSession.js';
+import {addSocketListener, createSession, disconnectSession, removeSocketListener, sendMessage} from 'lib/client/createSession.js';
 import Lobby from '../components/GameStage/Lobby.vue';
 import Bidding from '../components/GameStage/Bidding.vue';
 import Kitty from '../components/GameStage/Kitty.vue';
@@ -121,6 +107,20 @@ export default {
     },
 };
 </script>
+
+<template>
+    <h1 v-if="error" v-text="error" class="error"/>
+    <template v-else>
+        <h1 v-if="name" @click="copyGameLink" class="heading-game-code">
+            {{ showLinkCopiedMessage ? 'Copied' : currentStage || 'Game' }} {{ name.toUpperCase() }}
+        </h1>
+        <h2 v-if="currentPlayer" class="heading-player">{{ !connected ? '⛔ ' : '' }}{{ currentPlayer.name }}</h2>
+        <div>
+            <component :is="currentStage" ref="stage" @stage-action="stageAction" @game-action="gameAction"
+                       @stage-mounted="onStageMounted"/>
+        </div>
+    </template>
+</template>
 
 <style>
 .heading-game-code {

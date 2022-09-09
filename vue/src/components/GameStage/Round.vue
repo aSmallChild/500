@@ -1,11 +1,11 @@
 <script setup>
 import {computed, nextTick, ref} from 'vue';
 import {gameActions, getCardSvg, stageActions, stageEvents, usePlayers} from './common.js';
-import DeckConfig from '../../../../lib/game/model/DeckConfig.js';
+import DeckConfig from 'lib/game/model/DeckConfig.js';
 import CardGroup from '../CardGroup.vue';
 import CardSvgDefs from '../CardSvgDefs.vue';
-import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
-import Bid from '../../../../lib/game/model/Bid.js';
+import OrdinaryNormalDeck from 'lib/game/model/OrdinaryNormalDeck.js';
+import Bid from 'lib/game/model/Bid.js';
 import {GameEvents} from 'lib/game/GameEvents.js';
 import Scores from '../Scores.vue';
 

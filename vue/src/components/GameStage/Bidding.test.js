@@ -1,9 +1,9 @@
 import {mount} from '@vue/test-utils';
 import {GameAction} from '../../../../lib/game/GameAction.js';
 import BiddingComponent from './Bidding.vue';
-import BiddingStage from '../../../../lib/game/stage/Bidding.js';
-import OrdinaryNormalDeck from '../../../../lib/game/model/OrdinaryNormalDeck.js';
-import {STAGE_ACTION_EVENT_NAME, STAGE_ACTION_EVENT_HANDER, usePlayers} from './common.js';
+import BiddingStage from 'lib/game/stage/Bidding.js';
+import OrdinaryNormalDeck from 'lib/game/model/OrdinaryNormalDeck.js';
+import {STAGE_ACTION_EVENT_NAME, usePlayers} from './common.js';
 
 const createPlayer = (name, id, position) => ({userId: id, name, id, position, emit() {}});
 
