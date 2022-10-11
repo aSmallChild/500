@@ -3,7 +3,7 @@ import Card from 'lib/game/model/Card.js';
 import CardGroup from '../../components/CardGroup.vue';
 import CardSvgDefs from '../../components/CardSvgDefs.vue';
 import OrdinaryNormalDeck from 'lib/game/model/OrdinaryNormalDeck.js';
-import CardSVGBuilder from 'lib/view/CardSVGBuilder.js';
+import createCardSvg from 'lib/view/createCardSvg.js';
 import CardSVG from 'lib/view/CardSVG.js';
 import DeckConfig from 'lib/game/model/DeckConfig.js';
 import {ref} from 'vue';
@@ -14,8 +14,22 @@ const table = ref([]);
 const hands = ref([]);
 const cardMap = new Map();
 
-const onCardClicked = card => card.flip();
-const cardDropped = ({cardId, onCard}, toGroup) => {
+setCards(
+    [
+      ['HA', 'DA', 'SA', 'CA', 'DB', 'SC', 'CD', 'HE', 'DF', 'SG', 'CH'],
+      ['HK', 'DK', 'SK', 'CK'],
+      ['HQ', 'DQ', 'SQ', 'CQ'],
+      ['HJ', 'DJ', 'SJ', 'CJ'],
+      ['HH', 'DD', 'SS', 'CC'],
+      ['??', '', '', ''],
+    ]
+);
+
+function onCardClicked(card) {
+  card.flip();
+}
+
+function cardDropped({cardId, onCard}, toGroup) {
   const card = cardMap.get(cardId);
   if (!card) {
     return;
@@ -35,20 +49,19 @@ const cardDropped = ({cardId, onCard}, toGroup) => {
   }
 
   toGroup.splice(toIndex, 0, card);
-};
+}
 
-const createNewCard = (serializedCard) => {
-  const existingCard = cardMap.get(serializedCard);
-  if (existingCard) return existingCard;
+function createNewCard(serializedCard) {
   const card = Card.fromString(serializedCard, config);
-  const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
+  card.id = cardMap.size;
+  const svg = createCardSvg(card, OrdinaryNormalDeck.layout);
   const cardSvg = new CardSVG(card, svg);
   Object.freeze(cardSvg);
-  cardMap.set(card.toString(), cardSvg);
+  cardMap.set(card.id, cardSvg);
   return cardSvg;
-};
+}
 
-const setGroupCards = (thisGroup, otherGroup) => {
+function setGroupCards(thisGroup, otherGroup) {
   otherGroup.forEach((serializedCard, index) => {
     const cardSvg = createNewCard(serializedCard);
     if (thisGroup[index] === cardSvg) {
@@ -59,9 +72,9 @@ const setGroupCards = (thisGroup, otherGroup) => {
   if (thisGroup.length > otherGroup.length) {
     thisGroup.splice(otherGroup.length);
   }
-};
+}
 
-const setCards = groups => {
+function setCards(groups) {
   const [newTable, ...newHands] = groups;
   setGroupCards(table.value, newTable);
   newHands.forEach((hand, index) => {
@@ -70,9 +83,9 @@ const setCards = groups => {
     }
     setGroupCards(hands.value[index], hand);
   });
-};
+}
 
-const findGroupWithCard = card => {
+function findGroupWithCard(card) {
   for (const group of [table.value, ...hands.value]) {
     const index = group.indexOf(card);
     if (index > -1) {
@@ -80,17 +93,7 @@ const findGroupWithCard = card => {
     }
   }
   return [null, null];
-};
-
-setCards(
-    [
-      ['HA', 'DA', 'SA', 'CA', 'DB', 'SC', 'CD', 'HE', 'DF', 'SG', 'CH'],
-      ['HK', 'DK', 'SK', 'CK'],
-      ['HQ', 'DQ', 'SQ', 'CQ'],
-      ['HJ', 'DJ', 'SJ', 'CJ'],
-      ['HH', 'DD', 'SS', 'CC'],
-    ]
-);
+}
 </script>
 
 <style scoped>

@@ -20,7 +20,7 @@ import DeckConfig from '../lib/game/model/DeckConfig.js';
 import OrdinaryNormalDeck from '../lib/game/model/OrdinaryNormalDeck.js';
 // import Client from '../lib/client/Client.js';
 import Card from '../lib/game/model/Card.js';
-import CardSVGBuilder from '../lib/view/CardSVGBuilder.js';
+import createCardSvg from '../lib/view/createCardSvg.js';
 import CardSVG from '../lib/view/CardSVG.js';
 import {useRoute} from 'vue-router';
 import {NButton, NSpace, NInput, NInputGroup} from 'naive-ui';
@@ -51,7 +51,7 @@ export default {
             const existingCard = cardMap.get(serializedCard);
             if (existingCard) return existingCard;
             const card = Card.fromString(serializedCard, config);
-            const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
+            const svg = createCardSvg(card, OrdinaryNormalDeck.layout);
             const cardSvg = new CardSVG(card, svg);
             Object.freeze(cardSvg);
             cardMap.set(card.toString(), cardSvg);

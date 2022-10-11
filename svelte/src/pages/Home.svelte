@@ -5,7 +5,7 @@
     import DeckConfig from '../../../lib/game/model/DeckConfig.js';
     import OrdinaryNormalDeck from '../../../lib/game/model/OrdinaryNormalDeck.js';
     import Card from '../../../lib/game/model/Card.js';
-    import CardSVGBuilder from '../../../lib/view/CardSVGBuilder.js';
+    import createCardSvg from '../../../lib/view/createCardSvg.js';
     import CardSVG from '../../../lib/view/CardSVG.js';
 
     let svgDefs;
@@ -53,7 +53,7 @@
         const existingCard = cardMap.get(serializedCard);
         if (existingCard) return existingCard;
         const card = Card.fromString(serializedCard, config);
-        const svg = CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout);
+        const svg = createCardSvg(card, OrdinaryNormalDeck.layout);
         const cardSvg = new CardSVG(card, svg);
         cardMap.set(card.toString(), cardSvg);
         return cardSvg;

@@ -1,6 +1,6 @@
 import Card from 'lib/game/model/Card.js';
 import CardSVG from 'lib/view/CardSVG.js';
-import CardSVGBuilder from 'lib/view/CardSVGBuilder.js';
+import createCardSvg from 'lib/view/createCardSvg.js';
 import OrdinaryNormalDeck from 'lib/game/model/OrdinaryNormalDeck.js';
 import {ref, computed, onMounted} from 'vue';
 
@@ -49,7 +49,7 @@ export const getCardSvg = (card, config) => {
     const existingCard = cardMap.get(serializedCard);
     if (existingCard) return existingCard;
     card = card.constructor === String ? Card.fromString(serializedCard, config) : card;
-    const cardSvg = new CardSVG(card, CardSVGBuilder.getSVG(card, OrdinaryNormalDeck.layout));
+    const cardSvg = new CardSVG(card, createCardSvg(card, OrdinaryNormalDeck.layout));
     Object.freeze(cardSvg);
     cardMap.set(serializedCard, cardSvg);
     return cardSvg;
