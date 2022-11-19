@@ -16,12 +16,12 @@ const cardMap = new Map();
 
 setCards(
     [
-      ['HA', 'DA', 'SA', 'CA', 'DB', 'SC', 'CD', 'HE', 'DF', 'SG', 'CH'],
-      ['HK', 'DK', 'SK', 'CK'],
-      ['HQ', 'DQ', 'SQ', 'CQ'],
-      ['HJ', 'DJ', 'SJ', 'CJ'],
-      ['HH', 'DD', 'SS', 'CC'],
-      ['??', '', '', ''],
+      [randomSerializedCard(),randomSerializedCard(),randomSerializedCard(),randomSerializedCard()],
+      [randomSerializedCard(),randomSerializedCard(),randomSerializedCard(),randomSerializedCard()],
+      [randomSerializedCard(),randomSerializedCard(),randomSerializedCard(),randomSerializedCard()],
+      [randomSerializedCard(),randomSerializedCard(),randomSerializedCard(),randomSerializedCard()],
+      [randomSerializedCard(),randomSerializedCard(),randomSerializedCard(),randomSerializedCard()],
+      [randomSerializedCard(),randomSerializedCard(),randomSerializedCard(),randomSerializedCard()],
     ]
 );
 
@@ -74,6 +74,20 @@ function setGroupCards(thisGroup, otherGroup) {
   }
 }
 
+function randomSerializedCard() {
+  const suit = 'SCDH'[Math.floor(Math.random() * 53 / 13)] ?? '';
+  if (!suit) {
+    return '$';
+  }
+
+  const pictureValue = 'AKQJ'[Math.floor(Math.random() * 13)] ?? '';
+  if (pictureValue) {
+    return suit + pictureValue;
+  }
+
+  return suit + Math.floor(Math.random() * 9 + 2);
+}
+
 function setCards(groups) {
   const [newTable, ...newHands] = groups;
   setGroupCards(table.value, newTable);
@@ -96,6 +110,31 @@ function findGroupWithCard(card) {
 }
 </script>
 
+<template>
+  <card-svg-defs :def="svgDefs"/>
+  <div class="round-layout" :style="{
+    '--rl-items': hands.length,
+    '--rl-diameter': '800px',
+    'margin-top': '200px',
+    'margin-left': '200px',
+  }">
+    <card-group
+        draggable-cards animate pile
+        class="table rl-center" style="max-width: 50%; margin-left: -25%; margin-top: -50%"
+        :cards="table" @card-svg="onCardClicked"
+        @card-drop="cardDropped($event, table)"
+    />
+    <card-group
+        fan draggable-cards animate
+        v-for="hand in hands" :key="hand"
+        :cards="hand"
+        @card-svg="onCardClicked"
+        @card-drop="cardDropped($event, hand)"
+        class="rl-item"
+    />
+  </div>
+</template>
+
 <style scoped>
 .table {
   min-width: 400px;
@@ -104,14 +143,3 @@ function findGroupWithCard(card) {
   padding: 2.5em;
 }
 </style>
-
-<template>
-  <card-svg-defs :def="svgDefs"/>
-  <div style="margin: 2.5rem">
-    <card-group fan v-for="hand in hands" :cards="hand" :key="hand" @card-svg="onCardClicked" draggable-cards animate
-                @card-drop="cardDropped($event, hand)"/>
-
-    <card-group pile :cards="table" @card-svg="onCardClicked" draggable-cards class="table" animate
-                @card-drop="cardDropped($event, table)"/>
-  </div>
-</template>

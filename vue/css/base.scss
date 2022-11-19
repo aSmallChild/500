@@ -114,19 +114,86 @@
 }
 
 .fan {
+  --fan-cards: 0;
+  --fan-angle: 90deg;
   width: calc(var(--card-height) * 2.2);
   height: calc(var(--card-height) * 1.4);
   position: relative;
   display: inline-block;
   text-align: center;
-  @include allTheFans(16, 90deg);
 
   .card {
     position: absolute;
     transform-origin: 50% 125%;
+    transform: translate(-50%, 6%) rotate(var(--fan-card-angle));
+    --fan-offset: calc(var(--fan-angle) / -2);
+    --fan-increment: calc(var(--fan-angle) / (var(--fan-cards) + 1));
+    --fan-card-angle: calc(var(--fan-offset) + var(--fan-increment) * var(--fan-card));
+  }
+
+  @for $i from 1 through 20 {
+    .card:nth-child(#{$i}) {
+      --fan-card: #{$i};
+    }
+
+    &:has(>.card:nth-child(#{$i})) {
+      --fan-cards: #{$i};
+    }
   }
 }
 
 .full-height {
   height: 100vh;
+}
+
+.round-layout {
+  --rl-diameter: 400px;
+  --rl-size: 20px;
+  --rl-padding: 10px;
+  width: var(--rl-diameter);
+  height: var(--rl-diameter);
+  min-height: var(--rl-diameter);
+  min-width: var(--rl-diameter);
+  flex: 0;
+  border-radius: 50%;
+  display: flex;
+  position: relative;
+
+  > .rl-item {
+    padding: var(--rl-padding);
+    height: var(--rl-size);
+    width: var(--rl-size);
+    --rl-angle: calc(360deg / var(--rl-items));
+    --rl-translate: calc((var(--rl-diameter) - var(--rl-size)) / 2 - var(--rl-padding));
+    position: absolute;
+
+    @for $i from 1 through 12 {
+      &:nth-of-type(#{$i}) {
+        transform: translate(var(--rl-translate), var(--rl-translate)) rotate(calc(#{$i - 1} * var(--rl-angle) + 90deg)) translate(var(--rl-translate)) rotate(-90deg);
+
+        &.rl-level {
+          transform: translate(var(--rl-translate), var(--rl-translate)) rotate(calc(#{$i - 1} * var(--rl-angle) + 90deg)) translate(var(--rl-translate)) rotate(calc(-#{$i - 1} * var(--rl-angle) - 90deg));
+
+          .rl-level {
+            transform: none;
+          }
+        }
+
+        .rl-level {
+          transform: rotate(calc(-#{$i - 1} * var(--rl-angle)));
+        }
+      }
+    }
+  }
+
+  > .rl-center {
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    padding: 0;
+  }
+}
+
+.rl-level {
+  position: absolute;
 }
