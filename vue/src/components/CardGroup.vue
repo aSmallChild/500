@@ -142,7 +142,9 @@ function clear() {
 </script>
 
 <template>
-  <div ref="root" :class="{fan, 'animate-cards': animate}"
+  <div ref="root"
+       :class="{fan, 'animate-cards': animate}"
+       :style="{'--fan-cards': cards.length}"
        @click="onClick"
        @drop.prevent="onDrop"
        @dragstart="onDragStart"
