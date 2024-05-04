@@ -111,10 +111,10 @@ export default {
 <template>
     <h1 v-if="error" v-text="error" class="error"/>
     <template v-else>
-        <h1 v-if="name" @click="copyGameLink" class="heading-game-code">
+        <div v-if="name" @click="copyGameLink" class="heading-game-code">
             {{ showLinkCopiedMessage ? 'Copied' : currentStage || 'Game' }} {{ name.toUpperCase() }}
-        </h1>
-        <h2 v-if="currentPlayer" class="heading-player">{{ !connected ? '⛔ ' : '' }}{{ currentPlayer.name }}</h2>
+        </div>
+        <div v-if="currentPlayer" class="heading-player">{{ !connected ? '⛔ ' : '' }}{{ currentPlayer.name }}</div>
         <div>
             <component :is="currentStage" ref="stage" @stage-action="stageAction" @game-action="gameAction"
                        @stage-mounted="onStageMounted"/>
@@ -127,12 +127,12 @@ export default {
     text-transform: capitalize;
     margin: 10px;
     cursor: pointer;
-    text-align: center;
+    text-align: right;
 }
 
 .heading-player {
     margin: 10px;
-    text-align: center;
+    text-align: right;
 }
 
 .error {

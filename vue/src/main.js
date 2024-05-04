@@ -12,6 +12,7 @@ const routes = [
     {path: '/game/:id', name: 'game', component: Game},
     {path: '/circles', name: 'circles', component: () => import('./views/doodle/tablelayout.vue'), meta: {menuOrder: 30, title: 'Circles'}},
     {path: '/animation', name: 'animation', component: () => import('./views/doodle/animation.vue'), meta: {menuOrder: 30, title: 'Animations'}},
+    {path: '/shadows', name: 'shadows', component: () => import('./views/doodle/shadows.vue'), meta: {menuOrder: 30, title: 'Shadows'}},
     {path: '/:pathNotFound(.*)*', name: 'not_found', component: MainMenu},
 ];
 
